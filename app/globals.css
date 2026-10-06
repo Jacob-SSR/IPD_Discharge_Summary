@@ -1,26 +1,108 @@
 @import "tailwindcss";
 
+/* ธีมเขียว/มินต์ ให้ตรงกับ ppc-hos-10667 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5faf7;
+  --foreground: #1f2a24;
+  --mint-50: #f0faf4;
+  --mint-100: #d6f0e0;
+  --mint-200: #a8d5ba;
+  --mint-300: #7ec8a0;
+  --mint-400: #55b882;
+  --mint-500: #3aa36a;
+  --mint-600: #2d8a56;
+  --mint-700: #236b43;
+  --mint-800: #1a5233;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-mint-50: var(--mint-50);
+  --color-mint-100: var(--mint-100);
+  --color-mint-200: var(--mint-200);
+  --color-mint-300: var(--mint-300);
+  --color-mint-400: var(--mint-400);
+  --color-mint-500: var(--mint-500);
+  --color-mint-600: var(--mint-600);
+  --color-mint-700: var(--mint-700);
+  --color-mint-800: var(--mint-800);
+  --font-sans: var(--font-prompt), system-ui, sans-serif;
+  --font-form: var(--font-sarabun), var(--font-prompt), sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-prompt), system-ui, sans-serif;
+}
+
+/* ตาราง */
+.report-table th {
+  background: var(--mint-700);
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.report-table tbody tr:nth-child(even) td {
+  background: var(--mint-50);
+}
+.report-table tbody tr:hover td {
+  background: var(--mint-100);
+}
+
+/* ── แบบฟอร์ม A4 ───────────────────────────────────────────────────────── */
+.a4-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 14mm 14mm 16mm;
+  background: #fff;
+  font-family: var(--font-sarabun), sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #111;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 8px 24px rgb(26 82 51 / 0.08);
+}
+.a4-sheet table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.a4-sheet td,
+.a4-sheet th {
+  border: 1px solid #9fb5a8;
+  padding: 3px 6px;
+  vertical-align: top;
+  text-align: left;
+}
+.a4-sheet th {
+  background: #eef7f1;
+  font-weight: 600;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .a4-sheet {
+    box-shadow: none;
+    margin: 0;
+    width: 210mm;
+    min-height: auto;
+  }
+  .a4-sheet th {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }

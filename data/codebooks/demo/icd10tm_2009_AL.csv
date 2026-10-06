@@ -1,0 +1,53 @@
+code,description
+A09,Diarrhoea and gastroenteritis of presumed infectious origin
+A27.9,"Leptospirosis, unspecified"
+A41.9,"Sepsis, unspecified"
+A41.5,Sepsis due to other Gram-negative organisms
+A90,Dengue fever [classical dengue]
+A91,Dengue haemorrhagic fever
+B96.2,Escherichia coli [E. coli] as the cause of diseases classified to other chapters
+D50.0,Iron deficiency anaemia secondary to blood loss (chronic)
+D62,Acute posthaemorrhagic anaemia
+D64.9,"Anaemia, unspecified"
+D69.6,"Thrombocytopenia, unspecified"
+E11.4,Type 2 diabetes mellitus with neurological complications
+E11.6,Type 2 diabetes mellitus with other specified complications
+E11.9,Type 2 diabetes mellitus without complications
+E16.2,"Hypoglycaemia, unspecified"
+E78.0,Pure hypercholesterolaemia
+E78.5,"Hyperlipidaemia, unspecified"
+E86,Volume depletion
+E87.0,Hyperosmolality and hypernatraemia
+E87.1,Hypo-osmolality and hyponatraemia
+E87.2,Acidosis
+E87.5,Hyperkalaemia
+E87.6,Hypokalaemia
+G63.2,Diabetic polyneuropathy
+I10,Essential (primary) hypertension
+I21.9,"Acute myocardial infarction, unspecified"
+I48,Atrial fibrillation and flutter
+I50.0,Congestive heart failure
+I50.9,"Heart failure, unspecified"
+I63.9,"Cerebral infarction, unspecified"
+I69.4,"Sequelae of stroke, not specified as haemorrhage or infarction"
+J15.9,"Bacterial pneumonia, unspecified"
+J18.9,"Pneumonia, unspecified"
+J44.0,Chronic obstructive pulmonary disease with acute lower respiratory infection
+J44.1,"Chronic obstructive pulmonary disease with acute exacerbation, unspecified"
+J45.9,"Asthma, unspecified"
+J96.0,Acute respiratory failure
+K25.4,Chronic or unspecified gastric ulcer with haemorrhage
+K35.8,"Acute appendicitis, other and unspecified"
+K92.2,"Gastrointestinal haemorrhage, unspecified"
+L03.1,Cellulitis of other parts of limb
+N17.9,"Acute renal failure, unspecified"
+N18.5,"Chronic kidney disease, stage 5"
+N39.0,"Urinary tract infection, site not specified"
+O80.0,Spontaneous vertex delivery
+R50.9,"Fever, unspecified"
+R57.2,Septic shock
+S06.0,Concussion
+S52.5,Fracture of lower end of radius
+S72.0,Fracture of neck of femur
+W19,Unspecified fall
+Z37.0,Single live birth
