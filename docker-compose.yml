@@ -1,0 +1,40 @@
+# app + redis — รันบน server ใน LAN
+#   1) cp .env.example .env.production แล้วกรอกค่า (APP_MODE=hosxp ต้องมี APP_DB_URL และ user HOSxP อ่านอย่างเดียว)
+#   2) docker compose up -d --build   → เปิด http://<เครื่องนี้>:3600
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ipd-discharge-summary:latest
+    container_name: ipd-discharge-summary
+    restart: unless-stopped
+    ports:
+      - "3600:3000"
+    env_file:
+      - .env.production
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - APP_DB_FILE=/app/.data/appdb.json
+    # ถ้า MySQL (HOSxP / ฐานแอป) อยู่บนเครื่องเดียวกับ Docker ใช้ host.docker.internal ได้
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # ใช้เฉพาะโหมด demo ที่เก็บฐานแอปเป็นไฟล์
+      - app-data:/app/.data
+      # วาง codebook / ตาราง TDRG จริงได้โดยไม่ต้อง build ใหม่ (ไม่บังคับ)
+      # - ./data:/app/data:ro
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: ipd-discharge-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+
+volumes:
+  app-data:
+  redis-data:

@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // build แบบ standalone สำหรับ Docker multi-stage (ดู Dockerfile)
+  output: "standalone",
+  poweredByHeader: false,
 };
 
 export default nextConfig;

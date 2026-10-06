@@ -130,3 +130,14 @@ NHSO_RATE_PER_ADJRW=8350     # อัตรา สปสช. 2569
 
 - ทำทีละข้อ จบแต่ละข้อให้รัน `tsc --noEmit`, lint และ test ให้ผ่าน แล้วสรุปสิ่งที่เปลี่ยนสั้นๆ พร้อมเสนอ commit message ภาษาไทยแบบ conventional (ผู้ใช้ commit เอง)
 - ทุกฟีเจอร์ต้องทำงานได้ในโหมด `demo` ก่อน
+
+## สถานะปัจจุบัน (อัปเดตล่าสุด 6 ต.ค. 2569)
+
+ทำครบทุกข้อ 1–6 แล้ว **แต่ยังไม่ได้รับไฟล์ `IPD_Discharge_Summary.zip`** จึงยังทำข้อ 0 ไม่ได้ —
+logic ที่สเปกบอกให้ "port แบบตรงตัว" เขียนขึ้นใหม่จากสเปก/มาตรฐาน และต้องเทียบกับของเดิมเมื่อได้ไฟล์:
+
+- SQL (`lib/hosxp/queries.ts`) — อิง SQL ใน repo drg_grouper + โครงสร้าง HOSxP ทั่วไป ทดสอบกับฐานจำลองแล้ว ยังไม่เคยต่อ HOSxP จริง
+- กฎตรวจรหัส (`lib/coding/rules.config.ts`) และเกณฑ์ lab ของ engine แบบกฎ (`lib/ai/rules.config.ts`, `CLINICAL_REVIEWED = false`) — ต้องให้แพทย์/ผู้ให้รหัสตรวจ
+- สูตร AdjRW (`lib/drg/adjrw.ts`, `ADJRW_FORMULA_VERIFIED = false`) — ต้องเทียบกับของเดิมและเพิ่ม test ด้วยเคสจากของเดิม
+- แบบฟอร์ม A4 — ยังไม่ได้เทียบกับ template เดิม
+- ยังไม่มี codebook จริง (`data/codebooks/*.csv`) และตาราง TDRG จริง (`data/tdrg/*.csv`) — ห้ามเดาค่า RW
