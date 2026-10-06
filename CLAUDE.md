@@ -36,7 +36,7 @@
 - deploy: Docker แบบ multi-stage + Docker Compose บน server ใน LAN
 - commit message ภาษาไทยแบบ conventional
 
-ถ้าจะรวมเข้าเป็นโมดูลหนึ่งใน ppc-hos-10667 แทนการแยกโปรเจกต์ ให้ถามผู้ใช้ก่อนเริ่มงานข้อ 1
+ผู้ใช้ตัดสินใจแล้ว: เป็นโปรเจกต์แยกของตัวเอง ไม่รวมเข้า ppc-hos-10667 (ใช้ ppc-hos-10667 / drg_grouper เป็นต้นแบบด้าน convention เช่น ล็อกอิน, cache, component)
 
 ## โครงสร้างที่เสนอ
 
