@@ -1,23 +1,35 @@
 // lib/appdb/schema.ts
 // ตารางของฐานข้อมูลแอป (MySQL/MariaDB) — แยกจาก HOSxP โดยสิ้นเชิง
-// สร้างให้อัตโนมัติครั้งแรกที่ใช้ (CREATE TABLE IF NOT EXISTS) หรือให้ DBA รันเองก็ได้
-// ตาราง users ใช้คอลัมน์แบบเดียวกับ ppchos.users ของ ppc-hos-10667 (user/passweb/name/role)
+// ออกแบบให้วางในฐาน ppchos เดิม (DB_HOST2 ของ ppc-hos-10667) ได้เลย ไม่ต้องตั้งฐานใหม่:
+//   ตารางของแอปขึ้นต้นด้วย ipdsum_ ทั้งหมด จึงไม่ชนกับตารางเดิม
+//   บัญชีผู้ใช้อ่านจาก APP_USERS_TABLE (เช่น ppchos.users — มีอยู่แล้ว CREATE IF NOT EXISTS จะไม่แตะ)
+// สร้างให้อัตโนมัติครั้งแรกที่ใช้ หรือให้ DBA รัน docs/sql/appdb.sql เองก็ได้ (ต้องตรงกับไฟล์นี้ — มี test ตรวจ)
 
-export const APPDB_SCHEMA: string[] = [
-  `CREATE TABLE IF NOT EXISTS users (
+export const T = {
+  decisions: "ipdsum_code_decisions",
+  aiRuns: "ipdsum_ai_runs",
+  courses: "ipdsum_course_texts",
+  audit: "ipdsum_audit_log",
+} as const;
+
+/** ตารางผู้ใช้แบบเดียวกับ ppchos.users ของ ppc-hos-10667 (user/passweb/name/role) */
+export function usersTableSql(table: string): string {
+  return `CREATE TABLE IF NOT EXISTS ${table} (
     \`user\`  VARCHAR(50)  NOT NULL PRIMARY KEY,
     passweb VARCHAR(100) NOT NULL COMMENT 'bcrypt (หรือ md5 เก่า ระบบอัปเกรดให้ตอน login)',
     name    VARCHAR(150) NULL,
     role    VARCHAR(30)  NULL
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`;
+}
 
-  `CREATE TABLE IF NOT EXISTS code_decisions (
+export const APPDB_SCHEMA: string[] = [
+  `CREATE TABLE IF NOT EXISTS ipdsum_code_decisions (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     an          VARCHAR(15)  NOT NULL,
     code        VARCHAR(10)  NOT NULL,
     code_system ENUM('ICD10','ICD9CM') NOT NULL,
     source      ENUM('ai','rules','manual') NOT NULL,
-    action      ENUM('accept','reject','add','remove') NOT NULL,
+    action      ENUM('accept','reject','undo','add','remove') NOT NULL,
     diagtype    CHAR(1) NULL,
     or_type     ENUM('OR','NonOR') NULL,
     op_date     DATE NULL,
@@ -26,11 +38,11 @@ export const APPDB_SCHEMA: string[] = [
     ai_run_id   BIGINT NULL,
     decided_by  VARCHAR(50)  NOT NULL,
     decided_at  DATETIME     NOT NULL,
-    INDEX idx_decisions_an (an),
-    INDEX idx_decisions_at (decided_at)
+    INDEX idx_ipdsum_dec_an (an),
+    INDEX idx_ipdsum_dec_at (decided_at)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 
-  `CREATE TABLE IF NOT EXISTS ai_runs (
+  `CREATE TABLE IF NOT EXISTS ipdsum_ai_runs (
     id                     BIGINT AUTO_INCREMENT PRIMARY KEY,
     an                     VARCHAR(15)  NOT NULL,
     kind                   ENUM('suggest','course') NOT NULL,
@@ -43,11 +55,11 @@ export const APPDB_SCHEMA: string[] = [
     result_json            MEDIUMTEXT NOT NULL COMMENT 'ผลลัพธ์ที่ไม่มีข้อมูลระบุตัวตนเท่านั้น',
     created_by             VARCHAR(50)  NOT NULL,
     created_at             DATETIME     NOT NULL,
-    INDEX idx_ai_runs_an (an, kind),
-    INDEX idx_ai_runs_at (created_at)
+    INDEX idx_ipdsum_ai_an (an, kind),
+    INDEX idx_ipdsum_ai_at (created_at)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 
-  `CREATE TABLE IF NOT EXISTS course_texts (
+  `CREATE TABLE IF NOT EXISTS ipdsum_course_texts (
     an          VARCHAR(15) NOT NULL PRIMARY KEY,
     text        MEDIUMTEXT  NOT NULL,
     source      ENUM('ai','rules','manual') NOT NULL,
@@ -55,13 +67,13 @@ export const APPDB_SCHEMA: string[] = [
     updated_at  DATETIME    NOT NULL
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 
-  `CREATE TABLE IF NOT EXISTS audit_log (
+  `CREATE TABLE IF NOT EXISTS ipdsum_audit_log (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
     at        DATETIME     NOT NULL,
     username  VARCHAR(50)  NOT NULL,
     action    VARCHAR(50)  NOT NULL,
     an        VARCHAR(15)  NULL,
     detail    VARCHAR(500) NULL,
-    INDEX idx_audit_at (at)
+    INDEX idx_ipdsum_audit_at (at)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 ];

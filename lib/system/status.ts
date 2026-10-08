@@ -105,9 +105,9 @@ export async function systemStatus(): Promise<StatusCheck[]> {
   });
   checks.push({
     key: "rules",
-    label: "กฎของ engine แบบกฎ",
+    label: "กฎหลักฐาน (port จากโปรแกรมเดิม)",
     state: CLINICAL_REVIEWED ? "ok" : "warn",
-    detail: CLINICAL_REVIEWED ? "ผ่านการตรวจทางคลินิกแล้ว" : "เกณฑ์ใน lib/ai/rules.config.ts ยังไม่ผ่านการตรวจทางคลินิก",
+    detail: CLINICAL_REVIEWED ? "ผ่านการตรวจทางคลินิกแล้ว" : "เกณฑ์ lab ใน lib/coding/legacyRules.ts อนุมานจากผลของโปรแกรมเดิม — ยังไม่ผ่านการตรวจทางคลินิก",
   });
 
   // codebook
@@ -130,13 +130,13 @@ export async function systemStatus(): Promise<StatusCheck[]> {
     detail:
       t.rw.size === 0
         ? "ยังไม่มี data/tdrg/tdrg_rw_table.csv — ค่าประมาณใช้ค่าเฉลี่ยย้อนหลังแทน"
-        : `${t.source} · ${t.rw.size} DRG · ORP ${t.orp.size} รหัส${t.isDemo ? " (ค่าสมมติ)" : ""}`,
+        : `${t.source} · ${t.rw.size} DRG${t.isDemo ? " (ค่าสมมติ)" : ""} · OR/Non-OR จาก codebook ICD-9-CM`,
   });
   checks.push({
     key: "adjrw",
     label: "สูตร AdjRW",
     state: ADJRW_FORMULA_VERIFIED ? "ok" : "warn",
-    detail: ADJRW_FORMULA_VERIFIED ? "ยืนยันกับโปรแกรมเดิมแล้ว" : "ยังไม่ได้ยืนยันกับโปรแกรมเดิม/คู่มือ — ใช้เป็นค่าประมาณเท่านั้น",
+    detail: ADJRW_FORMULA_VERIFIED ? "ตรงกับ rw_estimator.py ของโปรแกรมเดิม (เกิน OT ต้องยืนยันด้วย TDS/TGrp)" : "ยังไม่ได้ยืนยันกับโปรแกรมเดิม/คู่มือ — ใช้เป็นค่าประมาณเท่านั้น",
   });
   return checks;
 }

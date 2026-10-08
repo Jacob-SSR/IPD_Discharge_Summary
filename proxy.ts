@@ -3,7 +3,7 @@
 // route ใหม่ถูกล็อกอัตโนมัติ ไม่ต้องมาแก้ไฟล์นี้
 
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySession } from "@/lib/auth/session";
+import { isAllowedRole, SESSION_COOKIE, verifySession } from "@/lib/auth/session";
 
 const PUBLIC_PATHS = ["/login", "/api/login", "/api/logout"];
 
@@ -16,7 +16,13 @@ export async function proxy(request: NextRequest) {
   if (isPublic(pathname)) return NextResponse.next();
 
   const session = await verifySession(request.cookies.get(SESSION_COOKIE)?.value);
-  if (session) return NextResponse.next();
+  if (session && isAllowedRole(session.role)) return NextResponse.next();
+  if (session) {
+    // login ได้แต่ role ไม่อยู่ใน APP_ALLOWED_ROLES (เช่น ถูกเปลี่ยน role หลัง login)
+    return pathname.startsWith("/api")
+      ? NextResponse.json({ error: "บัญชีนี้ไม่มีสิทธิ์ใช้ระบบนี้" }, { status: 403 })
+      : NextResponse.redirect(new URL("/login?error=role", request.url));
+  }
 
   const res = pathname.startsWith("/api")
     ? NextResponse.json({ error: "กรุณาเข้าสู่ระบบ" }, { status: 401 })

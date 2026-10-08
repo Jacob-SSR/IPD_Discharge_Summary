@@ -1,31 +1,30 @@
-// ทดสอบว่าโค้ดคำนวณ "ตามสูตรที่เขียนไว้ใน adjrw.ts" ถูกต้อง โดยใช้พารามิเตอร์สมมติ
-// ⚠️ ยังไม่ใช่การยืนยันว่าสูตรตรงกับ TDRG 6.3 / โปรแกรมเดิม —
-//    เมื่อได้ไฟล์ legacy ให้เพิ่ม test ชุด "legacy cases" ด้วยค่าที่คาดหวังจากของเดิม
-//    แล้วเปลี่ยน ADJRW_FORMULA_VERIFIED เป็น true
+// สูตร AdjRW ตาม rw_estimator.py ของโปรแกรมเดิม (ค่าที่คาดหวังคำนวณตามสูตรเดิม — พารามิเตอร์สมมติ)
 import { describe, expect, it } from "vitest";
 import { ADJRW_FORMULA_VERIFIED, computeAdjRw } from "./adjrw";
 import type { DrgParams } from "./tables";
 
 const P: DrgParams = { drg: "TEST1", description: "", rw: 1.2, wtlos: 6, ot: 18, rw0d: 0.3, of: 0.5 };
 
-describe("computeAdjRw (สูตรตาม adjrw.ts — พารามิเตอร์สมมติ)", () => {
-  it("วันนอนปกติ = RW", () => {
-    expect(computeAdjRw(P, 6)).toEqual({ adjrw: 1.2, kind: "normal" });
-    expect(computeAdjRw(P, 2)).toEqual({ adjrw: 1.2, kind: "normal" }); // = WtLOS/3 พอดี ไม่ถือว่าสั้น
-    expect(computeAdjRw(P, 18)).toEqual({ adjrw: 1.2, kind: "normal" }); // = OT พอดี ไม่ถือว่านาน
+describe("computeAdjRw (โปรแกรมเดิม)", () => {
+  it("นอน < 24 ชม. = RW0d", () => {
+    expect(computeAdjRw(P, 0)).toEqual({ adjrw: 0.3, note: "นอน < 24 ชม. ใช้ RW0d" });
   });
-  it("นอนสั้น: RW0d + (RW−RW0d)×LOS/(WtLOS/3)", () => {
-    expect(computeAdjRw(P, 0)).toEqual({ adjrw: 0.3, kind: "short" });
-    expect(computeAdjRw(P, 1)).toEqual({ adjrw: 0.75, kind: "short" });
+  it("LOS < ⌈WtLOS/3⌉ → RW0d + LOS×(RW−RW0d)/⌈WtLOS/3⌉", () => {
+    expect(computeAdjRw(P, 1)).toEqual({ adjrw: 0.75, note: "วันนอนน้อยกว่า 2 วัน (WtLOS/3)" });
+    expect(computeAdjRw({ ...P, wtlos: 7 }, 2).adjrw).toBe(0.9); // ⌈7/3⌉ = 3
   });
-  it("นอนนาน: RW + (LOS−OT)×of×RW/WtLOS", () => {
-    expect(computeAdjRw(P, 24)).toEqual({ adjrw: 1.8, kind: "long" });
+  it("⌈WtLOS/3⌉ ≤ LOS ≤ OT → RW", () => {
+    expect(computeAdjRw(P, 2)).toEqual({ adjrw: 1.2, note: "วันนอนอยู่ในช่วงปกติ (2–18 วัน)" });
+    expect(computeAdjRw(P, 18).adjrw).toBe(1.2);
   });
-  it("ไม่มี RW0d/of → ใช้ RW", () => {
-    expect(computeAdjRw({ ...P, rw0d: null, of: null }, 0).adjrw).toBe(1.2);
-    expect(computeAdjRw({ ...P, rw0d: null, of: null }, 40).adjrw).toBe(1.2);
+  it("เกิน OT → ไม่คำนวณ ต้องยืนยันด้วย TDS/TGrp", () => {
+    expect(computeAdjRw(P, 19)).toEqual({ adjrw: null, note: "วันนอนเกิน OT (18 วัน) ต้องยืนยันด้วย TDS/TGrp" });
   });
-  it("สถานะสูตรยังไม่ยืนยัน", () => {
-    expect(ADJRW_FORMULA_VERIFIED).toBe(false);
+  it("ไม่มีในตาราง / ไม่ทราบวันนอน → แสดงเฉพาะ RW", () => {
+    expect(computeAdjRw(undefined, 3)).toEqual({ adjrw: null, note: "แสดงเฉพาะ RW" });
+    expect(computeAdjRw(P, null).adjrw).toBeNull();
+  });
+  it("สูตรตรงกับโปรแกรมเดิม", () => {
+    expect(ADJRW_FORMULA_VERIFIED).toBe(true);
   });
 });

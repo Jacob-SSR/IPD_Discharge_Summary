@@ -5,10 +5,13 @@ import { useState, type FormEvent } from "react";
 import { buttonClass, ErrorBox, inputClass } from "@/components/ui";
 
 export function LoginForm({ demo }: { demo: boolean }) {
-  const next = useSearchParams().get("next");
+  const params = useSearchParams();
+  const next = params.get("next");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    params.get("error") === "role" ? "บัญชีนี้ไม่มีสิทธิ์ใช้ระบบสรุปเวชระเบียน — ติดต่อผู้ดูแลระบบ" : null,
+  );
   const [busy, setBusy] = useState(false);
 
   async function submit(e: FormEvent) {
@@ -44,7 +47,11 @@ export function LoginForm({ demo }: { demo: boolean }) {
       <button className={buttonClass("primary")} disabled={busy}>
         {busy ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
       </button>
-      {demo && <p className="text-center text-xs text-amber-700">โหมด demo — ใช้บัญชีจาก DEMO_USERNAME / DEMO_PASSWORD ใน .env.local</p>}
+      {demo ? (
+        <p className="text-center text-xs text-amber-700">โหมด demo — ใช้บัญชีจาก DEMO_USERNAME / DEMO_PASSWORD ใน .env.local</p>
+      ) : (
+        <p className="text-center text-xs text-muted">ใช้ชื่อผู้ใช้และรหัสผ่านเดียวกับระบบ ppc-hos</p>
+      )}
     </form>
   );
 }

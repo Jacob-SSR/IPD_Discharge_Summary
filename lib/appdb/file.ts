@@ -76,6 +76,10 @@ export function createFileAppDb(file: string): AppDb {
     },
     findUser: (username) =>
       run((d) => d.users.find((u) => u.user === username) ?? null, false),
+    updatePassword: (username, passweb) =>
+      run((d) => {
+        d.users = d.users.map((u) => (u.user === username ? { ...u, passweb } : u));
+      }, true),
     upsertUser: (u) =>
       run((d) => {
         d.users = [...d.users.filter((x) => x.user !== u.user), u];
@@ -104,6 +108,12 @@ export function createFileAppDb(file: string): AppDb {
       run((d) => {
         const list = d.aiRuns.filter((r) => r.an === an && r.kind === kind);
         return list.length ? list[list.length - 1] : null;
+      }, false),
+    listAiRunsForAn: (an) => run((d) => d.aiRuns.filter((r) => r.an === an), false),
+    ansWithAiRuns: (ans) =>
+      run((d) => {
+        const want = new Set(ans);
+        return new Set(d.aiRuns.filter((r) => r.kind === "suggest" && r.provider === "gemini" && want.has(r.an)).map((r) => r.an));
       }, false),
     listAiRunsInRange: (from, to) =>
       run(

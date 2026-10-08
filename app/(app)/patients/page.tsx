@@ -1,11 +1,12 @@
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui";
-import { PatientsClient } from "./PatientsClient";
+import { appMode } from "@/lib/env";
+import { Workspace } from "./Workspace";
 
 export default function PatientsPage() {
   return (
     <Suspense fallback={<Spinner />}>
-      <PatientsClient />
+      <Workspace mode={appMode()} />
     </Suspense>
   );
 }

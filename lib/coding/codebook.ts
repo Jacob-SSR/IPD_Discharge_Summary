@@ -1,9 +1,7 @@
 // lib/coding/codebook.ts
-// โหลด codebook จาก data/codebooks/*.csv
-//   ICD-10-TM : icd10tm_2009_AL.csv  (จาก OCR ยังไม่ได้ตรวจ — มีแค่เล่ม A–L)
-//   ICD-9-CM  : icd9cm_fy15.csv
-// รูปแบบไฟล์: บรรทัดแรกเป็นหัวตาราง มีคอลัมน์ code และ description (หรือใช้ 2 คอลัมน์แรก)
-// ถ้ายังไม่มีไฟล์จริงและอยู่ในโหมด demo → ใช้ data/codebooks/demo/*.csv (ชุดย่อยสำหรับทดลอง)
+// โหลด codebook จาก data/codebooks/*.csv (ชุดเดียวกับโปรแกรมเดิม / สนามลอง AI ให้รหัส)
+//   ICD-10   : icd10tm_2009_AL.csv  code,description,thai — ICD-10 WHO 2016 + ชื่อไทย ICD-10-TM 2009 (A–L, จาก OCR ยังไม่ได้ตรวจ)
+//   ICD-9-CM : icd9cm_fy15.csv      code,description,or,affects_drg — FY15 ฉบับ สรท. (OR / Non-OR / มีผลต่อ DRG)
 // รหัสที่ไม่พบใน codebook ต้องแสดงคำเตือนเสมอ ห้ามซ่อน
 
 import { existsSync, readFileSync } from "node:fs";
@@ -15,6 +13,12 @@ import { codeKey, normalizeCode } from "./icd";
 export interface CodebookEntry {
   code: string;
   description: string;
+  /** ชื่อไทย (ICD-10-TM เล่ม 1ก มีเฉพาะหมวด A–L, อ่านด้วย OCR) */
+  thai?: string;
+  /** ICD-9-CM: OR procedure / Non-OR procedure (ฉบับ สรท.) */
+  orType?: "OR" | "NonOR";
+  /** Non-OR แต่มีผลต่อ ThaiDRG */
+  affectsDrg?: boolean;
 }
 
 export interface Codebook {
@@ -78,19 +82,30 @@ export function buildCodebook(
 ): Codebook {
   const map = new Map<string, CodebookEntry>();
   if (csvText) {
-    const rows = parseCsv(csvText.replace(/^﻿/, ""));
+    const rows = parseCsv(csvText.replace(/^\uFEFF/, ""));
     const header = rows[0]?.map((h) => h.trim().toLowerCase()) ?? [];
-    const ci = header.indexOf("code") >= 0 ? header.indexOf("code") : 0;
-    const di = header.indexOf("description") >= 0 ? header.indexOf("description") : 1;
+    const col = (name: string, fallback: number) => (header.indexOf(name) >= 0 ? header.indexOf(name) : fallback);
+    const ci = col("code", 0);
+    const di = col("description", 1);
+    const ti = header.indexOf("thai");
+    const oi = header.indexOf("or");
+    const ai = header.indexOf("affects_drg");
     const hasHeader = header.includes("code");
     for (const r of rows.slice(hasHeader ? 1 : 0)) {
       const raw = (r[ci] ?? "").trim();
       if (!raw) continue;
       const code = normalizeCode(system, raw);
-      map.set(codeKey(code), { code, description: (r[di] ?? "").trim() });
+      const e: CodebookEntry = { code, description: (r[di] ?? "").trim() };
+      const thai = ti >= 0 ? (r[ti] ?? "").trim() : "";
+      if (thai) e.thai = thai;
+      const or = oi >= 0 ? (r[oi] ?? "").trim().toUpperCase() : "";
+      if (or) e.orType = or === "OR" ? "OR" : "NonOR";
+      if (ai >= 0 && (r[ai] ?? "").trim() === "1") e.affectsDrg = true;
+      map.set(codeKey(code), e);
     }
   }
   const entries = [...map.values()];
+  const lower = entries.map((e) => e.description.toLowerCase());
   return {
     system,
     source,
@@ -98,15 +113,27 @@ export function buildCodebook(
     size: map.size,
     has: (code) => map.has(codeKey(normalizeCode(system, code))),
     get: (code) => map.get(codeKey(normalizeCode(system, code))) ?? null,
-    search(q, limit = 20) {
-      const needle = q.trim().toLowerCase();
-      if (!needle) return [];
-      const key = codeKey(needle);
-      const byCode = entries.filter((e) => codeKey(e.code).toLowerCase().startsWith(key.toLowerCase()));
-      const byText = entries.filter(
-        (e) => !byCode.includes(e) && e.description.toLowerCase().includes(needle),
-      );
-      return [...byCode, ...byText].slice(0, limit);
+    /**
+     * ค้นแบบโปรแกรมเดิม: ขึ้นต้นด้วยรหัส > ชื่อไทยมีคำที่พิมพ์ > ชื่ออังกฤษมีทุกคำ
+     * ภายในกลุ่มเดียวกัน รหัสสั้น (หมวดกว้าง) มาก่อน แล้วเรียงตามรหัส
+     */
+    search(q, limit = 15) {
+      const query = q.trim();
+      if (query.length < 2) return [];
+      const key = codeKey(query).replace(/[^A-Z0-9]/g, "");
+      const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+      const hits: [number, number, string, CodebookEntry][] = [];
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        const k = codeKey(e.code);
+        const byCode = key !== "" && k.startsWith(key);
+        const byTh = !!e.thai && e.thai.includes(query);
+        const byName = words.length > 0 && words.every((w) => lower[i].includes(w));
+        if (byCode || byTh || byName) hits.push([byCode ? 0 : byTh ? 1 : 2, k.length, k, e]);
+        if (hits.length > 400) break;
+      }
+      hits.sort((a, b) => a[0] - b[0] || a[1] - b[1] || (a[2] < b[2] ? -1 : 1));
+      return hits.slice(0, limit).map((h) => h[3]);
     },
   };
 }
@@ -132,4 +159,15 @@ export function getCodebook(system: CodeSystem): Codebook {
   }
   cache.set(system, book);
   return book;
+}
+
+/**
+ * OR / Non-OR ของหัตถการ: จาก codebook ICD-9-CM ฉบับ สรท. ก่อน
+ * ไม่มีในตาราง → แบบโปรแกรมเดิม: บท 87 ขึ้นไป (ตรวจวินิจฉัย/รักษาอื่น) = Non-OR นอกนั้น = OR
+ */
+export function procClass(code: string, book: Codebook = getCodebook("ICD9CM")): "OR" | "NonOR" {
+  const e = book.get(code);
+  if (e?.orType) return e.orType;
+  const ch = parseInt(code.replace(/\D/g, "").slice(0, 2), 10);
+  return ch >= 87 ? "NonOR" : "OR";
 }

@@ -1,6 +1,7 @@
-import { SummaryClient } from "./SummaryClient";
+// ลิงก์เดิม /patients/<AN> → หน้าทำงานที่เลือกผู้ป่วยรายนั้น
+import { redirect } from "next/navigation";
 
-export default async function SummaryPage({ params }: PageProps<"/patients/[an]">) {
+export default async function PatientRedirect({ params }: PageProps<"/patients/[an]">) {
   const { an } = await params;
-  return <SummaryClient an={an} />;
+  redirect(`/patients?an=${encodeURIComponent(an)}`);
 }

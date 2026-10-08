@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check-schema": "node --env-file=.env.local --import tsx scripts/check-schema.ts",
-    "create-user": "node --env-file=.env.local --import tsx scripts/create-user.ts"
+    "create-user": "node --env-file=.env.local --import tsx scripts/create-user.ts",
+    "appdb-sql": "node --import tsx scripts/write-appdb-sql.ts"
   },
   "dependencies": {
     "@google/genai": "^2.27.0",

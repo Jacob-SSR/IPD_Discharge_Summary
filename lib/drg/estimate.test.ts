@@ -1,34 +1,54 @@
+// ประมาณ DRG 4 ระดับแบบ rw_estimator.py + การรวมผลจัดกลุ่มรายเคสของโหมด hosxp
 import { describe, expect, it } from "vitest";
-import { estimateGroup, pickGroup } from "./estimate";
+import { demoGroupingHistory } from "@/lib/demo/data";
+import { estimate, valOf } from "./estimate";
+import { aggregateHistory, type GroupedCase } from "./history";
 import type { TdrgTables } from "./tables";
-import type { HistoricalGroup } from "@/lib/patients/types";
 
-const groups: HistoricalGroup[] = [
-  { drg: "G0", n: 100, avgRw: 0.8, avgAdjRw: 0.82, hasOr: false, avgSdx: 0 },
-  { drg: "G1", n: 50, avgRw: 1.2, avgAdjRw: 1.25, hasOr: false, avgSdx: 2 },
-  { drg: "G2", n: 10, avgRw: 2.5, avgAdjRw: 2.6, hasOr: true, avgSdx: 1 },
-];
-const noTables: TdrgTables = { source: null, isDemo: false, rw: new Map(), orp: new Set() };
+const tables: TdrgTables = {
+  source: null,
+  isDemo: false,
+  rw: new Map([
+    ["A", { drg: "A", description: "", rw: 1, wtlos: 6, ot: 15, rw0d: 0.4, of: null }],
+    ["B", { drg: "B", description: "", rw: 2, wtlos: 6, ot: 15, rw0d: 0.8, of: null }],
+  ]),
+};
+const c = (drg: string, sdx: string[], hasOr = false, rw: number | null = null): GroupedCase => ({ drg, sdx, hasOr, rw });
 
-describe("estimate", () => {
-  it("เลือกกลุ่มตามจำนวน SDx และ OR", () => {
-    expect(pickGroup(groups, { pdx: "X", sdxCount: 0, hasOr: false, los: 3 })?.drg).toBe("G0");
-    expect(pickGroup(groups, { pdx: "X", sdxCount: 2, hasOr: false, los: 3 })?.drg).toBe("G1");
-    expect(pickGroup(groups, { pdx: "X", sdxCount: 0, hasOr: true, los: 3 })?.drg).toBe("G2");
+describe("aggregateHistory + estimate", () => {
+  const cases = [
+    ...Array.from({ length: 3 }, () => c("B", ["E87.6", "I10"])),
+    ...Array.from({ length: 4 }, () => c("A", [])),
+    c("A", ["E87.6"]),
+    c("C", ["N18.3"], false, 0.7),
+    c("D", [], true, 3),
+  ];
+  const h = aggregateHistory("J18.9", cases);
+
+  it("แยกระดับตามหมวดโรคร่วม/จำนวน/OR", () => {
+    expect(h.t1["E87,I10#0"]).toEqual({ B: 3 });
+    expect(h.t2["0#0"]).toEqual({ A: 4 });
+    expect(h.t3["1"]).toEqual({ D: 1 });
+    expect(h.t4).toEqual({ B: 3, A: 5, C: 1, D: 1 });
+    expect(h.drgRw).toEqual({ C: 0.7, D: 3 });
   });
-  it("ไม่มีตาราง TDRG → ใช้ค่าเฉลี่ยย้อนหลัง", () => {
-    const e = estimateGroup(groups, { pdx: "X", sdxCount: 2, hasOr: false, los: 4 }, noTables);
-    expect(e).toMatchObject({ drg: "G1", rw: 1.2, adjrw: 1.25, adjrwFrom: "history" });
+  it("ระดับ 1 ต้อง ≥ 3 ราย", () => {
+    const e = estimate(h, "J18.9", ["I10", "E87.6"], 4, false, tables)!;
+    expect(e).toMatchObject({ drg: "B", level: 1, n: 3, share: 100, rw: 2, adjrw: 2 });
   });
-  it("มีตาราง TDRG → ใช้สูตร", () => {
-    const t: TdrgTables = {
-      ...noTables,
-      rw: new Map([["G1", { drg: "G1", description: "", rw: 1.2, wtlos: 6, ot: 18, rw0d: 0.3, of: 0.5 }]]),
-    };
-    expect(estimateGroup(groups, { pdx: "X", sdxCount: 2, hasOr: false, los: 24 }, t)).toMatchObject({ rw: 1.2, adjrw: 1.8, adjrwFrom: "formula" });
+  it("ไม่พอระดับ 1 → ระดับ 3 (OR/Non-OR เดียวกัน ≥ 5)", () => {
+    const e = estimate(h, "J18.9", ["N18.3"], 1, false, tables)!;
+    expect(e.level).toBe(3);
+    expect(e.drg).toBe("A");
+    expect(e.adjrw).toBe(0.4 + (1 * 0.6) / 2);
+    expect(e.alts).toEqual(["B", "C"]);
   });
-  it("ไม่มี PDx / ไม่มีประวัติ", () => {
-    expect(estimateGroup(groups, { pdx: null, sdxCount: 0, hasOr: null, los: 1 }, noTables).drg).toBeNull();
-    expect(estimateGroup([], { pdx: "X", sdxCount: 0, hasOr: null, los: 1 }, noTables).drg).toBeNull();
+  it("ไม่มีประวัติพอ → null", () => {
+    expect(estimate(aggregateHistory("X", [c("A", [])]), "X00", [], 3, false, tables)).toBeNull();
+    expect(valOf(null)).toBeNull();
+  });
+  it("ข้อมูลผลจัดกลุ่มสมมติ (demo) ใช้ประมาณได้", () => {
+    const d = demoGroupingHistory("J18.9");
+    expect(Object.values(d.t4).reduce((a, b) => a + b, 0)).toBeGreaterThan(5);
   });
 });

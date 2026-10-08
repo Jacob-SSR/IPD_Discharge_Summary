@@ -1,11 +1,12 @@
 // lib/auth/session.ts
-// JWT ใน httpOnly cookie ชื่อ "token" อายุ 8 ชม. — แบบเดียวกับ ppc-hos-10667 (ใช้ jose แทน jsonwebtoken)
+// JWT ใน httpOnly cookie อายุ 8 ชม. — แบบเดียวกับ ppc-hos-10667 (ใช้ jose แทน jsonwebtoken)
 
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
-import { jwtSecret } from "@/lib/env";
+import { allowedRoles, deciderRoles, jwtSecret } from "@/lib/env";
 
-export const SESSION_COOKIE = "token";
+// ชื่อไม่ซ้ำ ppc-hos ("token") — cookie แยกตาม host ไม่แยกตาม port ถ้ารันบนเครื่องเดียวกันจะทับกัน
+export const SESSION_COOKIE = "ipdsum_token";
 export const SESSION_MAX_AGE = 60 * 60 * 8;
 
 export interface Session {
@@ -14,11 +15,16 @@ export interface Session {
   role: string;
 }
 
-/** role ที่กดยืนยัน/ไม่ยืนยันรหัส และเพิ่มรหัสเองได้ */
-export const DECISION_ROLES = ["DOCTOR", "ADMIN"] as const;
+/** role ที่เข้าใช้ระบบได้ (APP_ALLOWED_ROLES) — ใช้ทั้งตอน login และใน proxy ทุก request */
+export function isAllowedRole(role: string): boolean {
+  const allowed = allowedRoles();
+  // "*" = ทุกบัญชีใน ppchos.users เข้าได้ (เหมือน ppc-hos)
+  return allowed.includes("*") || allowed.includes(role.toUpperCase());
+}
 
+/** role ที่ขอคำแนะนำ AI และยืนยัน/ไม่ยืนยัน/เพิ่มรหัสได้ (APP_DECIDER_ROLES) */
 export function canDecide(s: Session): boolean {
-  return (DECISION_ROLES as readonly string[]).includes(s.role);
+  return isAllowedRole(s.role) && deciderRoles().includes(s.role.toUpperCase());
 }
 
 export async function signSession(s: Session): Promise<string> {

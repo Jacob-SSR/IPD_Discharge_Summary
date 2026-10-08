@@ -1,12 +1,16 @@
 // lib/reports/ai.ts
-// หน้า "ผลงาน AI": อัตรายอมรับ, รหัสที่แพทย์เพิ่มเอง (sensitivity), RW ที่เพิ่ม (ค่าประมาณ)
+// หน้า "ผลงาน AI" และตัวเลขหัวหน้าทำงาน: อัตรายอมรับ, รหัสที่แพทย์เพิ่มเอง (sensitivity), RW ที่เพิ่ม (ค่าประมาณ)
+// นับจากสถานะล่าสุดของแต่ละรหัส (กดซ้ำ = ยกเลิก) แบบตัวนับของโปรแกรมเดิม
 
+import { computeWorkspace } from "@/lib/ai";
+import { decisionView } from "@/lib/ai/merge";
+import type { AnalyzeResult } from "@/lib/ai/types";
+import { appDb } from "@/lib/appdb";
 import type { AiRun, CodeDecision } from "@/lib/appdb/types";
-import { buildFinalCodes, latestDecisions } from "@/lib/coding/final";
-import { estimateForCodes } from "@/lib/drg/caseEstimate";
+import { valOf } from "@/lib/drg/estimate";
 import { nhsoRatePerAdjRw } from "@/lib/env";
+import type { Tally } from "@/lib/patients/bundle";
 import type { PatientSource } from "@/lib/patients/types";
-import type { SuggestResult } from "@/lib/ai/types";
 import type { AiPerfGroup, AiPerfReport } from "./types";
 
 const RW_CASE_CAP = 200;
@@ -21,76 +25,120 @@ function top(codes: string[], n = 10) {
   return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n).map(([code, k]) => ({ code, n: k }));
 }
 
-export async function buildAiReport(
-  runs: AiRun[],
-  decisions: CodeDecision[],
-  source: PatientSource,
-  from: string,
-  to: string,
-  allDecisionsFor: (an: string) => Promise<CodeDecision[]>,
-): Promise<AiPerfReport> {
-  const suggestRuns = runs.filter((r) => r.kind === "suggest");
-  // ใช้ผลครั้งล่าสุดของแต่ละ AN เป็นตัวตั้ง
-  const latestRun = new Map<string, AiRun>();
-  for (const r of suggestRuns) latestRun.set(r.an, r);
+function toResult(r: AiRun): AnalyzeResult {
+  const x = r.result as Partial<AnalyzeResult>;
+  return {
+    runId: r.id,
+    provider: r.provider as AnalyzeResult["provider"],
+    model: r.model,
+    fallbackReason: r.fallbackReason,
+    items: x.items ?? [],
+    remarks: x.remarks ?? [],
+    draft: x.draft ?? "",
+    droppedNoEvidence: x.droppedNoEvidence ?? [],
+    secs: x.secs ?? 0,
+    createdAt: r.createdAt,
+  };
+}
 
-  const latest = latestDecisions(decisions);
-  const suggestedDecisions = [...latest.values()].filter((d) => d.source !== "manual");
-  const manualAdds = [...latest.values()].filter((d) => d.source === "manual" && d.action === "add");
+/** สถานะล่าสุดของรหัสทุกตัวในช่วง แยกราย AN */
+function states(decisions: CodeDecision[]) {
+  const byAn = new Map<string, CodeDecision[]>();
+  for (const d of decisions) byAn.set(d.an, [...(byAn.get(d.an) ?? []), d]);
+  const accepted: CodeDecision[] = [];
+  const rejected: CodeDecision[] = [];
+  const manual: CodeDecision[] = [];
+  for (const list of byAn.values()) {
+    const view = decisionView(list);
+    const last = new Map<string, CodeDecision>();
+    for (const d of [...list].sort((a, b) => a.id - b.id)) last.set(`${d.system}|${d.code.replace(/\./g, "")}`, d);
+    for (const d of last.values()) {
+      const k = `${d.system === "ICD10" ? "dx" : "proc"}|${d.code.toUpperCase().replace(/[^A-Z0-9]/g, "")}`;
+      if (view.manual.some((m) => `${m.kind}|${m.code.toUpperCase().replace(/[^A-Z0-9]/g, "")}` === k)) manual.push(d);
+      else if (view.state.get(k) === "accepted") accepted.push(d);
+      else if (view.state.get(k) === "rejected") rejected.push(d);
+    }
+  }
+  return { accepted, rejected, manual, ans: [...byAn.keys()] };
+}
+
+/** RW ที่ได้เพิ่มจากรหัสที่ยืนยัน: รายที่ลงรหัสแล้ว = AdjRW หลัง − ก่อน · รายรอสรุป = AdjRW ทั้งราย */
+async function rwGain(source: PatientSource, ans: string[], runs: AiRun[]) {
+  let gain = 0;
+  let cases = 0;
+  const db = appDb();
+  for (const an of ans.slice(0, RW_CASE_CAP)) {
+    const a = await source.getAdmission(an);
+    if (!a) continue;
+    const [decisions, course] = await Promise.all([db.listDecisions(an), db.getCourse(an)]);
+    const mine = runs.filter((r) => r.an === an && r.kind === "suggest");
+    const last = mine.length ? toResult(mine[mine.length - 1]) : null;
+    const ws = await computeWorkspace(a, source, decisions, course, last);
+    const st = ws.rw;
+    if (st.delta) {
+      gain += st.delta;
+      cases += 1;
+    } else if (!st.before && st.after) {
+      gain += valOf(st.after) ?? 0;
+      cases += 1;
+    }
+  }
+  return { gain: Math.round(gain * 10_000) / 10_000, cases, capped: ans.length > RW_CASE_CAP };
+}
+
+export async function buildTally(source: PatientSource, from: string, to: string): Promise<Tally> {
+  const db = appDb();
+  const [runs, decisions] = await Promise.all([db.listAiRunsInRange(from, to), db.listDecisionsInRange(from, to)]);
+  const s = states(decisions);
+  const ans = [...new Set([...runs.filter((r) => r.kind === "suggest").map((r) => r.an), ...s.ans])];
+  const rw = await rwGain(source, ans, runs);
+  return {
+    from,
+    to,
+    analyzed: new Set(runs.filter((r) => r.kind === "suggest" && r.provider === "gemini").map((r) => r.an)).size,
+    accepted: s.accepted.length + s.manual.length,
+    rejected: s.rejected.length,
+    rate: rate(s.accepted.length + s.manual.length, s.rejected.length),
+    rwGain: rw.gain,
+    capped: rw.capped,
+  };
+}
+
+export async function buildAiReport(source: PatientSource, from: string, to: string): Promise<AiPerfReport> {
+  const db = appDb();
+  const [runs, decisions] = await Promise.all([db.listAiRunsInRange(from, to), db.listDecisionsInRange(from, to)]);
+  const suggestRuns = runs.filter((r) => r.kind === "suggest");
+  const s = states(decisions);
 
   const groups = new Map<string, AiPerfGroup>();
-  const g = (key: string, label: string) => {
-    const cur = groups.get(key) ?? { key, label, runs: 0, suggested: 0, accepted: 0, rejected: 0, pending: 0, acceptanceRate: null };
+  const g = (provider: string, model: string | null) => {
+    const key = `${provider}|${model ?? ""}`;
+    const cur = groups.get(key) ?? { key, label: model ? `${provider} / ${model}` : provider, runs: 0, suggested: 0, accepted: 0, rejected: 0, pending: 0, acceptanceRate: null };
     groups.set(key, cur);
     return cur;
   };
+  for (const r of suggestRuns) g(r.provider, r.model).runs += 1;
 
-  for (const r of suggestRuns) g(`${r.provider}|${r.model ?? ""}`, r.model ? `${r.provider} / ${r.model}` : r.provider).runs += 1;
-
+  // ข้อเสนอของ AI ครั้งล่าสุดแต่ละ AN ที่ยังไม่ได้ตัดสิน
+  const latestRun = new Map<string, AiRun>();
+  for (const r of suggestRuns) latestRun.set(r.an, r);
+  const decided = new Set([...s.accepted, ...s.rejected].map((d) => `${d.an}|${d.code}`));
   let pendingTotal = 0;
   for (const r of latestRun.values()) {
-    const grp = g(`${r.provider}|${r.model ?? ""}`, r.model ? `${r.provider} / ${r.model}` : r.provider);
-    const res = r.result as Pick<SuggestResult, "suggestions">;
-    for (const s of res.suggestions ?? []) {
+    const grp = g(r.provider, r.model);
+    for (const it of toResult(r).items) {
       grp.suggested += 1;
-      const d = decisions
-        .filter((x) => x.an === r.an && x.source !== "manual" && x.system === s.system && x.code === s.code)
-        .sort((a, b) => b.id - a.id)[0];
-      if (!d) {
+      if (!decided.has(`${r.an}|${it.code}`)) {
         grp.pending += 1;
         pendingTotal += 1;
       }
     }
   }
-  for (const d of suggestedDecisions) {
-    const grp = g(`${d.provider ?? d.source}|${d.model ?? ""}`, d.model ? `${d.provider} / ${d.model}` : (d.provider ?? d.source));
-    if (d.action === "accept") grp.accepted += 1;
-    if (d.action === "reject") grp.rejected += 1;
-  }
+  for (const d of s.accepted) g(d.provider ?? d.source, d.model).accepted += 1;
+  for (const d of s.rejected) g(d.provider ?? d.source, d.model).rejected += 1;
   const byProvider = [...groups.values()].map((x) => ({ ...x, acceptanceRate: rate(x.accepted, x.rejected) }));
 
-  const accepted = suggestedDecisions.filter((d) => d.action === "accept");
-  const rejected = suggestedDecisions.filter((d) => d.action === "reject");
-
-  // RW ที่เพิ่ม: เทียบค่าประมาณ ก่อน (รหัส HOSxP) / หลัง (รวมรหัสที่ยืนยัน) ของแต่ละ AN
-  const ans = [...new Set([...accepted, ...manualAdds].map((d) => d.an))];
-  const capped = ans.length > RW_CASE_CAP;
-  let gain = 0;
-  let cases = 0;
-  for (const an of ans.slice(0, RW_CASE_CAP)) {
-    const a = await source.getAdmission(an);
-    if (!a) continue;
-    const all = await allDecisionsFor(an);
-    const [before, after] = await Promise.all([
-      estimateForCodes(source, buildFinalCodes(a, []), a.los),
-      estimateForCodes(source, buildFinalCodes(a, all), a.los),
-    ]);
-    if (before.adjrw != null && after.adjrw != null) {
-      gain += after.adjrw - before.adjrw;
-      cases += 1;
-    }
-  }
-  const adjRwGain = Math.round(gain * 10_000) / 10_000;
+  const rw = await rwGain(source, [...new Set([...s.accepted, ...s.manual].map((d) => d.an))], runs);
 
   return {
     from,
@@ -99,26 +147,21 @@ export async function buildAiReport(
       key: "all",
       label: "ทั้งหมด",
       runs: suggestRuns.length,
-      suggested: byProvider.reduce((s, x) => s + x.suggested, 0),
-      accepted: accepted.length,
-      rejected: rejected.length,
+      suggested: byProvider.reduce((n, x) => n + x.suggested, 0),
+      accepted: s.accepted.length,
+      rejected: s.rejected.length,
       pending: pendingTotal,
-      acceptanceRate: rate(accepted.length, rejected.length),
-      manualAdded: manualAdds.length,
-      droppedNoEvidence: suggestRuns.reduce((s, r) => s + r.nDroppedNoEvidence, 0),
-      notInCodebook: suggestRuns.reduce((s, r) => s + r.nNotInCodebook, 0),
-      sensitivity: rate(accepted.length, manualAdds.length),
+      acceptanceRate: rate(s.accepted.length, s.rejected.length),
+      manualAdded: s.manual.length,
+      droppedNoEvidence: suggestRuns.reduce((n, r) => n + r.nDroppedNoEvidence, 0),
+      notInCodebook: suggestRuns.reduce((n, r) => n + r.nNotInCodebook, 0),
+      sensitivity: rate(s.accepted.length, s.manual.length),
       fallbackRuns: suggestRuns.filter((r) => r.fallbackReason).length,
     },
     byProvider,
-    topAccepted: top(accepted.map((d) => d.code)),
-    topRejected: top(rejected.map((d) => d.code)),
-    topManual: top(manualAdds.map((d) => d.code)),
-    rw: {
-      cases,
-      adjRwGain,
-      estimatedRevenueGain: Math.round(adjRwGain * nhsoRatePerAdjRw()),
-      capped,
-    },
+    topAccepted: top(s.accepted.map((d) => d.code)),
+    topRejected: top(s.rejected.map((d) => d.code)),
+    topManual: top(s.manual.map((d) => d.code)),
+    rw: { cases: rw.cases, adjRwGain: rw.gain, estimatedRevenueGain: Math.round(rw.gain * nhsoRatePerAdjRw()), capped: rw.capped },
   };
 }
