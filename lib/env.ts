@@ -67,6 +67,38 @@ export function appDbFile(): string {
   return process.env.APP_DB_FILE!;
 }
 
+/**
+ * ตารางบัญชีผู้ใช้ในฐานแอป เช่น ppchos.users (บัญชีเดียวกับ ppc-hos-10667) หรือ users
+ */
+export function appUsersTable(): string {
+  const t = (process.env.APP_USERS_TABLE! ?? "").trim();
+  if (!/^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)?$/.test(t)) throw new Error("APP_USERS_TABLE ต้องเป็นชื่อตาราง เช่น ppchos.users");
+  return t
+    .split(".")
+    .map((p) => `\`${p}\``)
+    .join(".");
+}
+
+function roleList(name: string): string[] {
+  const v = process.env[name]!;
+  const list = (v ?? "")
+    .split(",")
+    .map((r) => r.trim().toUpperCase())
+    .filter(Boolean);
+  if (!list.length) throw new Error(`${name} ต้องระบุ role อย่างน้อย 1 ค่า (คั่นด้วย ,)`);
+  return list;
+}
+
+/** role ที่เข้าใช้ระบบได้ (ดูข้อมูลผู้ป่วย) — บัญชี role อื่นใน ppchos.users จะ login ไม่ได้ */
+export function allowedRoles(): string[] {
+  return roleList("APP_ALLOWED_ROLES");
+}
+
+/** role ที่ขอคำแนะนำ AI และยืนยัน/เพิ่มรหัสได้ (ต้องเป็นส่วนหนึ่งของ APP_ALLOWED_ROLES) */
+export function deciderRoles(): string[] {
+  return roleList("APP_DECIDER_ROLES");
+}
+
 export function redisUrl(): string | undefined {
   return optional("REDIS_URL");
 }

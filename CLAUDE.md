@@ -136,8 +136,13 @@ NHSO_RATE_PER_ADJRW=8350     # อัตรา สปสช. 2569
 ทำครบทุกข้อ 1–6 แล้ว **แต่ยังไม่ได้รับไฟล์ `IPD_Discharge_Summary.zip`** จึงยังทำข้อ 0 ไม่ได้ —
 logic ที่สเปกบอกให้ "port แบบตรงตัว" เขียนขึ้นใหม่จากสเปก/มาตรฐาน และต้องเทียบกับของเดิมเมื่อได้ไฟล์:
 
-- SQL (`lib/hosxp/queries.ts`) — อิง SQL ใน repo drg_grouper + โครงสร้าง HOSxP ทั่วไป ทดสอบกับฐานจำลองแล้ว ยังไม่เคยต่อ HOSxP จริง
+- SQL (`lib/hosxp/queries.ts`) — ปรับตาม SQL ที่ ppc-hos-10667 ใช้กับ HOSxP จริงแล้ว (ipt.dch_doctor, an_stat.aid → thaiaddress.full_name,
+  an_stat.pttype, รหัสไม่มีจุด/มี extension) คอลัมน์ที่ต่างตามเวอร์ชันเลือกอัตโนมัติ (`lib/hosxp/columns.ts`)
+  ทดสอบกับฐานจำลอง 2 รุ่นแล้ว ยังไม่เคยต่อ HOSxP จริง
 - กฎตรวจรหัส (`lib/coding/rules.config.ts`) และเกณฑ์ lab ของ engine แบบกฎ (`lib/ai/rules.config.ts`, `CLINICAL_REVIEWED = false`) — ต้องให้แพทย์/ผู้ให้รหัสตรวจ
 - สูตร AdjRW (`lib/drg/adjrw.ts`, `ADJRW_FORMULA_VERIFIED = false`) — ต้องเทียบกับของเดิมและเพิ่ม test ด้วยเคสจากของเดิม
 - แบบฟอร์ม A4 — ยังไม่ได้เทียบกับ template เดิม
 - ยังไม่มี codebook จริง (`data/codebooks/*.csv`) และตาราง TDRG จริง (`data/tdrg/*.csv`) — ห้ามเดาค่า RW
+
+ฐานข้อมูลแอป: ใช้ฐาน `ppchos` เดิมของ ppc-hos (ตาราง `ipdsum_*`, `docs/sql/appdb.sql`) และ login ด้วย `ppchos.users`
+สิทธิ์ตาม role: `APP_ALLOWED_ROLES` (เข้าดู) / `APP_DECIDER_ROLES` (ยืนยันรหัส)

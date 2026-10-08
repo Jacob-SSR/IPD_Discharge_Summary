@@ -43,6 +43,8 @@ export interface Diagnosis {
 
 export interface Procedure {
   icd9: string;
+  /** extension code ที่ต่อท้ายรหัสใน HOSxP (เช่น 990401 → "01") */
+  ext?: string | null;
   name: string | null;
   opDate: string | null;
   doctorCode: string | null;

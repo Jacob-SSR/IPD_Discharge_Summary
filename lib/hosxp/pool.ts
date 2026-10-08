@@ -25,13 +25,23 @@ function getPool(): Pool {
     database: cfg.database,
     charset: cfg.charset === "tis620" ? "TIS620_THAI_CI" : "LATIN1_SWEDISH_CI",
     multipleStatements: false,
-    connectionLimit: 5,
     dateStrings: true,
+    // ขนาด pool เล็กและจำกัดคิว (แนวเดียวกับ ppc-hos-10667) — ยอมช้าดีกว่าพา HOSxP ล่ม
+    connectionLimit: 5,
+    maxIdle: 2,
+    idleTimeout: 60_000,
+    waitForConnections: true,
+    queueLimit: 50,
     connectTimeout: 10_000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 30_000,
   });
   // ตั้ง session ให้อ่านอย่างเดียวทุก connection ใหม่ (ชั้นป้องกันเพิ่มจากสิทธิ์ user)
+  // MySQL/MariaDB รุ่นเก่า (ก่อน 5.6.5 / 10.0) ไม่รองรับคำสั่งนี้ → แค่เตือน ยังมีสิทธิ์ user และ SQL guard กันอยู่
   pool.pool.on("connection", (conn) => {
-    conn.query("SET SESSION TRANSACTION READ ONLY");
+    conn.query("SET SESSION TRANSACTION READ ONLY", (err: Error | null) => {
+      if (err) console.warn("[hosxp] ตั้ง session read only ไม่ได้:", err.message);
+    });
   });
   return pool;
 }

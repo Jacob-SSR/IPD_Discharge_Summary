@@ -4,7 +4,7 @@ import { buildFinalCodes, codesToClipboardText, latestDecisions, suggestionState
 import { fiscalYearBE, fiscalYearRange, formatThaiDate, quickRange } from "@/lib/date";
 import { buildDemoAdmissions } from "@/lib/demo/data";
 import { matchesFilter } from "@/lib/demo/source";
-import { buildListWhere } from "@/lib/hosxp/queries";
+import { buildListWhere, splitIcd9 } from "@/lib/hosxp/queries";
 import { parseFilter } from "@/lib/patients/filter";
 import { buildRwReport } from "@/lib/reports/rw";
 
@@ -32,15 +32,24 @@ describe("ตัวกรองรายชื่อ", () => {
     expect(f).toMatchObject({ admitFrom: "2026-01-01", admitTo: undefined, ward: undefined, q: undefined, pending: true, pendingStatus: "all" });
   });
   it("SQL ใช้ placeholder ทุกค่า และแยกช่วง admit / จำหน่าย", () => {
-    const { where, params } = buildListWhere({ admitFrom: "2026-01-01", dischargeTo: "2026-02-01", pdxDoctor: "D1", pending: true, pendingStatus: "noPdx" });
+    const { where, params } = buildListWhere({ admitFrom: "2026-01-01", dischargeTo: "2026-02-01", pdxDoctor: "D1", pending: true, pendingStatus: "noPdx" }, { admitDoctor: "admdoctor" });
     expect(where).toContain("i.regdate >= ?");
     expect(where).toContain("i.dchdate <= ?");
     expect(where).toContain("x.doctor = ?");
     expect(where).toContain("NOT EXISTS");
     expect(params).toEqual(["2026-01-01", "2026-02-01", "D1"]);
   });
+  it("ไม่มีคอลัมน์แพทย์ผู้รับไว้ → กรองแล้วไม่คืนทุกคน", () => {
+    expect(buildListWhere({ admitDoctor: "D1", q: "1" }, { admitDoctor: null }).where).toContain("1 = 0");
+    expect(buildListWhere({ admitDoctor: "D1", q: "1" }, { admitDoctor: "incharge_doctor" }).where).toContain("i.incharge_doctor = ?");
+  });
+  it("รหัสหัตถการมี extension ต่อท้าย", () => {
+    expect(splitIcd9("990401")).toEqual({ icd9: "99.04", ext: "01" });
+    expect(splitIcd9("9904")).toEqual({ icd9: "99.04", ext: null });
+    expect(splitIcd9("47.09")).toEqual({ icd9: "47.09", ext: null });
+  });
   it("แท็บรอสรุปไม่มีช่วงวัน → จำกัด 1 ปี", () => {
-    const { where, params } = buildListWhere({ pending: true });
+    const { where, params } = buildListWhere({ pending: true }, { admitDoctor: "admdoctor" });
     expect(where).toContain("i.regdate >= ?");
     expect(where).toContain("OR i.dchdate IS NULL");
     expect(params).toHaveLength(1);

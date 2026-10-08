@@ -1,8 +1,10 @@
 // lib/appdb/mysql.ts
 // ฐานข้อมูลแอปบน MySQL/MariaDB (APP_DB_URL) — ไม่ใช่ HOSxP จึงเขียนได้ตามปกติ
+// ใช้ฐาน ppchos เดิมของ ppc-hos-10667 ได้ (ตาราง ipdsum_* + บัญชีจาก ppchos.users)
 
 import mysql, { type Pool, type ResultSetHeader, type RowDataPacket } from "mysql2/promise";
-import { APPDB_SCHEMA } from "./schema";
+import { appUsersTable } from "@/lib/env";
+import { APPDB_SCHEMA, T, usersTableSql } from "./schema";
 import type {
   AiRun,
   AiRunKind,
@@ -71,11 +73,26 @@ export function createMysqlAppDb(url: string): AppDb {
     dateStrings: true,
   });
 
+  const users = appUsersTable();
   let ready: Promise<void> | null = null;
   function ensure(): Promise<void> {
     if (!ready) {
       ready = (async () => {
-        for (const stmt of APPDB_SCHEMA) await pool.query(stmt);
+        for (const stmt of [usersTableSql(users), ...APPDB_SCHEMA]) {
+          try {
+            await pool.query(stmt);
+          } catch (e) {
+            // user ไม่มีสิทธิ์ CREATE (เช่นในฐาน ppchos ที่ใช้ร่วมกัน) → ใช้ได้ถ้า DBA สร้างตารางไว้แล้ว
+            const table = /CREATE TABLE IF NOT EXISTS (\S+)/.exec(stmt)?.[1] ?? "?";
+            try {
+              await pool.query(`SELECT 1 FROM ${table} LIMIT 0`);
+            } catch {
+              throw new Error(
+                `ฐานข้อมูลแอป: ไม่มีตาราง ${table} และสร้างเองไม่ได้ (${(e as Error).message}) — ให้ DBA รัน docs/sql/appdb.sql`,
+              );
+            }
+          }
+        }
       })().catch((e) => {
         ready = null;
         throw e;
@@ -103,7 +120,7 @@ export function createMysqlAppDb(url: string): AppDb {
     },
 
     async findUser(username) {
-      const rows = await q("SELECT `user`, passweb, name, role FROM users WHERE `user` = ? LIMIT 1", [username]);
+      const rows = await q(`SELECT \`user\`, passweb, name, role FROM ${users} WHERE \`user\` = ? LIMIT 1`, [username]);
       if (!rows.length) return null;
       const r = rows[0];
       return {
@@ -115,15 +132,19 @@ export function createMysqlAppDb(url: string): AppDb {
     },
     async upsertUser(u) {
       await exec(
-        "INSERT INTO users (`user`, passweb, name, role) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE passweb = VALUES(passweb), name = VALUES(name), role = VALUES(role)",
+        `INSERT INTO ${users} (\`user\`, passweb, name, role) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE passweb = VALUES(passweb), name = VALUES(name), role = VALUES(role)`,
         [u.user, u.passweb, u.name, u.role],
       );
+    },
+
+    async updatePassword(username, passweb) {
+      await exec(`UPDATE ${users} SET passweb = ? WHERE \`user\` = ?`, [passweb, username]);
     },
 
     async addDecision(d) {
       const at = sqlNow();
       const res = await exec(
-        `INSERT INTO code_decisions
+        `INSERT INTO ${T.decisions}
           (an, code, code_system, source, action, diagtype, or_type, op_date, provider, model, ai_run_id, decided_by, decided_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [d.an, d.code, d.system, d.source, d.action, d.diagtype, d.orType, d.opDate, d.provider, d.model, d.aiRunId, d.decidedBy, at],
@@ -131,18 +152,18 @@ export function createMysqlAppDb(url: string): AppDb {
       return { ...d, id: res.insertId, decidedAt: iso(at) };
     },
     async listDecisions(an) {
-      return (await q("SELECT * FROM code_decisions WHERE an = ? ORDER BY id", [an])).map(mapDecision);
+      return (await q(`SELECT * FROM ${T.decisions} WHERE an = ? ORDER BY id`, [an])).map(mapDecision);
     },
     async listDecisionsInRange(from, to) {
       return (
-        await q("SELECT * FROM code_decisions WHERE decided_at >= ? AND decided_at < DATE_ADD(?, INTERVAL 1 DAY) ORDER BY id", [from, to])
+        await q(`SELECT * FROM ${T.decisions} WHERE decided_at >= ? AND decided_at < DATE_ADD(?, INTERVAL 1 DAY) ORDER BY id`, [from, to])
       ).map(mapDecision);
     },
 
     async addAiRun(r) {
       const at = sqlNow();
       const res = await exec(
-        `INSERT INTO ai_runs
+        `INSERT INTO ${T.aiRuns}
           (an, kind, provider, model, fallback_reason, n_suggestions, n_dropped_no_evidence, n_not_in_codebook, result_json, created_by, created_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [r.an, r.kind, r.provider, r.model, r.fallbackReason, r.nSuggestions, r.nDroppedNoEvidence, r.nNotInCodebook, JSON.stringify(r.result), r.createdBy, at],
@@ -150,17 +171,17 @@ export function createMysqlAppDb(url: string): AppDb {
       return { ...r, id: res.insertId, createdAt: iso(at) };
     },
     async latestAiRun(an, kind) {
-      const rows = await q("SELECT * FROM ai_runs WHERE an = ? AND kind = ? ORDER BY id DESC LIMIT 1", [an, kind]);
+      const rows = await q(`SELECT * FROM ${T.aiRuns} WHERE an = ? AND kind = ? ORDER BY id DESC LIMIT 1`, [an, kind]);
       return rows.length ? mapRun(rows[0]) : null;
     },
     async listAiRunsInRange(from, to) {
       return (
-        await q("SELECT * FROM ai_runs WHERE created_at >= ? AND created_at < DATE_ADD(?, INTERVAL 1 DAY) ORDER BY id", [from, to])
+        await q(`SELECT * FROM ${T.aiRuns} WHERE created_at >= ? AND created_at < DATE_ADD(?, INTERVAL 1 DAY) ORDER BY id`, [from, to])
       ).map(mapRun);
     },
 
     async getCourse(an) {
-      const rows = await q("SELECT * FROM course_texts WHERE an = ? LIMIT 1", [an]);
+      const rows = await q(`SELECT * FROM ${T.courses} WHERE an = ? LIMIT 1`, [an]);
       if (!rows.length) return null;
       const r = rows[0];
       return {
@@ -174,7 +195,7 @@ export function createMysqlAppDb(url: string): AppDb {
     async saveCourse(c) {
       const at = sqlNow();
       await exec(
-        `INSERT INTO course_texts (an, text, source, updated_by, updated_at) VALUES (?, ?, ?, ?, ?)
+        `INSERT INTO ${T.courses} (an, text, source, updated_by, updated_at) VALUES (?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE text = VALUES(text), source = VALUES(source), updated_by = VALUES(updated_by), updated_at = VALUES(updated_at)`,
         [c.an, c.text, c.source, c.updatedBy, at],
       );
@@ -182,7 +203,7 @@ export function createMysqlAppDb(url: string): AppDb {
     },
 
     async audit(e) {
-      await exec("INSERT INTO audit_log (at, username, action, an, detail) VALUES (?, ?, ?, ?, ?)", [
+      await exec(`INSERT INTO ${T.audit} (at, username, action, an, detail) VALUES (?, ?, ?, ?, ?)`, [
         sqlNow(),
         e.username,
         e.action,

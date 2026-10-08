@@ -18,6 +18,9 @@ export default defineConfig({
       HOSPITAL_NAME: "โรงพยาบาลทดสอบ",
       JWT_SECRET: "test-secret-test-secret-test-secret-0000",
       APP_DB_FILE: ".data/test-appdb.json",
+      APP_USERS_TABLE: "users",
+      APP_ALLOWED_ROLES: "DOCTOR,ADMIN,FINANCE",
+      APP_DECIDER_ROLES: "DOCTOR",
     },
   },
 });

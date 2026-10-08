@@ -16,6 +16,8 @@ export interface FinalCode {
   opDate: string | null;
   origin: CodeOrigin;
   name: string | null;
+  /** extension code ของหัตถการใน HOSxP (เช่น 990401 → "01") */
+  ext?: string | null;
 }
 
 export type SuggestionState = "pending" | "accepted" | "rejected";
@@ -62,7 +64,7 @@ export function buildFinalCodes(
     push({ system: "ICD10", code: d.icd10, diagtype: d.diagtype, orType: null, opDate: null, origin: "hosxp", name: d.name });
   }
   for (const p of a.procedures) {
-    push({ system: "ICD9CM", code: p.icd9, diagtype: null, orType: null, opDate: p.opDate, origin: "hosxp", name: p.name });
+    push({ system: "ICD9CM", code: p.icd9, diagtype: null, orType: null, opDate: p.opDate, origin: "hosxp", name: p.name, ext: p.ext ?? null });
   }
   for (const d of latestDecisions(decisions).values()) {
     const included = d.action === "accept" || d.action === "add";

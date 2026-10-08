@@ -3,7 +3,7 @@
 // ⚠️ ห้าม log ข้อมูลผู้ป่วย — log เฉพาะชนิดของ error
 
 import { NextResponse } from "next/server";
-import { canDecide, getSession, type Session } from "@/lib/auth/session";
+import { canDecide, getSession, isAllowedRole, type Session } from "@/lib/auth/session";
 
 export class HttpError extends Error {
   constructor(
@@ -17,12 +17,13 @@ export class HttpError extends Error {
 export async function requireSession(): Promise<Session> {
   const s = await getSession();
   if (!s) throw new HttpError(401, "กรุณาเข้าสู่ระบบ");
+  if (!isAllowedRole(s.role)) throw new HttpError(403, "บัญชีนี้ไม่มีสิทธิ์ใช้ระบบนี้");
   return s;
 }
 
 export async function requireDecider(): Promise<Session> {
   const s = await requireSession();
-  if (!canDecide(s)) throw new HttpError(403, "เฉพาะแพทย์ (role DOCTOR) ที่ยืนยันรหัสได้");
+  if (!canDecide(s)) throw new HttpError(403, "บัญชีนี้ไม่มีสิทธิ์ยืนยันรหัส (APP_DECIDER_ROLES)");
   return s;
 }
 

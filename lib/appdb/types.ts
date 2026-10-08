@@ -78,6 +78,8 @@ export interface AppDb {
 
   findUser(username: string): Promise<UserRecord | null>;
   upsertUser(u: UserRecord): Promise<void>;
+  /** เปลี่ยนเฉพาะรหัสผ่าน (ไม่แตะคอลัมน์อื่นของตารางผู้ใช้ที่ใช้ร่วมกับ ppc-hos) */
+  updatePassword(username: string, passweb: string): Promise<void>;
 
   addDecision(d: NewCodeDecision): Promise<CodeDecision>;
   listDecisions(an: string): Promise<CodeDecision[]>;

@@ -63,7 +63,12 @@ export async function dischargeSummaryWorkbook(
   }
   header(["หัตถการ", "ICD-9-CM", "ชื่อหัตถการ", "วันที่"]);
   for (const c of codes.filter((x) => x.system === "ICD9CM")) {
-    ws.addRow([c.orType === "OR" ? "OR" : c.orType === "NonOR" ? "Non-OR" : "-", c.code, c.name ?? "", formatThaiDate(c.opDate)]);
+    ws.addRow([
+      c.orType === "OR" ? "OR" : c.orType === "NonOR" ? "Non-OR" : "-",
+      c.ext ? `${c.code} ext ${c.ext}` : c.code,
+      c.name ?? "",
+      formatThaiDate(c.opDate),
+    ]);
   }
 
   header(["Course in hospital", "", "", ""]);

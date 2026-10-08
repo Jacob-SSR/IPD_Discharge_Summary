@@ -76,6 +76,10 @@ export function createFileAppDb(file: string): AppDb {
     },
     findUser: (username) =>
       run((d) => d.users.find((u) => u.user === username) ?? null, false),
+    updatePassword: (username, passweb) =>
+      run((d) => {
+        d.users = d.users.map((u) => (u.user === username ? { ...u, passweb } : u));
+      }, true),
     upsertUser: (u) =>
       run((d) => {
         d.users = [...d.users.filter((x) => x.user !== u.user), u];

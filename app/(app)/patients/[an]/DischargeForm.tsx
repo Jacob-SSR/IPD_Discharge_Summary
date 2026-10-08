@@ -141,7 +141,10 @@ export function DischargeForm({
             return l.map((c, i) => (
               <tr key={c.code}>
                 <td>{i === 0 ? (label as string) : ""}</td>
-                <td className="font-semibold">{c.code}</td>
+                <td className="font-semibold">
+                  {c.code}
+                  {c.ext ? <span className="font-normal text-slate-500"> ext {c.ext}</span> : null}
+                </td>
                 <td>{c.name ?? ""}</td>
                 <td>{formatThaiDate(c.opDate)}</td>
               </tr>

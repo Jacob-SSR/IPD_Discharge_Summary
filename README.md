@@ -30,25 +30,28 @@ npm run dev            # http://localhost:3000  → login ด้วย DEMO_USER
 | `/reports/ai` | ผลงาน AI: อัตรายอมรับ, sensitivity (เทียบรหัสที่แพทย์เพิ่มเอง), AdjRW ที่เพิ่ม (ประมาณ) |
 | `/system` | ตรวจการเชื่อมต่อ HOSxP (รวมตรวจว่า user อ่านอย่างเดียวจริง), ฐานแอป, Redis, AI, codebook, ตาราง TDRG |
 
-## ต่อ HOSxP จริง (เครื่องใน LAN)
+## ใช้งานจริงคู่กับ ppc-hos-10667 (เครื่องใน LAN)
 
-1. ให้ DBA สร้าง user อ่านอย่างเดียว: [`docs/sql/create_readonly_user.sql`](docs/sql/create_readonly_user.sql) (แนะนำต่อ Slave/Replica)
-2. เตรียมฐานข้อมูลของแอป (MySQL/MariaDB แยกจาก HOSxP) แล้วตั้ง `APP_DB_URL` — ตารางถูกสร้างอัตโนมัติ (`lib/appdb/schema.ts`)
-3. ตั้ง `.env.local`: `APP_MODE=hosxp`, `HOSXP_DB_*`, `HOSXP_DB_CHARSET` (`tis620` หรือ `latin1`)
-4. ตรวจโครงสร้าง: `npm run check-schema` — พิมพ์เฉพาะชื่อตาราง/ฟิลด์ที่ไม่มีจริง (ไม่พิมพ์ข้อมูลผู้ป่วย)
-   ถ้าพบ ให้แก้ `lib/hosxp/queries.ts` และ `lib/hosxp/schema.ts` คู่กัน (โดยเฉพาะ `ipt.dch_doctor`)
-5. สร้างบัญชี: `npm run create-user -- <username> DOCTOR "<ชื่อ>"` (role `DOCTOR`/`ADMIN` ยืนยันรหัสได้, `USER` ดูอย่างเดียว)
-6. เปิด `/system` ตรวจว่าทุกช่องเขียว
-7. ใช้ Gemini กับข้อมูลจริง: ต้องเปิด billing แล้วตั้ง `GEMINI_PAID_TIER=true` (ไม่ตั้ง = ใช้ engine แบบกฎ)
+**ไม่ต้องตั้งฐานข้อมูลใหม่** — แอปต้องมีที่เขียนข้อมูลของตัวเอง (การยืนยันรหัส, audit log, Course ที่บันทึก)
+เพราะห้ามเขียน HOSxP แต่ใช้ฐาน `ppchos` เดิม (`DB_HOST2` ของ ppc-hos) ได้เลย:
+ตารางของแอปขึ้นต้นด้วย `ipdsum_` ไม่ชนของเดิม และ login ด้วยบัญชีใน `ppchos.users` ชุดเดียวกับ ppc-hos
 
-## Docker (server ใน LAN)
+1. **HOSxP:** ให้ DBA สร้าง user อ่านอย่างเดียว [`docs/sql/create_readonly_user.sql`](docs/sql/create_readonly_user.sql)
+   (อย่าใช้ user ของ ppc-hos เพราะเขียนได้ — หน้า `/system` จะแจ้งเตือนถ้า user มีสิทธิ์เขียน)
+2. **ฐานแอป:** รัน [`docs/sql/appdb.sql`](docs/sql/appdb.sql) ในฐาน `ppchos` (หรือให้แอปสร้างเองถ้า user มีสิทธิ์ CREATE)
+3. **env:** `cp .env.example .env.production` แล้วกรอก — ค่าหลัก:
+   - `HOSXP_DB_HOST` / `HOSXP_DB_NAME` = `DB_HOST` / `DB_NAME` ของ ppc-hos, user = user อ่านอย่างเดียวจากข้อ 1
+   - `APP_DB_URL=mysql://<DB_USER>:<DB_PASS>@<DB_HOST2>:3306/ppchos`, `APP_USERS_TABLE=ppchos.users`
+   - `APP_ALLOWED_ROLES` (เข้าดูได้) / `APP_DECIDER_ROLES` (ยืนยันรหัสได้) ตาม role ใน `ppchos.users`
+   - `JWT_SECRET` ใหม่ (ไม่ใช้ร่วมกับ ppc-hos — cookie ชื่อ `ipdsum_token` แยกกันอยู่แล้ว)
+4. **ตรวจโครงสร้าง HOSxP:** `npm run check-schema` (ต้องมี `.env.local` ค่าเดียวกัน) — พิมพ์เฉพาะชื่อตาราง/ฟิลด์
+   และบอกว่าคอลัมน์ที่ต่างกันตามเวอร์ชันถูกเลือกเป็นตัวไหน (แพทย์ผู้รับไว้, วันที่/แพทย์ผู้ทำหัตถการ, วันที่สั่งยา, lab ผู้ป่วยใน)
+5. **รัน:** `docker compose up -d --build` → `http://<เครื่องนี้>:3600` แล้วเปิด `/system` ตรวจว่าเขียวทุกช่อง
+6. **Gemini กับข้อมูลจริง:** เปิด billing แล้วตั้ง `GEMINI_PAID_TIER=true` (ไม่ตั้ง = ใช้ engine แบบกฎอัตโนมัติ)
+7. **ก่อนใช้จริง:** ให้ผู้ให้รหัสเทียบกับ HOSxP อย่างน้อย 10 ราย
 
-```bash
-cp .env.example .env.production   # กรอกค่าจริง
-docker compose up -d --build      # app + redis → http://<เครื่องนี้>:3600
-```
-
-build ไม่ต้องใช้ค่า env (อ่านตอน runtime ทั้งหมด) แต่เครื่องที่ build ต้องต่อเน็ตได้ (โหลดฟอนต์ Prompt/Sarabun)
+ถ้าไม่ใช้ ppchos: ตั้ง `APP_DB_URL` เป็นฐานอื่น + `APP_USERS_TABLE=users` แล้วสร้างบัญชีด้วย
+`npm run create-user -- <username> DOCTOR "<ชื่อ>"`
 
 ## คำสั่ง
 
@@ -58,6 +61,7 @@ npm run lint
 npm test            # vitest (deidentify, กฎตรวจรหัส, AdjRW, SQL guard, ฯลฯ)
 npm run check-schema
 npm run create-user -- <username> <role> "<ชื่อ>"
+npm run appdb-sql   # สร้าง docs/sql/appdb.sql ใหม่หลังแก้ lib/appdb/schema.ts
 ```
 
 ## โครงสร้าง

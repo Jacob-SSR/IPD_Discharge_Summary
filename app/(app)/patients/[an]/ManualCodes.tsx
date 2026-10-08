@@ -151,7 +151,7 @@ export function ManualCodes({
           {error && <ErrorBox message={error} />}
         </form>
       ) : (
-        <p className="text-xs text-slate-500">เฉพาะแพทย์ (role DOCTOR) ที่เพิ่มรหัสได้</p>
+        <p className="text-xs text-slate-500">บัญชีนี้ดูได้อย่างเดียว — เฉพาะแพทย์ที่ได้รับสิทธิ์ที่เพิ่มรหัสได้</p>
       )}
 
       {added.length > 0 && (

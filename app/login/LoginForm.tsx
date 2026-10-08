@@ -5,10 +5,13 @@ import { useState, type FormEvent } from "react";
 import { buttonClass, ErrorBox, inputClass } from "@/components/ui";
 
 export function LoginForm({ demo }: { demo: boolean }) {
-  const next = useSearchParams().get("next");
+  const params = useSearchParams();
+  const next = params.get("next");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    params.get("error") === "role" ? "บัญชีนี้ไม่มีสิทธิ์ใช้ระบบสรุปเวชระเบียน — ติดต่อผู้ดูแลระบบ" : null,
+  );
   const [busy, setBusy] = useState(false);
 
   async function submit(e: FormEvent) {

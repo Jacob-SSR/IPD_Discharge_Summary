@@ -1,5 +1,6 @@
 // app/api/login/route.ts
-// เข้าสู่ระบบด้วยบัญชีในตาราง users ของฐานข้อมูลแอป (คอลัมน์แบบ ppchos.users)
+// เข้าสู่ระบบด้วยบัญชีในตาราง APP_USERS_TABLE (เช่น ppchos.users = บัญชีเดียวกับ ppc-hos-10667)
+// เข้าได้เฉพาะ role ใน APP_ALLOWED_ROLES เพราะหน้านี้มีข้อมูลผู้ป่วย
 // โหมด demo: ใช้ DEMO_USERNAME / DEMO_PASSWORD จาก env ได้ด้วย (role DOCTOR)
 
 import { NextResponse } from "next/server";
@@ -7,7 +8,7 @@ import { z } from "zod";
 import { appDb } from "@/lib/appdb";
 import { hashPassword, isBcrypt, verifyPassword } from "@/lib/auth/password";
 import { clientIp, rateLimit } from "@/lib/auth/rateLimit";
-import { SESSION_COOKIE, SESSION_MAX_AGE, signSession, type Session } from "@/lib/auth/session";
+import { isAllowedRole, SESSION_COOKIE, SESSION_MAX_AGE, signSession, type Session } from "@/lib/auth/session";
 import { errorResponse } from "@/lib/api";
 import { cookieSecure, demoLogin, isDemo } from "@/lib/env";
 
@@ -40,6 +41,7 @@ export async function POST(req: Request) {
     if (!userLimit.ok) return tooMany(userLimit.retryAfterSec, "บัญชีนี้ถูกพยายามเข้าสู่ระบบหลายครั้งเกินไป กรุณารอสักครู่");
 
     let session: Session | null = null;
+    let upgradeHash = false;
 
     const demo = isDemo() ? demoLogin() : undefined;
     if (demo && username === demo.username && password === demo.password) {
@@ -48,10 +50,7 @@ export async function POST(req: Request) {
       const db = appDb();
       const user = await db.findUser(username);
       if (user && (await verifyPassword(password, user.passweb))) {
-        if (!isBcrypt(user.passweb)) {
-          // อัปเกรด md5 → bcrypt (ฐานข้อมูลแอป ไม่ใช่ HOSxP)
-          await db.upsertUser({ ...user, passweb: await hashPassword(password) });
-        }
+        upgradeHash = !isBcrypt(user.passweb);
         session = { username: user.user, name: user.name, role: (user.role ?? "USER").toUpperCase() };
       }
     }
@@ -59,7 +58,18 @@ export async function POST(req: Request) {
     if (!session) {
       return NextResponse.json({ error: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
     }
+    if (!isAllowedRole(session.role)) {
+      await appDb().audit({ username: session.username, action: "login-denied-role", an: null, detail: session.role });
+      return NextResponse.json(
+        { error: `บัญชีนี้ (role ${session.role}) ไม่มีสิทธิ์ใช้ระบบสรุปเวชระเบียน — ติดต่อผู้ดูแลระบบ` },
+        { status: 403 },
+      );
+    }
 
+    if (upgradeHash) {
+      // อัปเกรด md5 → bcrypt แบบเดียวกับ ppc-hos (ตารางผู้ใช้ในฐานแอป ไม่ใช่ HOSxP) — เฉพาะบัญชีที่มีสิทธิ์ใช้ระบบนี้
+      await appDb().updatePassword(session.username, await hashPassword(password));
+    }
     await appDb().audit({ username: session.username, action: "login", an: null, detail: null });
 
     const res = NextResponse.json({ ok: true, role: session.role });

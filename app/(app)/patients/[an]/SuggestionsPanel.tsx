@@ -95,7 +95,7 @@ export function SuggestionsPanel({
         {ai.reason && <span className="text-amber-700">{ai.reason}</span>}
       </div>
       {error && <ErrorBox message={error} />}
-      {!canDecide && <p className="text-xs text-slate-500">เฉพาะแพทย์ (role DOCTOR) ที่ขอคำแนะนำและยืนยันรหัสได้</p>}
+      {!canDecide && <p className="text-xs text-slate-500">บัญชีนี้ดูได้อย่างเดียว — เฉพาะแพทย์ที่ได้รับสิทธิ์ที่ขอคำแนะนำและยืนยันรหัสได้</p>}
 
       {suggest && (
         <div className="flex flex-col gap-3">
