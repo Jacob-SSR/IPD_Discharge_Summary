@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Activity, BarChart3, BrainCircuit, ClipboardList, LogOut, PlugZap } from "lucide-react";
 
 const NAV = [
@@ -26,6 +26,15 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  // ธีมที่ผู้ใช้เลือกเอง (command palette) — ไม่ได้เลือกก็ตามเครื่อง
+  useEffect(() => {
+    try {
+      const t = localStorage.getItem("ipdsum-theme");
+      if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
+    } catch {
+      /* ไม่มี localStorage */
+    }
+  }, []);
   async function logout() {
     await fetch("/api/logout", { method: "POST" });
     router.replace("/login");
@@ -33,6 +42,10 @@ export function AppShell({
   }
   return (
     <div className="min-h-screen">
+      <div className="bg-fx" aria-hidden>
+        <i />
+        <i />
+      </div>
       <header className="no-print glass sticky top-0 z-20 border-x-0 border-t-0">
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2">
           <Link href="/patients" className="group flex items-center gap-2">

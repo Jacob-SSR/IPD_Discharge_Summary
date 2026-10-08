@@ -10,6 +10,7 @@ import type { ListItem, Tally, WorkspaceBundle } from "@/lib/patients/bundle";
 import type { FilterOptions } from "@/lib/patients/types";
 import { AiPanel } from "./AiPanel";
 import { CenterPane } from "./CenterPane";
+import { CommandPalette, type PaletteAction } from "./CommandPalette";
 import { PatientList, type ListFilter } from "./PatientList";
 
 const VIEW_KEY = "ipdsum-view";
@@ -51,6 +52,7 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
   const ctl = useRef<AbortController | null>(null);
   const [course, setCourseState] = useState<{ an: string; text: string; saved: string } | null>(null);
   const saveTimer = useRef<number | undefined>(undefined);
+  const [palette, setPalette] = useState(false);
 
   // รายชื่อ
   useEffect(() => {
@@ -183,15 +185,85 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
   }
 
   const shown = bundle && bundle.admission.an === cur ? bundle : null;
+  const ordered = useMemo(() => [...items.filter((i) => i.pending), ...items.filter((i) => !i.pending)], [items]);
+
+  // คีย์ลัด: Ctrl/⌘+K = command palette, Alt+↑/↓ = ผู้ป่วยก่อนหน้า/ถัดไป
+  useEffect(() => {
+    function onKey(e: globalThis.KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPalette((p) => !p);
+      } else if (e.altKey && (e.key === "ArrowDown" || e.key === "ArrowUp") && ordered.length && !busyAn) {
+        e.preventDefault();
+        const i = ordered.findIndex((x) => x.an === cur);
+        const next = ordered[(i + (e.key === "ArrowDown" ? 1 : -1) + ordered.length) % ordered.length];
+        setPicked(next.an);
+        window.history.replaceState(null, "", `?an=${next.an}`);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [ordered, cur, busyAn]);
   const courseNow = course && shown && course.an === shown.admission.an ? course : null;
   const pendingCount = items.filter((i) => i.pending).length;
+  const actions: PaletteAction[] = [
+    {
+      id: "analyze",
+      label: shown && !shown.admission.diagnoses.some((d) => d.diagtype === "1") ? "ให้ AI ร่างรหัส" : "วิเคราะห์ด้วย AI",
+      hint: shown?.ai.active === "gemini" ? (shown.ai.model ?? "") : "ยังไม่ได้ตั้งค่า AI",
+      disabled: !shown || shown.ai.active !== "gemini" || !shown.canDecide || !!busyAn,
+      run: () => void analyze(),
+    },
+    { id: "chart", label: "เปิดแท็บ ข้อมูลในชาร์ต", run: () => setView("chart") },
+    { id: "form", label: "เปิดแท็บ แบบฟอร์ม Discharge Summary", run: () => setView("form") },
+    {
+      id: "print",
+      label: "พิมพ์แบบฟอร์ม A4 / บันทึก PDF",
+      disabled: !shown,
+      run: () => {
+        setView("form");
+        window.setTimeout(() => window.print(), 300);
+      },
+    },
+    {
+      id: "excel",
+      label: "ส่งออก Excel",
+      disabled: !shown,
+      run: () => {
+        if (!shown) return;
+        const a = document.createElement("a");
+        a.href = `/api/patients/${shown.admission.an}/excel`;
+        a.click();
+      },
+    },
+    {
+      id: "manual",
+      label: "เพิ่มรหัสเอง",
+      disabled: !shown?.canDecide,
+      run: () => document.querySelector<HTMLInputElement>(".manual input[type=search]")?.focus(),
+    },
+    {
+      id: "theme",
+      label: "สลับธีม สว่าง / มืด",
+      run: () => {
+        const el = document.documentElement;
+        const dark = el.dataset.theme ? el.dataset.theme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        el.dataset.theme = dark ? "light" : "dark";
+        try {
+          localStorage.setItem("ipdsum-theme", el.dataset.theme);
+        } catch {
+          /* ไม่จำก็ได้ */
+        }
+      },
+    },
+  ];
 
   return (
     <div className="ws">
       <header className="ws-top">
         <div>
           <h1>
-            <BlurText text="AI แนะนำรหัส · สรุปเวชระเบียนผู้ป่วยใน" />
+            <span className="grad-text">AI แนะนำรหัส</span> <BlurText text="· สรุปเวชระเบียนผู้ป่วยใน" />
             {mode === "demo" && <span className="demo-tag">ข้อมูลสมมติ</span>}
           </h1>
           <p>
@@ -200,6 +272,10 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
             {pendingCount ? ` · รอสรุป ${pendingCount} ราย` : ""}
           </p>
         </div>
+        <button type="button" className="kbd no-print" onClick={() => setPalette(true)} title="ค้นหาผู้ป่วยและคำสั่ง">
+          ค้นหา / คำสั่ง <kbd>Ctrl</kbd>
+          <kbd>K</kbd>
+        </button>
         <div className="tally" aria-live="polite" title={tally ? `ปีงบประมาณปัจจุบัน (${tally.from} ถึง ${tally.to})` : undefined}>
           <div>
             <b><CountUp value={tally?.analyzed ?? 0} /></b>
@@ -246,6 +322,7 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
           onView={setView}
           course={courseNow}
           onCourse={setCourse}
+          scanning={!!shown && busyAn === shown.admission.an}
         />
         <AiPanel
           key={`ai-${cur ?? "none"}`}
@@ -259,6 +336,7 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
           onUseDraft={insertDraft}
         />
       </div>
+      <CommandPalette open={palette} onClose={() => setPalette(false)} items={ordered} actions={actions} onSelect={select} />
     </div>
   );
 }

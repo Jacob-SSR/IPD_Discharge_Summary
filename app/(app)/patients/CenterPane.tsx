@@ -19,6 +19,7 @@ export function CenterPane({
   onView,
   course,
   onCourse,
+  scanning = false,
 }: {
   bundle: WorkspaceBundle | null;
   error: string | null;
@@ -26,6 +27,8 @@ export function CenterPane({
   onView: (v: "chart" | "form") => void;
   course: Course;
   onCourse: (text: string) => void;
+  /** AI กำลังอ่านชาร์ตรายนี้ (เส้นสแกน) */
+  scanning?: boolean;
 }) {
   const tabs = useRef<HTMLDivElement>(null);
   const [ink, setInk] = useState<{ left: number; width: number } | null>(null);
@@ -50,7 +53,7 @@ export function CenterPane({
   const acc = acceptedItems(bundle.items, new Map(Object.entries(bundle.state)));
 
   return (
-    <main className="pane chart" aria-live="polite">
+    <main className={`pane chart ${scanning ? "scanning" : ""}`} aria-live="polite" aria-busy={scanning}>
       <div className="vtabs" role="tablist" ref={tabs}>
         <button type="button" role="tab" data-v="chart" aria-selected={view === "chart"} onClick={() => onView("chart")}>
           ข้อมูลในชาร์ต

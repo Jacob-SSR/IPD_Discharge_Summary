@@ -115,9 +115,11 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
   }
 
   return (
-    <aside className="pane ai" aria-label="AI แนะนำรหัส">
+    <aside className={`pane ai ${busy ? "beam" : ""}`} aria-label="AI แนะนำรหัส">
       <div className="ai-head">
-        <h2>AI แนะนำรหัส</h2>
+        <h2>
+          <span className="grad-text">AI</span> แนะนำรหัส
+        </h2>
         <span className="muted" style={{ fontSize: 12 }}>{who}</span>
       </div>
       <p className="ai-note">
@@ -128,7 +130,10 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
       <RwBox b={bundle} />
 
       <div className="run">
-        <button className="btn primary" type="button" onClick={onAnalyze} disabled={busy || otherBusy || !aiReady || !bundle.canDecide || !!bundle.promptError}>
+        <button
+          className={`btn primary ${aiReady && !busy && !otherBusy && bundle.canDecide ? "ready" : ""}`}
+          type="button"
+          onClick={onAnalyze} disabled={busy || otherBusy || !aiReady || !bundle.canDecide || !!bundle.promptError}>
           {busy ? "กำลังวิเคราะห์…" : runLabel}
         </button>
         {busy && (
