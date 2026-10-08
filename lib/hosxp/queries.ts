@@ -59,13 +59,14 @@ function diagtype(v: unknown): DiagType {
 
 function listSelect(c: ResolvedColumns): string {
   const adm = c.admitDoctor ? `i.${c.admitDoctor}` : "NULL";
+  const g = c.grouper;
   return `
 SELECT i.an, i.hn, i.regdate, i.regtime, i.dchdate, i.dchtime,
        i.ward, w.name AS ward_name,
        ${adm} AS admdoctor, da.name AS admdoctor_name,
        i.dch_doctor, dd.name AS dch_doctor_name, i.dchtype, dt.name AS dchtype_name,
        CONCAT(IFNULL(p.pname,''), IFNULL(p.fname,''), ' ', IFNULL(p.lname,'')) AS ptname,
-       p.sex, s.age_y, s.drg, s.rw, s.adjrw,
+       p.sex, s.age_y, ${g.drg ?? "NULL"} AS drg, ${g.rw ?? "NULL"} AS rw, ${g.adjrw ?? "NULL"} AS adjrw,
        DATEDIFF(i.dchdate, i.regdate) AS los,
        (SELECT x.icd10 FROM iptdiag x WHERE x.an = i.an AND x.diagtype = '1' ORDER BY x.icd10 LIMIT 1) AS pdx,
        (SELECT x.doctor FROM iptdiag x WHERE x.an = i.an AND x.diagtype = '1' ORDER BY x.icd10 LIMIT 1) AS pdx_doctor,
@@ -342,13 +343,16 @@ const HISTORY_LIMIT = 3000;
 
 export async function fetchGroupingHistory(pdx: string, from: string, to: string): Promise<GroupingHistory> {
   const key = pdx.replace(/\./g, "").toUpperCase();
+  const g = (await resolveColumns()).grouper;
+  // ไม่มีคอลัมน์ DRG ทั้งใน ipt และ an_stat → ไม่มีผลจัดกลุ่มย้อนหลัง (หน้าจอแจ้ง "ข้อมูลย้อนหลังไม่พอประมาณ")
+  if (!g.drg) return aggregateHistory(key, []);
   const cases = await hosxpQuery<Row>(
-    `SELECT s.an, s.drg, s.rw
-     FROM an_stat s
-     JOIN ipt i ON i.an = s.an
-     JOIN iptdiag d ON d.an = s.an AND d.diagtype = '1'
+    `SELECT i.an, ${g.drg} AS drg, ${g.rw ?? "NULL"} AS rw
+     FROM ipt i
+     LEFT JOIN an_stat s ON s.an = i.an
+     JOIN iptdiag d ON d.an = i.an AND d.diagtype = '1'
      WHERE REPLACE(d.icd10, '.', '') = ? AND i.dchdate BETWEEN ? AND ?
-       AND s.drg IS NOT NULL AND s.drg <> ''
+       AND ${g.drg} IS NOT NULL AND ${g.drg} <> ''
      ORDER BY i.dchdate DESC
      LIMIT ${HISTORY_LIMIT}`,
     [key, from, to],
@@ -395,11 +399,13 @@ export async function fetchCoding(ans: string[]): Promise<Record<string, Admissi
   return out;
 }
 
-// ── รายงาน RW/CMI (RW จริงจาก an_stat) ───────────────────────────────────────
+// ── รายงาน RW/CMI (RW จริงจาก grouper: ipt หรือ an_stat) ───────────────────────────────────────
 export async function fetchRwRows(from: string, to: string): Promise<RwRow[]> {
+  const g = (await resolveColumns()).grouper;
   const rows = await hosxpQuery<Row>(
     `SELECT i.an, i.dchdate, i.ward, w.name AS ward_name, i.dch_doctor, d.name AS dch_doctor_name,
-            s.drg, s.rw, s.adjrw, DATEDIFF(i.dchdate, i.regdate) AS los
+            ${g.drg ?? "NULL"} AS drg, ${g.rw ?? "NULL"} AS rw, ${g.adjrw ?? "NULL"} AS adjrw,
+            DATEDIFF(i.dchdate, i.regdate) AS los
      FROM ipt i
      LEFT JOIN an_stat s ON s.an = i.an
      LEFT JOIN ward w ON w.ward = i.ward

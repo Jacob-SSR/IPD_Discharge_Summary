@@ -145,7 +145,7 @@ codebook ICD-10-TM/ICD-9-CM (OR/Non-OR) และข้อมูลสมมต�
 - เกณฑ์ lab ของกฎหลักฐาน (`lib/coding/legacyRules.ts`, `CLINICAL_REVIEWED = false`) อนุมานจากผลของโปรแกรมเดิม — ให้แพทย์/ผู้ให้รหัสตรวจ
 - ตาราง TDRG 6.3 จริง (`data/tdrg/tdrg_rw_table.csv`) ยังไม่มี — ค่าใน `data/tdrg/demo/` เป็นค่าสมมติ ห้ามเดาค่า RW
 - codebook จาก OCR ยังไม่ได้ตรวจทาน
-- SQL (`lib/hosxp/queries.ts`) ปรับตาม ppc-hos-10667 / rca แล้ว (ipt.dch_doctor, ipt.vn → opdscreen/ovstdiag, an_stat.aid/pttype,
+- SQL (`lib/hosxp/queries.ts`) ปรับตาม ppc-hos-10667 / rca แล้ว (ipt.dch_doctor, ipt.vn → opdscreen/ovstdiag, an_stat.aid/pttype, DRG/RW/AdjRW จาก ipt ก่อนแล้วค่อย an_stat,
   รหัสไม่มีจุด/มี extension) คอลัมน์ที่ต่างตามเวอร์ชันเลือกอัตโนมัติ (`lib/hosxp/columns.ts`) ทดสอบกับฐานจำลอง 3 รุ่น ยังไม่เคยต่อ HOSxP จริง
 
 ฐานข้อมูลแอป: ใช้ฐาน `ppchos` เดิมของ ppc-hos (ตาราง `ipdsum_*`, `docs/sql/appdb.sql`) และ login ด้วย `ppchos.users`
