@@ -8,6 +8,7 @@ import { closeHosxpPool, hosxpPing, hosxpQuery } from "@/lib/hosxp/pool";
 import {
   ADMIT_DOCTOR_CANDIDATES,
   OPDATE_CANDIDATES,
+  GROUPER_FIELDS,
   OPDOCTOR_CANDIDATES,
   PREDIAG_CANDIDATES,
   SCREEN_COLUMNS,
@@ -69,6 +70,9 @@ async function main() {
   console.log(`✓ lab ผู้ป่วยใน: ${c.labHasAn ? "lab_head.an หรือ lab_head.vn = AN" : "lab_head.vn = AN"}`);
   show("ipt.vn (visit ที่ admit)", c.iptVn ? "vn" : null, ["vn"], "ไม่มี CC/HPI/สัญญาณชีพแรกรับ และรหัสจาก ER/OPD");
   show("ipt การวินิจฉัยแรกรับ", c.prediag, PREDIAG_CANDIDATES, "ไม่แสดงการวินิจฉัยแรกรับที่แพทย์พิมพ์");
+  for (const f of GROUPER_FIELDS) {
+    show(`${f} (ผล grouper)`, c.grouper[f] ? c.grouper[f]!.replace(/^i\./, "ipt.").replace(/^s\./, "an_stat.") : null, [`ipt.${f}`, `an_stat.${f}`], "ไม่แสดง DRG/RW จริงจาก HOSxP และประมาณ DRG จากผลย้อนหลังไม่ได้");
+  }
   const missingScreen = SCREEN_COLUMNS.filter((x) => !c.screen.includes(x));
   if (!c.screen.length) {
     console.log("! opdscreen: อ่านไม่ได้ — ไม่มี CC/HPI/สัญญาณชีพแรกรับ");

@@ -11,7 +11,8 @@ export const HOSXP_COLUMNS: Record<string, readonly string[]> = {
   ipt: ["an", "hn", "regdate", "regtime", "dchdate", "dchtime", "ward", "dch_doctor", "dchstts", "dchtype"],
   patient: ["hn", "pname", "fname", "lname", "sex", "birthday", "cid", "addrpart", "moopart", "hometel"],
   thaiaddress: ["addressid", "full_name"],
-  an_stat: ["an", "age_y", "drg", "rw", "adjrw", "aid", "pttype"],
+  // drg / rw / adjrw ไม่อยู่ในรายการนี้ — เลือกจาก ipt หรือ an_stat อัตโนมัติ (columns.ts, ppc-hos ใช้ ipt.adjrw)
+  an_stat: ["an", "age_y", "aid", "pttype"],
   ward: ["ward", "name"],
   doctor: ["code", "name"],
   pttype: ["pttype", "name"],

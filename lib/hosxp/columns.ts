@@ -15,6 +15,12 @@ export const RXDATE_CANDIDATES = ["rxdate", "vstdate"] as const;
 export const OPDOCTOR_CANDIDATES = ["doctor", "opdoctor", "doctor_code"] as const;
 /** การวินิจฉัยแรกรับที่แพทย์พิมพ์ใน ipt (free text — แสดงอย่างเดียว ห้ามส่ง AI) */
 export const PREDIAG_CANDIDATES = ["prediag", "pre_diag", "admit_diag"] as const;
+/**
+ * DRG / RW / AdjRW ที่ grouper คำนวณแล้ว — HOSxP ส่วนใหญ่เก็บใน ipt (ppc-hos ใช้ ipt.adjrw)
+ * บางรุ่นเก็บใน an_stat → เลือก ipt ก่อน ถ้าไม่มีค่อยใช้ an_stat ไม่มีทั้งคู่ = NULL
+ */
+export const GROUPER_FIELDS = ["drg", "rw", "adjrw"] as const;
+
 /** คอลัมน์ของ opdscreen ที่ใช้ (มีครบหรือไม่แล้วแต่เวอร์ชัน) */
 export const SCREEN_COLUMNS = ["cc", "hpi", "pmh", "bps", "bpd", "pulse", "temperature", "rr", "bw", "height"] as const;
 
@@ -31,6 +37,14 @@ export interface ResolvedColumns {
   prediag: string | null;
   /** คอลัมน์ของ opdscreen ที่มีจริง (ว่าง = ไม่มีตาราง/อ่านไม่ได้) */
   screen: string[];
+  /** นิพจน์ SQL ของ DRG/RW/AdjRW เช่น "i.adjrw" (ipt) หรือ "s.adjrw" (an_stat) — null = ไม่มี */
+  grouper: Record<(typeof GROUPER_FIELDS)[number], string | null>;
+}
+
+/** ipt ก่อน แล้วค่อย an_stat (alias i / s ตาม queries.ts) */
+export function pickGrouper(ipt: Set<string>, anStat: Set<string>): ResolvedColumns["grouper"] {
+  const one = (c: string) => (ipt.has(c) ? `i.${c}` : anStat.has(c) ? `s.${c}` : null);
+  return { drg: one("drg"), rw: one("rw"), adjrw: one("adjrw") };
 }
 
 let cached: Promise<ResolvedColumns> | null = null;
@@ -51,12 +65,13 @@ export function pick(cols: Set<string>, candidates: readonly string[]): string |
 export function resolveColumns(): Promise<ResolvedColumns> {
   if (!cached) {
     cached = (async () => {
-      const [ipt, oprt, lab, item, screen] = await Promise.all([
+      const [ipt, oprt, lab, item, screen, anStat] = await Promise.all([
         tableColumns("ipt"),
         tableColumns("iptoprt"),
         tableColumns("lab_head"),
         tableColumns("opitemrece"),
         tableColumns("opdscreen"),
+        tableColumns("an_stat"),
       ]);
       return {
         admitDoctor: pick(ipt, ADMIT_DOCTOR_CANDIDATES),
@@ -67,6 +82,7 @@ export function resolveColumns(): Promise<ResolvedColumns> {
         iptVn: ipt.has("vn"),
         prediag: pick(ipt, PREDIAG_CANDIDATES),
         screen: screen.has("vn") ? SCREEN_COLUMNS.filter((c) => screen.has(c)) : [],
+        grouper: pickGrouper(ipt, anStat),
       };
     })().catch((e) => {
       cached = null;

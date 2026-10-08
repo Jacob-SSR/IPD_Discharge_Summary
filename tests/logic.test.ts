@@ -5,6 +5,7 @@ import { acceptedLabel, copyText, finalCodes } from "@/lib/coding/final";
 import { fiscalYearBE, fiscalYearRange, formatThaiDate, quickRange } from "@/lib/date";
 import { buildDemoAdmissions } from "@/lib/demo/data";
 import { matchesFilter } from "@/lib/demo/source";
+import { pickGrouper } from "@/lib/hosxp/columns";
 import { buildListWhere, splitIcd9 } from "@/lib/hosxp/queries";
 import { parseFilter } from "@/lib/patients/filter";
 import { buildRwReport } from "@/lib/reports/rw";
@@ -114,5 +115,13 @@ describe("รายงาน RW/CMI", () => {
     );
     expect(r.totals).toMatchObject({ n: 3, nWithRw: 2, sumAdjRw: 1.8, cmi: 0.9, nMissingDrg: 1, estimatedRevenue: Math.round(1.8 * 8350) });
     expect(r.byMonth.map((m) => m.key)).toEqual(["2026-01", "2026-02"]);
+  });
+});
+
+describe("คอลัมน์ DRG/RW/AdjRW ตามเวอร์ชัน HOSxP", () => {
+  it("เลือก ipt ก่อน (แบบ ppc-hos ใช้ ipt.adjrw) ถ้าไม่มีใช้ an_stat ไม่มีทั้งคู่ = null", () => {
+    expect(pickGrouper(new Set(["an", "drg", "rw", "adjrw"]), new Set(["an", "age_y"]))).toEqual({ drg: "i.drg", rw: "i.rw", adjrw: "i.adjrw" });
+    expect(pickGrouper(new Set(["an", "adjrw"]), new Set(["drg", "rw", "adjrw"]))).toEqual({ drg: "s.drg", rw: "s.rw", adjrw: "i.adjrw" });
+    expect(pickGrouper(new Set(["an"]), new Set(["an"]))).toEqual({ drg: null, rw: null, adjrw: null });
   });
 });
