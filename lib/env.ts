@@ -77,6 +77,21 @@ export function appDbFile(): string {
 }
 
 /**
+ * บัญชีผู้ใช้จาก ppchos.users ของ ppc-hos-10667 แบบอ่านอย่างเดียว (ชื่อ env เดียวกับ rca)
+ * ไม่ตั้ง AUTH_DB_HOST = ใช้ตาราง users ในฐานข้อมูลของแอปเอง (npm run create-user)
+ */
+export function authDbConfig() {
+  if (!optional("AUTH_DB_HOST")) return undefined;
+  return {
+    host: process.env.AUTH_DB_HOST!,
+    port: positiveNumber("AUTH_DB_PORT", process.env.AUTH_DB_PORT!),
+    user: process.env.AUTH_DB_USER!,
+    password: process.env.AUTH_DB_PASS!,
+    database: process.env.AUTH_DB_NAME!,
+  };
+}
+
+/**
  * ตารางบัญชีผู้ใช้ในฐานแอป เช่น ppchos.users (บัญชีเดียวกับ ppc-hos-10667) หรือ users
  */
 export function appUsersTable(): string {

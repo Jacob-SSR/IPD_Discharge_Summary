@@ -1,5 +1,6 @@
 // app/api/login/route.ts
-// เข้าสู่ระบบด้วยบัญชีในตาราง APP_USERS_TABLE (เช่น ppchos.users = บัญชีเดียวกับ ppc-hos-10667)
+// เข้าสู่ระบบด้วยบัญชี ppchos.users (AUTH_DB_* — บัญชีเดียวกับ ppc-hos-10667 / rca, อ่านอย่างเดียว)
+// หรือตาราง users ในฐานข้อมูลของแอปเอง ถ้าไม่ได้ตั้ง AUTH_DB_*
 // เข้าได้เฉพาะ role ใน APP_ALLOWED_ROLES เพราะหน้านี้มีข้อมูลผู้ป่วย
 // โหมด demo: ใช้ DEMO_USERNAME / DEMO_PASSWORD จาก env ได้ด้วย (role DOCTOR)
 
@@ -8,6 +9,7 @@ import { z } from "zod";
 import { appDb } from "@/lib/appdb";
 import { hashPassword, isBcrypt, verifyPassword } from "@/lib/auth/password";
 import { clientIp, rateLimit } from "@/lib/auth/rateLimit";
+import { userSource } from "@/lib/auth/users";
 import { isAllowedRole, SESSION_COOKIE, SESSION_MAX_AGE, signSession, type Session } from "@/lib/auth/session";
 import { errorResponse } from "@/lib/api";
 import { cookieSecure, demoLogin, isDemo } from "@/lib/env";
@@ -47,10 +49,11 @@ export async function POST(req: Request) {
     if (demo && username === demo.username && password === demo.password) {
       session = { username, name: "ผู้ใช้ทดลอง (demo)", role: "DOCTOR" };
     } else {
-      const db = appDb();
-      const user = await db.findUser(username);
+      const users = userSource();
+      const user = await users.findUser(username);
       if (user && (await verifyPassword(password, user.passweb))) {
-        upgradeHash = !isBcrypt(user.passweb);
+        // อัปเกรด md5 → bcrypt เฉพาะตารางผู้ใช้ของแอปเอง — ppchos.users ไม่เขียนกลับ (ppc-hos เป็นเจ้าของ)
+        upgradeHash = !users.external && !isBcrypt(user.passweb);
         session = { username: user.user, name: user.name, role: (user.role ?? "USER").toUpperCase() };
       }
     }
@@ -67,7 +70,7 @@ export async function POST(req: Request) {
     }
 
     if (upgradeHash) {
-      // อัปเกรด md5 → bcrypt แบบเดียวกับ ppc-hos (ตารางผู้ใช้ในฐานแอป ไม่ใช่ HOSxP) — เฉพาะบัญชีที่มีสิทธิ์ใช้ระบบนี้
+      // อัปเกรด md5 → bcrypt ในตารางผู้ใช้ของแอปเอง — เฉพาะบัญชีที่มีสิทธิ์ใช้ระบบนี้
       await appDb().updatePassword(session.username, await hashPassword(password));
     }
     await appDb().audit({ username: session.username, action: "login", an: null, detail: null });

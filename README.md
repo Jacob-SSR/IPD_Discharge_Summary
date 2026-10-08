@@ -41,28 +41,35 @@ codebook จริงจากโปรแกรมเดิม: ICD-10-TM 2009 
 
 ## ใช้งานจริงคู่กับ ppc-hos-10667 (เครื่องใน LAN)
 
-**ไม่ต้องตั้งฐานข้อมูลใหม่** — แอปต้องมีที่เขียนข้อมูลของตัวเอง (การยืนยันรหัส, audit log, Course ที่บันทึก)
-เพราะห้ามเขียน HOSxP แต่ใช้ฐาน `ppchos` เดิม (`DB_HOST2` ของ ppc-hos) ได้เลย:
-ตารางของแอปขึ้นต้นด้วย `ipdsum_` ไม่ชนของเดิม และ login ด้วยบัญชีใน `ppchos.users` ชุดเดียวกับ ppc-hos
+**ไม่สร้างตารางหรือเขียนข้อมูลบน server HOSxP / ppchos เลย** — ข้อมูลของโปรแกรม (การยืนยันรหัส, ผล AI, สรุปการรักษา, audit log)
+เก็บใน MariaDB ของโปรแกรมเองที่ `docker compose` รันให้ (service `appdb`, ตาราง `ipdsum_*` สร้างอัตโนมัติจาก
+[`docs/sql/appdb.sql`](docs/sql/appdb.sql) ตอนเริ่มครั้งแรก) โปรแกรมไม่ยอมเริ่มถ้า `APP_DB_URL` ชี้ไปที่ server HOSxP หรือ ppchos
 
-0. **บัญชีเข้าระบบ:** ใช้ชื่อผู้ใช้/รหัสผ่านเดียวกับ ppc-hos (ตาราง `ppchos.users` แบบเดียวกับ rca) — ใส่ `APP_ALLOWED_ROLES=*` ถ้าให้ทุกบัญชีเข้าได้
+| ต่อกับ | ใช้ทำอะไร | สิทธิ์ |
+|---|---|---|
+| HOSxP (`HOSXP_DB_*`) | ข้อมูลผู้ป่วยใน | อ่านอย่างเดียว (user SELECT + session read only + SQL guard) |
+| `ppchos.users` (`AUTH_DB_*`) | login ด้วยบัญชีเดียวกับ ppc-hos / rca | อ่านอย่างเดียว — ไม่อัปเกรดรหัสผ่านกลับ |
+| `appdb` ใน Docker (`APP_DB_URL`) | ข้อมูลของโปรแกรม | อ่าน/เขียน — ที่เดียวที่สร้างตาราง |
+
 1. **HOSxP:** ให้ DBA สร้าง user อ่านอย่างเดียว [`docs/sql/create_readonly_user.sql`](docs/sql/create_readonly_user.sql)
    (อย่าใช้ user ของ ppc-hos เพราะเขียนได้ — หน้า `/system` จะแจ้งเตือนถ้า user มีสิทธิ์เขียน)
-2. **ฐานแอป:** รัน [`docs/sql/appdb.sql`](docs/sql/appdb.sql) ในฐาน `ppchos` (หรือให้แอปสร้างเองถ้า user มีสิทธิ์ CREATE)
-3. **env:** `cp .env.example .env.production` แล้วกรอก — ค่าหลัก:
+2. **env:** `cp .env.example .env.production` แล้วกรอก — ค่าหลัก:
    - `HOSXP_DB_HOST` / `HOSXP_DB_NAME` = `DB_HOST` / `DB_NAME` ของ ppc-hos, user = user อ่านอย่างเดียวจากข้อ 1
-   - `APP_DB_URL=mysql://<DB_USER>:<DB_PASS>@<DB_HOST2>:3306/ppchos`, `APP_USERS_TABLE=ppchos.users`
-   - `APP_ALLOWED_ROLES` (เข้าดูได้) / `APP_DECIDER_ROLES` (ยืนยันรหัสได้) ตาม role ใน `ppchos.users`
+   - `AUTH_DB_HOST` / `AUTH_DB_PORT` / `AUTH_DB_USER` / `AUTH_DB_PASS` = `DB_HOST2` / `DB_PORT` / `DB_USER` / `DB_PASS` ของ ppc-hos, `AUTH_DB_NAME=ppchos` (แบบเดียวกับ rca)
+   - `MARIADB_ROOT_PASSWORD` / `MARIADB_PASSWORD` สุ่มใหม่ แล้วใส่รหัสเดียวกันใน `APP_DB_URL=mysql://ipdsum:<MARIADB_PASSWORD>@appdb:3306/ipdsum`
+   - `APP_ALLOWED_ROLES` (เข้าดูได้, `*` = ทุกบัญชี) / `APP_DECIDER_ROLES` (ยืนยันรหัสได้) ตาม role ใน `ppchos.users`
    - `HOSPITAL_NAME` / `HOSPITAL_CODE` / `HOSPITAL_PROVINCE` (หัวแบบฟอร์ม)
    - `JWT_SECRET` ใหม่ (ไม่ใช้ร่วมกับ ppc-hos — cookie ชื่อ `ipdsum_token` แยกกันอยู่แล้ว)
-4. **ตรวจโครงสร้าง HOSxP:** `npm run check-schema` (ต้องมี `.env.local` ค่าเดียวกัน) — พิมพ์เฉพาะชื่อตาราง/ฟิลด์
-   และบอกว่าคอลัมน์ที่ต่างกันตามเวอร์ชันถูกเลือกเป็นตัวไหน (แพทย์ผู้รับไว้, วันที่/แพทย์ผู้ทำหัตถการ, วันที่สั่งยา, lab ผู้ป่วยใน)
-5. **รัน:** `docker compose up -d --build` → `http://<เครื่องนี้>:3600` แล้วเปิด `/system` ตรวจว่าเขียวทุกช่อง
-6. **Gemini กับข้อมูลจริง:** เปิด billing แล้วตั้ง `GEMINI_PAID_TIER=true` (ไม่ตั้ง = ใช้ engine แบบกฎอัตโนมัติ)
-7. **ก่อนใช้จริง:** ให้ผู้ให้รหัสเทียบกับ HOSxP อย่างน้อย 10 ราย
+3. **ตรวจโครงสร้าง HOSxP:** `npm run check-schema` (ต้องมี `.env.local` ค่าเดียวกัน) — พิมพ์เฉพาะชื่อตาราง/ฟิลด์
+   และบอกว่าคอลัมน์ที่ต่างกันตามเวอร์ชันถูกเลือกเป็นตัวไหน (DRG/RW/AdjRW, แพทย์ผู้รับไว้, วันที่/แพทย์ผู้ทำหัตถการ, วันที่สั่งยา ฯลฯ)
+4. **รัน:** `docker compose up -d --build` (app + appdb + redis) → `http://<เครื่องนี้>:3600` แล้วเปิด `/system` ตรวจว่าเขียวทุกช่อง
+   — ข้อมูลของโปรแกรมอยู่ใน volume `appdb-data` (สำรองด้วย `docker exec ipd-discharge-appdb mariadb-dump ...`)
+5. **Gemini กับข้อมูลจริง:** เปิด billing แล้วตั้ง `GEMINI_PAID_TIER=true` (ไม่ตั้ง = แสดงเฉพาะผลจากกฎหลักฐาน)
+6. **ก่อนใช้จริง:** ให้ผู้ให้รหัสเทียบกับ HOSxP อย่างน้อย 10 ราย
 
-ถ้าไม่ใช้ ppchos: ตั้ง `APP_DB_URL` เป็นฐานอื่น + `APP_USERS_TABLE=users` แล้วสร้างบัญชีด้วย
-`npm run create-user -- <username> DOCTOR "<ชื่อ>"`
+ถ้าไม่ใช้บัญชี ppc-hos: ไม่ต้องตั้ง `AUTH_DB_*` แล้วสร้างบัญชีในตาราง `users` ของ appdb ด้วย
+`npm run create-user -- <username> DOCTOR "<ชื่อ>"` (appdb ไม่เปิด port ออกนอกเครื่อง — เปิด `ports: ["127.0.0.1:3307:3306"]` ชั่วคราว
+แล้วตั้ง `APP_DB_URL=mysql://ipdsum:<รหัส>@127.0.0.1:3307/ipdsum` ใน `.env.local`)
 
 ## คำสั่ง
 
@@ -72,7 +79,7 @@ npm run lint
 npm test            # vitest (deidentify, กฎตรวจรหัส, AdjRW, SQL guard, ฯลฯ)
 npm run check-schema
 npm run create-user -- <username> <role> "<ชื่อ>"
-npm run appdb-sql   # สร้าง docs/sql/appdb.sql ใหม่หลังแก้ lib/appdb/schema.ts
+npm run appdb-sql   # สร้าง docs/sql/appdb.sql ใหม่หลังแก้ lib/appdb/schema.ts (Docker ใช้ไฟล์นี้สร้างตาราง)
 ```
 
 ## โครงสร้าง

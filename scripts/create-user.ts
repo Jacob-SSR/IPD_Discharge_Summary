@@ -7,8 +7,13 @@
 import { createInterface } from "node:readline/promises";
 import { appDb } from "@/lib/appdb";
 import { hashPassword } from "@/lib/auth/password";
+import { authDbConfig } from "@/lib/env";
 
 async function main() {
+  if (authDbConfig()) {
+    console.error("ตั้ง AUTH_DB_* ไว้ → login ด้วย ppchos.users (อ่านอย่างเดียว) — เพิ่ม/แก้บัญชีใน ppc-hos แทน");
+    process.exit(1);
+  }
   const [username, role = "USER", ...nameParts] = process.argv.slice(2);
   if (!username || !/^[A-Za-z0-9._-]{1,50}$/.test(username)) {
     console.error('ใช้งาน: npm run create-user -- <username> <DOCTOR|ADMIN|USER> "<ชื่อที่แสดง>"');
