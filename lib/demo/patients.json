@@ -1,0 +1,4399 @@
+{
+ "note": "ข้อมูลสมมติ 22 ราย จากสนามลอง AI ให้รหัส (ไม่ใช่ข้อมูลจริง) — วันที่เก็บเป็นจำนวนวันย้อนจากวันล่าสุด",
+ "patients": [
+  {
+   "an": "690001245",
+   "hn": "000201000",
+   "name": "นายสมศักดิ์ ศรีสุข",
+   "sex": "M",
+   "age": 67,
+   "wardCode": "W01",
+   "ward": "หอผู้ป่วยในชาย",
+   "admitDoctor": "D001",
+   "dischargeDoctor": "D002",
+   "pdxDoctor": "D002",
+   "regAgo": 28,
+   "dchAgo": 23,
+   "los": 5,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "UC ในเขต",
+   "drg": "J182",
+   "adjrw": 1.3175,
+   "rw": 1.3175,
+   "screen": {
+    "cc": "ไข้ ไอมีเสมหะ หอบเหนื่อย 3 วัน",
+    "hpi": "ไข้ ไอมีเสมหะ หอบเหนื่อย 3 วัน มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 108,
+    "bpd": 89,
+    "pulse": 110,
+    "temperature": 37.2,
+    "rr": 23,
+    "bw": 45,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "J18.9",
+     "type": "1",
+     "name": "Pneumonia, unspecified"
+    },
+    {
+     "code": "E11.9",
+     "type": "2",
+     "name": "Type 2 diabetes mellitus without complications"
+    },
+    {
+     "code": "I10",
+     "type": "2",
+     "name": "Essential (primary) hypertension"
+    }
+   ],
+   "procs": [
+    {
+     "code": "93.96",
+     "name": "Other oxygen enrichment",
+     "or": "NonOR",
+     "day": 2
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "24.7",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "236.4",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "7.9",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "1.4",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "32.1",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "135.3",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Platelet",
+     "value": "86.9",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "17.8",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "214.9",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "4.0",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "239.6",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Hct",
+     "value": "40.0",
+     "unit": "%",
+     "normal": "36-48"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Salbutamol NB",
+     "strength": "2.5 mg",
+     "units": "neb",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 6
+    },
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "Paracetamol",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 6
+    },
+    {
+     "name": "0.9% NSS",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 20,
+     "day": 1,
+     "lastDay": 5
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "D64.9",
+      "diagtype": 2,
+      "reason": "ภาวะโลหิตจาง — ถ้าทราบชนิด (เช่น D62 เสียเลือดเฉียบพลัน) ให้ระบุเจาะจง",
+      "evidence": [
+       "CBC: Hct 24.7 %"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "D69.6",
+      "diagtype": 2,
+      "reason": "เกล็ดเลือดต่ำ (ถ้าไม่ใช่ส่วนหนึ่งของโรคหลัก เช่น ไข้เลือดออก)",
+      "evidence": [
+       "CBC: Platelet 86.9 10^3/uL"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "proc",
+      "code": "93.94",
+      "diagtype": null,
+      "reason": "ได้รับยาพ่นผ่าน nebulizer",
+      "evidence": [
+       "Salbutamol NB"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [],
+    "level": "ok"
+   }
+  },
+  {
+   "an": "690001246",
+   "hn": "000201037",
+   "name": "นางบุญเรือน บุญมา",
+   "sex": "F",
+   "age": 45,
+   "wardCode": "W02",
+   "ward": "หอผู้ป่วยในหญิง",
+   "admitDoctor": "D002",
+   "dischargeDoctor": "D003",
+   "pdxDoctor": "D003",
+   "regAgo": 24,
+   "dchAgo": 22,
+   "los": 2,
+   "admitted": false,
+   "dchstts": "Complete recovery",
+   "dchtype": "With approval",
+   "pttype": "UC นอกเขต",
+   "drg": "A091",
+   "adjrw": 0.4636,
+   "rw": 0.4636,
+   "screen": {
+    "cc": "ถ่ายเหลว 8 ครั้ง อาเจียน 1 วัน",
+    "hpi": "ถ่ายเหลว 8 ครั้ง อาเจียน 1 วัน มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 135,
+    "bpd": 76,
+    "pulse": 86,
+    "temperature": 38.1,
+    "rr": 25,
+    "bw": 54,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "A09.0",
+     "type": "1",
+     "name": "Other and unspecified gastroenteritis and colitis of infectious origin"
+    },
+    {
+     "code": "E87.6",
+     "type": "3",
+     "name": "Hypokalaemia"
+    }
+   ],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "42.4",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "281.7",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "13.8",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "K",
+     "value": "4.0",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "1.2",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "142.0",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "5.2",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Platelet",
+     "value": "331.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "4.0",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "246.2",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "1.9",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "Na",
+     "value": "141.2",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Omeprazole",
+     "strength": "20 mg",
+     "units": "cap",
+     "qty": 19,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 4,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Paracetamol",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 20,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 5,
+     "day": 1,
+     "lastDay": 3
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "N17.9",
+      "diagtype": 2,
+      "reason": "Creatinine สูง — ตรวจสอบว่าเป็น AKI (N17.-) หรือ CKD (N18.-) จากค่า baseline",
+      "evidence": [
+       "Creatinine 1.9 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 246.2 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [],
+    "level": "ok"
+   }
+  },
+  {
+   "an": "690001247",
+   "hn": "000201074",
+   "name": "เด็กชายกิตติ ทองคำ",
+   "sex": "M",
+   "age": 12,
+   "wardCode": "W03",
+   "ward": "หอผู้ป่วยในเด็ก",
+   "admitDoctor": "D003",
+   "dischargeDoctor": "D004",
+   "pdxDoctor": "D004",
+   "regAgo": 25,
+   "dchAgo": 21,
+   "los": 4,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "ข้าราชการ",
+   "drg": "A910",
+   "adjrw": 0.72,
+   "rw": 0.72,
+   "screen": {
+    "cc": "ไข้สูง 4 วัน ปวดท้อง",
+    "hpi": "ไข้สูง 4 วัน ปวดท้อง มารพ. ญาติพามา",
+    "pmh": "-",
+    "bps": 98,
+    "bpd": 89,
+    "pulse": 71,
+    "temperature": 37.8,
+    "rr": 23,
+    "bw": 44,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "A91",
+     "type": "1",
+     "name": "Dengue haemorrhagic fever"
+    }
+   ],
+   "procs": [
+    {
+     "code": "38.93",
+     "name": "Venous catheterization, not elsewhere classified",
+     "or": "NonOR",
+     "day": 2
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "42.0",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "2.4",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "207.6",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "K",
+     "value": "3.9",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "41.2",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "FBS",
+     "value": "176.9",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Platelet",
+     "value": "45.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "15.5",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 3,
+     "name": "CBC: WBC",
+     "value": "5.2",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "236.0",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "2.9",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "1.6",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 18,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "Omeprazole",
+     "strength": "20 mg",
+     "units": "cap",
+     "qty": 4,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "Paracetamol",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 18,
+     "day": 1,
+     "lastDay": 5
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 3,
+      "reason": "โพแทสเซียมต่ำ และได้รับการรักษาด้วย KCl",
+      "evidence": [
+       "K 2.9 mmol/L",
+       "Elixir KCl"
+      ],
+      "confidence": 0.85,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "N17.9",
+      "diagtype": 2,
+      "reason": "Creatinine สูง — ตรวจสอบว่าเป็น AKI (N17.-) หรือ CKD (N18.-) จากค่า baseline",
+      "evidence": [
+       "Creatinine 2.4 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 236.0 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [],
+    "level": "ok"
+   }
+  },
+  {
+   "an": "690001248",
+   "hn": "000201111",
+   "name": "นายวิชัย แก้วดี",
+   "sex": "M",
+   "age": 72,
+   "wardCode": "W01",
+   "ward": "หอผู้ป่วยในชาย",
+   "admitDoctor": "D004",
+   "dischargeDoctor": "D001",
+   "pdxDoctor": "D001",
+   "regAgo": 27,
+   "dchAgo": 20,
+   "los": 7,
+   "admitted": false,
+   "dchstts": "Not improved",
+   "dchtype": "By transfer",
+   "pttype": "ประกันสังคม",
+   "drg": "J441",
+   "adjrw": 1.159,
+   "rw": 1.159,
+   "screen": {
+    "cc": "หอบเหนื่อยมากขึ้น 2 วัน",
+    "hpi": "หอบเหนื่อยมากขึ้น 2 วัน มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 130,
+    "bpd": 64,
+    "pulse": 118,
+    "temperature": 39.3,
+    "rr": 22,
+    "bw": 68,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "J44.1",
+     "type": "1",
+     "name": "COPD with acute exacerbation, unspecified"
+    },
+    {
+     "code": "I50.0",
+     "type": "2",
+     "name": "Congestive heart failure"
+    }
+   ],
+   "procs": [
+    {
+     "code": "93.96",
+     "name": "Other oxygen enrichment",
+     "or": "NonOR",
+     "day": 2
+    },
+    {
+     "code": "96.04",
+     "name": "Insertion of endotracheal tube",
+     "or": "NonOR",
+     "day": 2
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "10.0",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "FBS",
+     "value": "234.6",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "200.3",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "1.0",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Platelet",
+     "value": "229.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "25.0",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "4.5",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "134.6",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 3,
+     "name": "CBC: WBC",
+     "value": "10.7",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "147.0",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "3.1",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Hct",
+     "value": "26.2",
+     "unit": "%",
+     "normal": "36-48"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 16,
+     "day": 1,
+     "lastDay": 8
+    },
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 16,
+     "day": 1,
+     "lastDay": 7
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 4,
+     "day": 1,
+     "lastDay": 7
+    },
+    {
+     "name": "Salbutamol NB",
+     "strength": "2.5 mg",
+     "units": "neb",
+     "qty": 13,
+     "day": 1,
+     "lastDay": 8
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 3,
+      "reason": "โพแทสเซียมต่ำ และได้รับการรักษาด้วย KCl",
+      "evidence": [
+       "K 3.1 mmol/L",
+       "Elixir KCl"
+      ],
+      "confidence": 0.85,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "D64.9",
+      "diagtype": 2,
+      "reason": "ภาวะโลหิตจาง — ถ้าทราบชนิด (เช่น D62 เสียเลือดเฉียบพลัน) ให้ระบุเจาะจง",
+      "evidence": [
+       "CBC: Hct 25.0 %"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 134.6 mmol/L"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 234.6 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "proc",
+      "code": "93.94",
+      "diagtype": null,
+      "reason": "ได้รับยาพ่นผ่าน nebulizer",
+      "evidence": [
+       "Salbutamol NB"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "info",
+      "จำหน่ายโดยการส่งต่อ (Refer) — ตรวจสอบใบส่งตัว"
+     ]
+    ],
+    "level": "info"
+   }
+  },
+  {
+   "an": "690001249",
+   "hn": "000201148",
+   "name": "นางจันทร์เพ็ญ พลับพลา",
+   "sex": "F",
+   "age": 58,
+   "wardCode": "W02",
+   "ward": "หอผู้ป่วยในหญิง",
+   "admitDoctor": "D001",
+   "dischargeDoctor": "D002",
+   "pdxDoctor": "D002",
+   "regAgo": 22,
+   "dchAgo": 19,
+   "los": 3,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "UC ในเขต",
+   "drg": "N392",
+   "adjrw": 0.8525,
+   "rw": 0.8525,
+   "screen": {
+    "cc": "ปัสสาวะแสบขัด ไข้หนาวสั่น",
+    "hpi": "ปัสสาวะแสบขัด ไข้หนาวสั่น มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 148,
+    "bpd": 85,
+    "pulse": 71,
+    "temperature": 39.1,
+    "rr": 27,
+    "bw": 72,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "N39.0",
+     "type": "1",
+     "name": "Urinary tract infection, site not specified"
+    },
+    {
+     "code": "E11.9",
+     "type": "2",
+     "name": "Type 2 diabetes mellitus without complications"
+    },
+    {
+     "code": "N18.3",
+     "type": "2",
+     "name": "Chronic kidney disease, stage 3"
+    }
+   ],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "FBS",
+     "value": "123.3",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "299.1",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "140.5",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "40.0",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "1.4",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "14.2",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "136.3",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Platelet",
+     "value": "157.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "174.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "1.8",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "244.1",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "3.9",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 4,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "Paracetamol",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 12,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Furosemide inj",
+     "strength": "20 mg",
+     "units": "amp",
+     "qty": 13,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 14,
+     "day": 1,
+     "lastDay": 4
+    }
+   ],
+   "legacy": {
+    "hints": [],
+    "alerts": [],
+    "level": "ok"
+   }
+  },
+  {
+   "an": "690001250",
+   "hn": "000201185",
+   "name": "เด็กหญิงใบเตย ชัยมงคล",
+   "sex": "F",
+   "age": 6,
+   "wardCode": "W03",
+   "ward": "หอผู้ป่วยในเด็ก",
+   "admitDoctor": "D002",
+   "dischargeDoctor": "D003",
+   "pdxDoctor": "D003",
+   "regAgo": 19,
+   "dchAgo": 18,
+   "los": 1,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "UC นอกเขต",
+   "drg": "R500",
+   "adjrw": 0.32,
+   "rw": 0.32,
+   "screen": {
+    "cc": "ไข้ 2 วัน",
+    "hpi": "ไข้ 2 วัน มารพ. ญาติพามา",
+    "pmh": "-",
+    "bps": 137,
+    "bpd": 69,
+    "pulse": 70,
+    "temperature": 38.1,
+    "rr": 28,
+    "bw": 75,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "R50.9",
+     "type": "1",
+     "name": "Fever, unspecified"
+    }
+   ],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "18.0",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "380.0",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "128.6",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "K",
+     "value": "4.2",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "8.7",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "3.3",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Platelet",
+     "value": "237.9",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "1.5",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Omeprazole",
+     "strength": "20 mg",
+     "units": "cap",
+     "qty": 15,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "ORS",
+     "strength": null,
+     "units": "ซอง",
+     "qty": 2,
+     "day": 1,
+     "lastDay": 1
+    },
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 3,
+     "day": 1,
+     "lastDay": 1
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 8,
+     "day": 1,
+     "lastDay": 2
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 128.6 mmol/L"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 2,
+      "reason": "โพแทสเซียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "K 3.3 mmol/L"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "warn",
+      "PDx R50.9 เป็นรหัสอาการ (R-code) — ตรวจสอบว่ามีการวินิจฉัยที่เจาะจงกว่านี้หรือไม่"
+     ]
+    ],
+    "level": "warn"
+   }
+  },
+  {
+   "an": "690001251",
+   "hn": "000201222",
+   "name": "นางสมใจ สุขใจ",
+   "sex": "F",
+   "age": 70,
+   "wardCode": "W02",
+   "ward": "หอผู้ป่วยในหญิง",
+   "admitDoctor": "D003",
+   "dischargeDoctor": "D004",
+   "pdxDoctor": "D004",
+   "regAgo": 20,
+   "dchAgo": 17,
+   "los": 3,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "ข้าราชการ",
+   "drg": "S52S0",
+   "adjrw": 1.794,
+   "rw": 1.794,
+   "screen": {
+    "cc": "หกล้มในบ้าน ข้อมือขวาปวดบวม",
+    "hpi": "หกล้มในบ้าน ข้อมือขวาปวดบวม มารพ. ญาติพามา",
+    "pmh": "-",
+    "bps": 135,
+    "bpd": 72,
+    "pulse": 116,
+    "temperature": 38.7,
+    "rr": 28,
+    "bw": 52,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "S52.5",
+     "type": "1",
+     "name": "Fracture of lower end of radius"
+    }
+   ],
+   "procs": [
+    {
+     "code": "79.01",
+     "name": "Closed reduction of fracture without internal fixation, humerus",
+     "or": "NonOR",
+     "day": 2
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "K",
+     "value": "2.9",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "133.2",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "27.0",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "1.7",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "32.3",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "141.2",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "16.2",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "FBS",
+     "value": "236.6",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Hct",
+     "value": "35.3",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "0.6",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "3.4",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "289.1",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 16,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 13,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "Salbutamol NB",
+     "strength": "2.5 mg",
+     "units": "neb",
+     "qty": 4,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "ORS",
+     "strength": null,
+     "units": "ซอง",
+     "qty": 20,
+     "day": 1,
+     "lastDay": 4
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "W19",
+      "diagtype": 5,
+      "reason": "มีรหัสบาดเจ็บแต่ไม่มีรหัสสาเหตุภายนอก — เลือกรหัส V01-Y98 ให้ตรงกลไกการบาดเจ็บ",
+      "evidence": [
+       "CC: หกล้มในบ้าน ข้อมือขวาปวดบวม"
+      ],
+      "confidence": 0.7,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 2,
+      "reason": "โพแทสเซียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "K 2.9 mmol/L"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "D64.9",
+      "diagtype": 2,
+      "reason": "ภาวะโลหิตจาง — ถ้าทราบชนิด (เช่น D62 เสียเลือดเฉียบพลัน) ให้ระบุเจาะจง",
+      "evidence": [
+       "CBC: Hct 27.0 %"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 133.2 mmol/L"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "N17.9",
+      "diagtype": 2,
+      "reason": "Creatinine สูง — ตรวจสอบว่าเป็น AKI (N17.-) หรือ CKD (N18.-) จากค่า baseline",
+      "evidence": [
+       "Creatinine 1.7 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 236.6 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "proc",
+      "code": "93.94",
+      "diagtype": null,
+      "reason": "ได้รับยาพ่นผ่าน nebulizer",
+      "evidence": [
+       "Salbutamol NB"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "err",
+      "มีรหัสการบาดเจ็บ (S/T) แต่ไม่มีรหัสสาเหตุภายนอก (V01-Y98)"
+     ]
+    ],
+    "level": "err"
+   }
+  },
+  {
+   "an": "690001252",
+   "hn": "000201259",
+   "name": "นางบุญเรือน ดีงาม",
+   "sex": "F",
+   "age": 26,
+   "wardCode": "W04",
+   "ward": "ห้องคลอด",
+   "admitDoctor": "D004",
+   "dischargeDoctor": "D001",
+   "pdxDoctor": "D001",
+   "regAgo": 18,
+   "dchAgo": 16,
+   "los": 2,
+   "admitted": false,
+   "dchstts": "Normal delivery",
+   "dchtype": "With approval",
+   "pttype": "ประกันสังคม",
+   "drg": "O800",
+   "adjrw": 0.36,
+   "rw": 0.36,
+   "screen": {
+    "cc": "เจ็บครรภ์คลอด GA 39 wk",
+    "hpi": "เจ็บครรภ์คลอด GA 39 wk มารพ. ญาติพามา",
+    "pmh": "-",
+    "bps": 97,
+    "bpd": 79,
+    "pulse": 94,
+    "temperature": 39.3,
+    "rr": 23,
+    "bw": 56,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "O80.0",
+     "type": "1",
+     "name": "Spontaneous vertex delivery"
+    }
+   ],
+   "procs": [
+    {
+     "code": "73.59",
+     "name": "Other manually assisted delivery",
+     "or": "NonOR",
+     "day": 2
+    },
+    {
+     "code": "75.69",
+     "name": "Repair of other current obstetric laceration",
+     "or": "NonOR",
+     "day": 2
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "131.2",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "0.6",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 1,
+     "name": "K",
+     "value": "3.5",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "44.6",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "3.2",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Platelet",
+     "value": "270.4",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "16.7",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "134.0",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 3,
+     "name": "Na",
+     "value": "134.2",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 3,
+     "name": "CBC: WBC",
+     "value": "13.6",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "259.2",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "3.8",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Paracetamol",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 14,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "Furosemide inj",
+     "strength": "20 mg",
+     "units": "amp",
+     "qty": 17,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 19,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "ORS",
+     "strength": null,
+     "units": "ซอง",
+     "qty": 17,
+     "day": 1,
+     "lastDay": 3
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 3,
+      "reason": "โพแทสเซียมต่ำ และได้รับการรักษาด้วย KCl",
+      "evidence": [
+       "K 3.2 mmol/L",
+       "Elixir KCl"
+      ],
+      "confidence": 0.85,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "Z37.0",
+      "diagtype": 4,
+      "reason": "มีการคลอดแต่ไม่มีรหัสผลการคลอด (Z37.-) — ตรวจจำนวนและสถานะทารก",
+      "evidence": [],
+      "confidence": 0.75,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 131.2 mmol/L"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 259.2 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "warn",
+      "มีรหัสการคลอด (O80-O84) แต่ไม่มีรหัสผลการคลอด (Z37.-)"
+     ]
+    ],
+    "level": "warn"
+   }
+  },
+  {
+   "an": "690001253",
+   "hn": "000201296",
+   "name": "นางมาลี ศรีสุข",
+   "sex": "F",
+   "age": 31,
+   "wardCode": "W04",
+   "ward": "ห้องคลอด",
+   "admitDoctor": "D001",
+   "dischargeDoctor": "D002",
+   "pdxDoctor": "D002",
+   "regAgo": 17,
+   "dchAgo": 15,
+   "los": 2,
+   "admitted": false,
+   "dchstts": "Normal delivery",
+   "dchtype": "With approval",
+   "pttype": "UC ในเขต",
+   "drg": "O801",
+   "adjrw": 0.4392,
+   "rw": 0.4392,
+   "screen": {
+    "cc": "เจ็บครรภ์ถี่ น้ำเดิน",
+    "hpi": "เจ็บครรภ์ถี่ น้ำเดิน มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 120,
+    "bpd": 55,
+    "pulse": 119,
+    "temperature": 39.1,
+    "rr": 23,
+    "bw": 71,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "O80.0",
+     "type": "1",
+     "name": "Spontaneous vertex delivery"
+    },
+    {
+     "code": "Z37.0",
+     "type": "4",
+     "name": "Single live birth"
+    }
+   ],
+   "procs": [
+    {
+     "code": "75.69",
+     "name": "Repair of other current obstetric laceration",
+     "or": "NonOR",
+     "day": 2
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "K",
+     "value": "3.5",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 1,
+     "name": "FBS",
+     "value": "128.4",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "5.8",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "215.7",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "14.7",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "1.3",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "3.1",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "130.0",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "3.3",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "Na",
+     "value": "141.5",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Hct",
+     "value": "27.8",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 3,
+     "name": "CBC: WBC",
+     "value": "5.8",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 16,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 5,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "ORS",
+     "strength": null,
+     "units": "ซอง",
+     "qty": 5,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Salbutamol NB",
+     "strength": "2.5 mg",
+     "units": "neb",
+     "qty": 16,
+     "day": 1,
+     "lastDay": 3
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 2,
+      "reason": "โพแทสเซียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "K 3.1 mmol/L"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "D64.9",
+      "diagtype": 2,
+      "reason": "ภาวะโลหิตจาง — ถ้าทราบชนิด (เช่น D62 เสียเลือดเฉียบพลัน) ให้ระบุเจาะจง",
+      "evidence": [
+       "CBC: Hct 27.8 %"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 130.0 mmol/L"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "proc",
+      "code": "93.94",
+      "diagtype": null,
+      "reason": "ได้รับยาพ่นผ่าน nebulizer",
+      "evidence": [
+       "Salbutamol NB"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [],
+    "level": "ok"
+   }
+  },
+  {
+   "an": "690001254",
+   "hn": "000201333",
+   "name": "นายวิชัย บุญมา",
+   "sex": "M",
+   "age": 80,
+   "wardCode": "W01",
+   "ward": "หอผู้ป่วยในชาย",
+   "admitDoctor": "D002",
+   "dischargeDoctor": "D003",
+   "pdxDoctor": "D003",
+   "regAgo": 14,
+   "dchAgo": 14,
+   "los": 0,
+   "admitted": false,
+   "dchstts": "Dead",
+   "dchtype": "Dead non autopsy",
+   "pttype": "UC นอกเขต",
+   "drg": "A412",
+   "adjrw": 0.8409,
+   "rw": 2.4025,
+   "screen": {
+    "cc": "ซึม ไข้สูง ความดันต่ำ",
+    "hpi": "ซึม ไข้สูง ความดันต่ำ มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 97,
+    "bpd": 63,
+    "pulse": 82,
+    "temperature": 39.0,
+    "rr": 24,
+    "bw": 77,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "A41.9",
+     "type": "1",
+     "name": "Sepsis, unspecified"
+    },
+    {
+     "code": "J18.9",
+     "type": "2",
+     "name": "Pneumonia, unspecified"
+    },
+    {
+     "code": "D64.9",
+     "type": "2",
+     "name": "Anaemia, unspecified"
+    }
+   ],
+   "procs": [
+    {
+     "code": "99.04",
+     "name": "Transfusion of packed cells",
+     "or": "NonOR",
+     "day": 1
+    },
+    {
+     "code": "38.93",
+     "name": "Venous catheterization, not elsewhere classified",
+     "or": "NonOR",
+     "day": 1
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "7.9",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "2.1",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "39.4",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "358.3",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 9,
+     "day": 1,
+     "lastDay": 1
+    },
+    {
+     "name": "Paracetamol",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 11,
+     "day": 1,
+     "lastDay": 1
+    },
+    {
+     "name": "Furosemide inj",
+     "strength": "20 mg",
+     "units": "amp",
+     "qty": 10,
+     "day": 1,
+     "lastDay": 1
+    },
+    {
+     "name": "0.9% NSS",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 1
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "N17.9",
+      "diagtype": 2,
+      "reason": "Creatinine สูง — ตรวจสอบว่าเป็น AKI (N17.-) หรือ CKD (N18.-) จากค่า baseline",
+      "evidence": [
+       "Creatinine 2.1 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "info",
+      "นอนโรงพยาบาล 0 วัน (LOS = 0) — ตรวจสอบเกณฑ์การรับไว้เป็นผู้ป่วยใน"
+     ]
+    ],
+    "level": "info"
+   }
+  },
+  {
+   "an": "690001255",
+   "hn": "000201370",
+   "name": "นางจันทร์เพ็ญ ทองคำ",
+   "sex": "F",
+   "age": 66,
+   "wardCode": "W02",
+   "ward": "หอผู้ป่วยในหญิง",
+   "admitDoctor": "D003",
+   "dischargeDoctor": "D004",
+   "pdxDoctor": "D004",
+   "regAgo": 19,
+   "dchAgo": 13,
+   "los": 6,
+   "admitted": false,
+   "dchstts": "Not improved",
+   "dchtype": "By transfer",
+   "pttype": "ข้าราชการ",
+   "drg": "I631",
+   "adjrw": 1.525,
+   "rw": 1.525,
+   "screen": {
+    "cc": "แขนขาซ้ายอ่อนแรงเฉียบพลัน 3 ชม.",
+    "hpi": "แขนขาซ้ายอ่อนแรงเฉียบพลัน 3 ชม. มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 153,
+    "bpd": 67,
+    "pulse": 77,
+    "temperature": 39.2,
+    "rr": 27,
+    "bw": 78,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "I63.9",
+     "type": "1",
+     "name": "Cerebral infarction, unspecified"
+    },
+    {
+     "code": "I10",
+     "type": "2",
+     "name": "Essential (primary) hypertension"
+    }
+   ],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "34.8",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "FBS",
+     "value": "118.5",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "290.7",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "7.7",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "FBS",
+     "value": "102.0",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "9.5",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "3.2",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "0.8",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "0.9",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "369.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 3,
+     "name": "CBC: WBC",
+     "value": "4.4",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Hct",
+     "value": "35.1",
+     "unit": "%",
+     "normal": "36-48"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Furosemide inj",
+     "strength": "20 mg",
+     "units": "amp",
+     "qty": 14,
+     "day": 1,
+     "lastDay": 6
+    },
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 14,
+     "day": 1,
+     "lastDay": 6
+    },
+    {
+     "name": "Omeprazole",
+     "strength": "20 mg",
+     "units": "cap",
+     "qty": 18,
+     "day": 1,
+     "lastDay": 6
+    },
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 4,
+     "day": 1,
+     "lastDay": 7
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 2,
+      "reason": "โพแทสเซียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "K 3.2 mmol/L"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "info",
+      "จำหน่ายโดยการส่งต่อ (Refer) — ตรวจสอบใบส่งตัว"
+     ]
+    ],
+    "level": "info"
+   }
+  },
+  {
+   "an": "690001256",
+   "hn": "000201407",
+   "name": "นายทองดี แก้วดี",
+   "sex": "M",
+   "age": 22,
+   "wardCode": "W01",
+   "ward": "หอผู้ป่วยในชาย",
+   "admitDoctor": "D004",
+   "dischargeDoctor": "D001",
+   "pdxDoctor": null,
+   "regAgo": 13,
+   "dchAgo": 12,
+   "los": 1,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "By transfer",
+   "pttype": "ประกันสังคม",
+   "drg": "K350",
+   "adjrw": 0.6885,
+   "rw": 1.02,
+   "screen": {
+    "cc": "ปวดท้องน้อยขวา 1 วัน",
+    "hpi": "ปวดท้องน้อยขวา 1 วัน มารพ. ญาติพามา",
+    "pmh": "-",
+    "bps": 157,
+    "bpd": 67,
+    "pulse": 119,
+    "temperature": 37.1,
+    "rr": 20,
+    "bw": 55,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "K35.8",
+     "type": "1",
+     "name": "Acute appendicitis, other and unspecified"
+    }
+   ],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "FBS",
+     "value": "219.3",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "5.9",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "130.9",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "1.4",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "3.2",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "6.5",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "0.6",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "135.7",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Furosemide inj",
+     "strength": "20 mg",
+     "units": "amp",
+     "qty": 2,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 8,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "0.9% NSS",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 17,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 4,
+     "day": 1,
+     "lastDay": 1
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 3,
+      "reason": "โพแทสเซียมต่ำ และได้รับการรักษาด้วย KCl",
+      "evidence": [
+       "K 3.2 mmol/L",
+       "Elixir KCl"
+      ],
+      "confidence": 0.85,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 130.9 mmol/L"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 219.3 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "warn",
+      "ไม่ระบุแพทย์ผู้วินิจฉัย"
+     ],
+     [
+      "info",
+      "จำหน่ายโดยการส่งต่อ (Refer) — ตรวจสอบใบส่งตัว"
+     ]
+    ],
+    "level": "warn"
+   }
+  },
+  {
+   "an": "690001257",
+   "hn": "000201444",
+   "name": "เด็กชายกิตติ พลับพลา",
+   "sex": "M",
+   "age": 9,
+   "wardCode": "W03",
+   "ward": "หอผู้ป่วยในเด็ก",
+   "admitDoctor": "D001",
+   "dischargeDoctor": "D002",
+   "pdxDoctor": "D002",
+   "regAgo": 14,
+   "dchAgo": 11,
+   "los": 3,
+   "admitted": false,
+   "dchstts": "Complete recovery",
+   "dchtype": "With approval",
+   "pttype": "UC ในเขต",
+   "drg": "A900",
+   "adjrw": 0.48,
+   "rw": 0.48,
+   "screen": {
+    "cc": "ไข้สูง ปวดเมื่อยตัว",
+    "hpi": "ไข้สูง ปวดเมื่อยตัว มารพ. ญาติพามา",
+    "pmh": "-",
+    "bps": 111,
+    "bpd": 70,
+    "pulse": 99,
+    "temperature": 38.9,
+    "rr": 25,
+    "bw": 71,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "A90",
+     "type": "1",
+     "name": "Dengue fever [classical dengue]"
+    }
+   ],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "139.3",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "1.4",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "4.3",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "30.1",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "36.6",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Platelet",
+     "value": "194.9",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 2,
+     "name": "FBS",
+     "value": "256.1",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "1.4",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "149.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "1.0",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "211.9",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "CBC: WBC",
+     "value": "4.8",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Salbutamol NB",
+     "strength": "2.5 mg",
+     "units": "neb",
+     "qty": 19,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "ORS",
+     "strength": null,
+     "units": "ซอง",
+     "qty": 18,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 2,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 10,
+     "day": 1,
+     "lastDay": 4
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 256.1 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "proc",
+      "code": "93.94",
+      "diagtype": null,
+      "reason": "ได้รับยาพ่นผ่าน nebulizer",
+      "evidence": [
+       "Salbutamol NB"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [],
+    "level": "ok"
+   }
+  },
+  {
+   "an": "690001258",
+   "hn": "000201481",
+   "name": "นางบุญเรือน ชัยมงคล",
+   "sex": "F",
+   "age": 61,
+   "wardCode": "W02",
+   "ward": "หอผู้ป่วยในหญิง",
+   "admitDoctor": "D002",
+   "dischargeDoctor": "D003",
+   "pdxDoctor": "D003",
+   "regAgo": 14,
+   "dchAgo": 10,
+   "los": 4,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "UC นอกเขต",
+   "drg": "E112",
+   "adjrw": 0.899,
+   "rw": 0.899,
+   "screen": {
+    "cc": "น้ำตาลในเลือดสูง อ่อนเพลีย",
+    "hpi": "น้ำตาลในเลือดสูง อ่อนเพลีย มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 114,
+    "bpd": 78,
+    "pulse": 76,
+    "temperature": 36.5,
+    "rr": 21,
+    "bw": 40,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "E11.9",
+     "type": "1",
+     "name": "Type 2 diabetes mellitus without complications"
+    },
+    {
+     "code": "E11.9",
+     "type": "2",
+     "name": "Type 2 diabetes mellitus without complications"
+    },
+    {
+     "code": "I10",
+     "type": "2",
+     "name": "Essential (primary) hypertension"
+    }
+   ],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "K",
+     "value": "3.6",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "138.9",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "FBS",
+     "value": "226.2",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "34.2",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "44.2",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "3.3",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "2.2",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "7.0",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "4.8",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "2.0",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "47.6",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 3,
+     "name": "Na",
+     "value": "128.1",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Omeprazole",
+     "strength": "20 mg",
+     "units": "cap",
+     "qty": 6,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "0.9% NSS",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 20,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 9,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "Furosemide inj",
+     "strength": "20 mg",
+     "units": "amp",
+     "qty": 19,
+     "day": 1,
+     "lastDay": 5
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 3,
+      "reason": "โพแทสเซียมต่ำ และได้รับการรักษาด้วย KCl",
+      "evidence": [
+       "K 3.3 mmol/L",
+       "Elixir KCl"
+      ],
+      "confidence": 0.85,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 128.1 mmol/L"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "D69.6",
+      "diagtype": 2,
+      "reason": "เกล็ดเลือดต่ำ (ถ้าไม่ใช่ส่วนหนึ่งของโรคหลัก เช่น ไข้เลือดออก)",
+      "evidence": [
+       "CBC: Platelet 47.6 10^3/uL"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "N17.9",
+      "diagtype": 2,
+      "reason": "Creatinine สูง — ตรวจสอบว่าเป็น AKI (N17.-) หรือ CKD (N18.-) จากค่า baseline",
+      "evidence": [
+       "Creatinine 2.2 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "warn",
+      "รหัสวินิจฉัยซ้ำ: E11.9"
+     ]
+    ],
+    "level": "warn"
+   }
+  },
+  {
+   "an": "690001259",
+   "hn": "000201518",
+   "name": "นายบุญมี สุขใจ",
+   "sex": "M",
+   "age": 50,
+   "wardCode": "W01",
+   "ward": "หอผู้ป่วยในชาย",
+   "admitDoctor": "D003",
+   "dischargeDoctor": "D004",
+   "pdxDoctor": null,
+   "regAgo": 11,
+   "dchAgo": 9,
+   "los": 2,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "Against advice",
+   "pttype": "ข้าราชการ",
+   "drg": null,
+   "adjrw": null,
+   "rw": null,
+   "screen": {
+    "cc": "เจ็บหน้าอก",
+    "hpi": "เจ็บหน้าอก มารพ. ญาติพามา",
+    "pmh": "-",
+    "bps": 130,
+    "bpd": 93,
+    "pulse": 93,
+    "temperature": 37.9,
+    "rr": 24,
+    "bw": 71,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "253.4",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "134.5",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "33.3",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "1.6",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "139.7",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "3.0",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "CBC: WBC",
+     "value": "5.8",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "1.7",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "Na",
+     "value": "129.4",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 3,
+     "name": "CBC: WBC",
+     "value": "5.4",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "219.6",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "153.4",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 6,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "0.9% NSS",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 6,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 13,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 19,
+     "day": 1,
+     "lastDay": 3
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 3,
+      "reason": "โพแทสเซียมต่ำ และได้รับการรักษาด้วย KCl",
+      "evidence": [
+       "K 3.0 mmol/L",
+       "Elixir KCl"
+      ],
+      "confidence": 0.85,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 129.4 mmol/L"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "N17.9",
+      "diagtype": 2,
+      "reason": "Creatinine สูง — ตรวจสอบว่าเป็น AKI (N17.-) หรือ CKD (N18.-) จากค่า baseline",
+      "evidence": [
+       "Creatinine 1.7 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 219.6 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "err",
+      "ไม่มีการวินิจฉัยหลัก (PDx)"
+     ],
+     [
+      "info",
+      "จำหน่ายโดยไม่สมัครใจอยู่ (Against advice)"
+     ]
+    ],
+    "level": "pending"
+   }
+  },
+  {
+   "an": "690001260",
+   "hn": "000201555",
+   "name": "นายวิชัย ดีงาม",
+   "sex": "M",
+   "age": 77,
+   "wardCode": "W01",
+   "ward": "หอผู้ป่วยในชาย",
+   "admitDoctor": "D004",
+   "dischargeDoctor": "D001",
+   "pdxDoctor": "D001",
+   "regAgo": 43,
+   "dchAgo": 8,
+   "los": 35,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "ประกันสังคม",
+   "drg": "I502",
+   "adjrw": 1.674,
+   "rw": 1.674,
+   "screen": {
+    "cc": "บวม หอบนอนราบไม่ได้",
+    "hpi": "บวม หอบนอนราบไม่ได้ มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 108,
+    "bpd": 74,
+    "pulse": 84,
+    "temperature": 37.1,
+    "rr": 23,
+    "bw": 47,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "I50.0",
+     "type": "1",
+     "name": "Congestive heart failure"
+    },
+    {
+     "code": "N18.3",
+     "type": "2",
+     "name": "Chronic kidney disease, stage 3"
+    },
+    {
+     "code": "E87.6",
+     "type": "3",
+     "name": "Hypokalaemia"
+    }
+   ],
+   "procs": [
+    {
+     "code": "93.96",
+     "name": "Other oxygen enrichment",
+     "or": "NonOR",
+     "day": 2
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "16.5",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "K",
+     "value": "4.2",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "141.4",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "82.6",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "1.2",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "24.2",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "130.1",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 2,
+     "name": "FBS",
+     "value": "108.3",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "3.3",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "0.6",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "98.5",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "103.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 10,
+     "day": 1,
+     "lastDay": 35
+    },
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 2,
+     "day": 1,
+     "lastDay": 36
+    },
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 6,
+     "day": 1,
+     "lastDay": 36
+    },
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 20,
+     "day": 1,
+     "lastDay": 36
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "D64.9",
+      "diagtype": 2,
+      "reason": "ภาวะโลหิตจาง — ถ้าทราบชนิด (เช่น D62 เสียเลือดเฉียบพลัน) ให้ระบุเจาะจง",
+      "evidence": [
+       "CBC: Hct 24.2 %"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "D69.6",
+      "diagtype": 2,
+      "reason": "เกล็ดเลือดต่ำ (ถ้าไม่ใช่ส่วนหนึ่งของโรคหลัก เช่น ไข้เลือดออก)",
+      "evidence": [
+       "CBC: Platelet 82.6 10^3/uL"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 130.1 mmol/L"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "info",
+      "นอนโรงพยาบาลนาน 35 วัน"
+     ]
+    ],
+    "level": "info"
+   }
+  },
+  {
+   "an": "690001261",
+   "hn": "000201592",
+   "name": "นางจันทร์เพ็ญ ศรีสุข",
+   "sex": "F",
+   "age": 83,
+   "wardCode": "W02",
+   "ward": "หอผู้ป่วยในหญิง",
+   "admitDoctor": "D001",
+   "dischargeDoctor": "D002",
+   "pdxDoctor": "D002",
+   "regAgo": 13,
+   "dchAgo": 7,
+   "los": 6,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "UC ในเขต",
+   "drg": "J181",
+   "adjrw": 1.037,
+   "rw": 1.037,
+   "screen": {
+    "cc": "ไข้ ไอ ซึมลง",
+    "hpi": "ไข้ ไอ ซึมลง มารพ. ญาติพามา",
+    "pmh": "โรคประจำตัวตามรายการวินิจฉัยร่วม",
+    "bps": 137,
+    "bpd": 68,
+    "pulse": 118,
+    "temperature": 36.6,
+    "rr": 23,
+    "bw": 50,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "J18.9",
+     "type": "1",
+     "name": "Pneumonia, unspecified"
+    },
+    {
+     "code": "D64.9",
+     "type": "2",
+     "name": "Anaemia, unspecified"
+    }
+   ],
+   "procs": [
+    {
+     "code": "99.04",
+     "name": "Transfusion of packed cells",
+     "or": "NonOR",
+     "day": 2
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "12.4",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "70.8",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "Na",
+     "value": "138.3",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "35.8",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "140.6",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "34.2",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "3.7",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 2,
+     "name": "Creatinine",
+     "value": "1.5",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "87.4",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Hct",
+     "value": "39.6",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 3,
+     "name": "K",
+     "value": "4.3",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "Na",
+     "value": "130.5",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Omeprazole",
+     "strength": "20 mg",
+     "units": "cap",
+     "qty": 10,
+     "day": 1,
+     "lastDay": 7
+    },
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 11,
+     "day": 1,
+     "lastDay": 7
+    },
+    {
+     "name": "Metformin",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 6,
+     "day": 1,
+     "lastDay": 7
+    },
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 6,
+     "day": 1,
+     "lastDay": 6
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "D69.6",
+      "diagtype": 2,
+      "reason": "เกล็ดเลือดต่ำ (ถ้าไม่ใช่ส่วนหนึ่งของโรคหลัก เช่น ไข้เลือดออก)",
+      "evidence": [
+       "CBC: Platelet 70.8 10^3/uL"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.1",
+      "diagtype": 2,
+      "reason": "โซเดียมต่ำ — ลงรหัสได้เมื่อมีการรักษา/ติดตาม",
+      "evidence": [
+       "Na 130.5 mmol/L"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [],
+    "level": "ok"
+   }
+  },
+  {
+   "an": "690001262",
+   "hn": "000201629",
+   "name": "เด็กชายภูมิ บุญมา",
+   "sex": "M",
+   "age": 3,
+   "wardCode": "W03",
+   "ward": "หอผู้ป่วยในเด็ก",
+   "admitDoctor": "D002",
+   "dischargeDoctor": "D003",
+   "pdxDoctor": "D003",
+   "regAgo": 8,
+   "dchAgo": 6,
+   "los": 2,
+   "admitted": false,
+   "dchstts": "Complete recovery",
+   "dchtype": "With approval",
+   "pttype": "UC นอกเขต",
+   "drg": "A090",
+   "adjrw": 0.38,
+   "rw": 0.38,
+   "screen": {
+    "cc": "ถ่ายเหลว ไข้ ซึม",
+    "hpi": "ถ่ายเหลว ไข้ ซึม มารพ. ญาติพามา",
+    "pmh": "-",
+    "bps": 128,
+    "bpd": 78,
+    "pulse": 100,
+    "temperature": 37.6,
+    "rr": 24,
+    "bw": 60,
+    "height": null
+   },
+   "prediag": null,
+   "admitDx": [],
+   "diags": [
+    {
+     "code": "A09.0",
+     "type": "1",
+     "name": "Other and unspecified gastroenteritis and colitis of infectious origin"
+    }
+   ],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "FBS",
+     "value": "254.0",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "223.3",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "8.5",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "31.0",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "FBS",
+     "value": "86.0",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 2,
+     "name": "Na",
+     "value": "138.6",
+     "unit": "mmol/L",
+     "normal": "135-145"
+    },
+    {
+     "day": 2,
+     "name": "CBC: Hct",
+     "value": "29.2",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 2,
+     "name": "K",
+     "value": "4.2",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    },
+    {
+     "day": 3,
+     "name": "FBS",
+     "value": "214.6",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Platelet",
+     "value": "68.5",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 3,
+     "name": "Creatinine",
+     "value": "1.4",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 3,
+     "name": "CBC: WBC",
+     "value": "8.2",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 9,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Paracetamol",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 8,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Amlodipine",
+     "strength": "5 mg",
+     "units": "tab",
+     "qty": 18,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "0.9% NSS",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 10,
+     "day": 1,
+     "lastDay": 3
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "D64.9",
+      "diagtype": 2,
+      "reason": "ภาวะโลหิตจาง — ถ้าทราบชนิด (เช่น D62 เสียเลือดเฉียบพลัน) ให้ระบุเจาะจง",
+      "evidence": [
+       "CBC: Hct 29.2 %"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "D69.6",
+      "diagtype": 2,
+      "reason": "เกล็ดเลือดต่ำ (ถ้าไม่ใช่ส่วนหนึ่งของโรคหลัก เช่น ไข้เลือดออก)",
+      "evidence": [
+       "CBC: Platelet 68.5 10^3/uL"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 254.0 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [],
+    "level": "ok"
+   }
+  },
+  {
+   "an": "690001400",
+   "hn": "000305000",
+   "name": "นางลำดวน พลับพลา",
+   "sex": "F",
+   "age": 63,
+   "wardCode": "W02",
+   "ward": "หอผู้ป่วยในหญิง",
+   "admitDoctor": "D003",
+   "dischargeDoctor": "D004",
+   "pdxDoctor": null,
+   "regAgo": 4,
+   "dchAgo": 0,
+   "los": 4,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "UC ในเขต",
+   "drg": null,
+   "adjrw": null,
+   "rw": null,
+   "screen": {
+    "cc": "ไข้ หนาวสั่น ปัสสาวะแสบขัด 2 วัน",
+    "hpi": "ไข้สูง หนาวสั่น ปัสสาวะแสบขัด ปวดหลังด้านขวา เบาหวาน 10 ปี",
+    "pmh": "-",
+    "bps": 128,
+    "bpd": 76,
+    "pulse": 104,
+    "temperature": 38.6,
+    "rr": 24,
+    "bw": 58,
+    "height": null
+   },
+   "prediag": "Acute pyelonephritis, DM",
+   "admitDx": [
+    "N39.0",
+    "E11.9"
+   ],
+   "diags": [],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "18.6",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 4,
+     "name": "CBC: WBC",
+     "value": "9.1",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "Creatinine",
+     "value": "1.9",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 4,
+     "name": "Creatinine",
+     "value": "1.1",
+     "unit": "mg/dL",
+     "normal": "0.6-1.2"
+    },
+    {
+     "day": 1,
+     "name": "FBS",
+     "value": "285",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 4,
+     "name": "FBS",
+     "value": "168",
+     "unit": "mg/dL",
+     "normal": "70-100"
+    },
+    {
+     "day": 1,
+     "name": "UA: WBC",
+     "value": "50",
+     "unit": "/HPF",
+     "normal": "0-5"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "1 g",
+     "units": "vial",
+     "qty": 3,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "0.9% NSS",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 5,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "Insulin RI",
+     "strength": "100 u/ml",
+     "units": "vial",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 5
+    },
+    {
+     "name": "Paracetamol",
+     "strength": "500 mg",
+     "units": "tab",
+     "qty": 9,
+     "day": 1,
+     "lastDay": 5
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "N39.0",
+      "diagtype": 1,
+      "reason": "รหัสจาก ER/OPD ตอนรับไว้ — ตรวจสอบว่ายังเป็นการวินิจฉัยหลักเมื่อสิ้นสุดการรักษาหรือไม่",
+      "evidence": [
+       "วินิจฉัยแรกรับ: Acute pyelonephritis, DM"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "admit"
+     },
+     {
+      "kind": "dx",
+      "code": "E11.9",
+      "diagtype": 2,
+      "reason": "ได้รับอินซูลินแต่ไม่มีรหัสเบาหวาน — ตรวจสอบชนิดเบาหวาน",
+      "evidence": [
+       "Insulin RI",
+       "วินิจฉัยแรกรับ: Acute pyelonephritis, DM"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "N17.9",
+      "diagtype": 2,
+      "reason": "Creatinine สูง — ตรวจสอบว่าเป็น AKI (N17.-) หรือ CKD (N18.-) จากค่า baseline",
+      "evidence": [
+       "Creatinine 1.9 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "dx",
+      "code": "R73.9",
+      "diagtype": 2,
+      "reason": "น้ำตาลในเลือดสูง — ถ้ามีประวัติเบาหวานให้ลง E11.- แทน",
+      "evidence": [
+       "FBS 285 mg/dL"
+      ],
+      "confidence": 0.4,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "err",
+      "ไม่มีการวินิจฉัยหลัก (PDx)"
+     ]
+    ],
+    "level": "pending"
+   }
+  },
+  {
+   "an": "690001401",
+   "hn": "000305041",
+   "name": "นายสุนทร ชัยมงคล",
+   "sex": "M",
+   "age": 71,
+   "wardCode": "W01",
+   "ward": "หอผู้ป่วยในชาย",
+   "admitDoctor": "D004",
+   "dischargeDoctor": "D001",
+   "pdxDoctor": null,
+   "regAgo": 4,
+   "dchAgo": 1,
+   "los": 3,
+   "admitted": false,
+   "dchstts": "Improved",
+   "dchtype": "With approval",
+   "pttype": "UC ในเขต",
+   "drg": null,
+   "adjrw": null,
+   "rw": null,
+   "screen": {
+    "cc": "ถ่ายเป็นเลือดดำ อ่อนเพลีย 1 วัน",
+    "hpi": "ถ่ายดำ 3 ครั้ง หน้ามืด กินยาแก้ปวดข้อ (NSAIDs) ประจำ",
+    "pmh": "-",
+    "bps": 128,
+    "bpd": 76,
+    "pulse": 104,
+    "temperature": 38.6,
+    "rr": 24,
+    "bw": 58,
+    "height": null
+   },
+   "prediag": "UGIB",
+   "admitDx": [
+    "K92.1"
+   ],
+   "diags": [],
+   "procs": [
+    {
+     "code": "99.04",
+     "name": "Transfusion of packed cells",
+     "or": "NonOR",
+     "day": 1
+    }
+   ],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "21.5",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 3,
+     "name": "CBC: Hct",
+     "value": "30.2",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "BUN",
+     "value": "48",
+     "unit": "mg/dL",
+     "normal": "7-20"
+    },
+    {
+     "day": 3,
+     "name": "BUN",
+     "value": "18",
+     "unit": "mg/dL",
+     "normal": "7-20"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Omeprazole inj",
+     "strength": "40 mg",
+     "units": "vial",
+     "qty": 3,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "LDPRC",
+     "strength": "1 unit",
+     "units": "unit",
+     "qty": 5,
+     "day": 1,
+     "lastDay": 4
+    },
+    {
+     "name": "0.9% NSS",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 4
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "K92.1",
+      "diagtype": 1,
+      "reason": "รหัสจาก ER/OPD ตอนรับไว้ — ตรวจสอบว่ายังเป็นการวินิจฉัยหลักเมื่อสิ้นสุดการรักษาหรือไม่",
+      "evidence": [
+       "วินิจฉัยแรกรับ: UGIB"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "admit"
+     },
+     {
+      "kind": "dx",
+      "code": "D64.9",
+      "diagtype": 2,
+      "reason": "ภาวะโลหิตจาง ที่ได้รับเลือด — ถ้าทราบชนิด (เช่น D62 เสียเลือดเฉียบพลัน) ให้ระบุเจาะจง",
+      "evidence": [
+       "CBC: Hct 21.5 %",
+       "ได้รับเลือด (99.04 / PRC)"
+      ],
+      "confidence": 0.8,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "err",
+      "ไม่มีการวินิจฉัยหลัก (PDx)"
+     ]
+    ],
+    "level": "pending"
+   }
+  },
+  {
+   "an": "690001402",
+   "hn": "000305082",
+   "name": "นายเสถียร บุญมา",
+   "sex": "M",
+   "age": 76,
+   "wardCode": "W01",
+   "ward": "หอผู้ป่วยในชาย",
+   "admitDoctor": "D001",
+   "dischargeDoctor": null,
+   "pdxDoctor": null,
+   "regAgo": 1,
+   "dchAgo": null,
+   "los": 2,
+   "admitted": true,
+   "dchstts": null,
+   "dchtype": null,
+   "pttype": "UC ในเขต",
+   "drg": null,
+   "adjrw": null,
+   "rw": null,
+   "screen": {
+    "cc": "หอบเหนื่อย ไอ มีเสมหะเขียว 3 วัน",
+    "hpi": "COPD ใช้ยาพ่นประจำ หอบมากขึ้น SpO2 แรกรับ 86%",
+    "pmh": "-",
+    "bps": 128,
+    "bpd": 76,
+    "pulse": 104,
+    "temperature": 38.6,
+    "rr": 24,
+    "bw": 58,
+    "height": null
+   },
+   "prediag": "AE COPD with pneumonia?",
+   "admitDx": [
+    "J44.1"
+   ],
+   "diags": [],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "14.2",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    },
+    {
+     "day": 1,
+     "name": "K",
+     "value": "3.1",
+     "unit": "mmol/L",
+     "normal": "3.5-5.1"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Berodual NB",
+     "strength": null,
+     "units": "neb",
+     "qty": 3,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Ceftriaxone inj",
+     "strength": "2 g",
+     "units": "vial",
+     "qty": 5,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Oxygen cannula",
+     "strength": null,
+     "units": "hr",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 3
+    },
+    {
+     "name": "Elixir KCl",
+     "strength": "20 mEq/15ml",
+     "units": "ขวด",
+     "qty": 9,
+     "day": 1,
+     "lastDay": 3
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "J44.1",
+      "diagtype": 1,
+      "reason": "รหัสจาก ER/OPD ตอนรับไว้ — ตรวจสอบว่ายังเป็นการวินิจฉัยหลักเมื่อสิ้นสุดการรักษาหรือไม่",
+      "evidence": [
+       "วินิจฉัยแรกรับ: AE COPD with pneumonia?"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "admit"
+     },
+     {
+      "kind": "dx",
+      "code": "E87.6",
+      "diagtype": 3,
+      "reason": "โพแทสเซียมต่ำ และได้รับการรักษาด้วย KCl",
+      "evidence": [
+       "K 3.1 mmol/L",
+       "Elixir KCl"
+      ],
+      "confidence": 0.85,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "proc",
+      "code": "93.94",
+      "diagtype": null,
+      "reason": "ได้รับยาพ่นผ่าน nebulizer",
+      "evidence": [
+       "Berodual NB"
+      ],
+      "confidence": 0.6,
+      "source": "rule",
+      "origin": "rule"
+     },
+     {
+      "kind": "proc",
+      "code": "93.96",
+      "diagtype": null,
+      "reason": "ได้รับออกซิเจนเสริม",
+      "evidence": [
+       "Oxygen cannula"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "err",
+      "ไม่มีการวินิจฉัยหลัก (PDx)"
+     ]
+    ],
+    "level": "pending"
+   }
+  },
+  {
+   "an": "690001403",
+   "hn": "000305123",
+   "name": "เด็กหญิงพิมพ์ชนก ศรีสุข",
+   "sex": "F",
+   "age": 10,
+   "wardCode": "W03",
+   "ward": "หอผู้ป่วยในเด็ก",
+   "admitDoctor": "D002",
+   "dischargeDoctor": null,
+   "pdxDoctor": null,
+   "regAgo": 0,
+   "dchAgo": null,
+   "los": 1,
+   "admitted": true,
+   "dchstts": null,
+   "dchtype": null,
+   "pttype": "UC ในเขต",
+   "drg": null,
+   "adjrw": null,
+   "rw": null,
+   "screen": {
+    "cc": "เด็กไข้สูง 3 วัน ปวดท้อง อาเจียน",
+    "hpi": "ไข้สูงลอย 3 วัน ปวดท้อง มีจุดเลือดออกที่แขน tourniquet test positive",
+    "pmh": "-",
+    "bps": 128,
+    "bpd": 76,
+    "pulse": 104,
+    "temperature": 38.6,
+    "rr": 24,
+    "bw": 28,
+    "height": null
+   },
+   "prediag": "DHF",
+   "admitDx": [
+    "A91"
+   ],
+   "diags": [],
+   "procs": [],
+   "labs": [
+    {
+     "day": 1,
+     "name": "CBC: Hct",
+     "value": "44.8",
+     "unit": "%",
+     "normal": "36-48"
+    },
+    {
+     "day": 1,
+     "name": "CBC: Platelet",
+     "value": "62",
+     "unit": "10^3/uL",
+     "normal": "150-400"
+    },
+    {
+     "day": 1,
+     "name": "CBC: WBC",
+     "value": "3.1",
+     "unit": "10^3/uL",
+     "normal": "4.5-11.0"
+    }
+   ],
+   "meds": [
+    {
+     "name": "Paracetamol syr",
+     "strength": "120 mg/5ml",
+     "units": "ขวด",
+     "qty": 3,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "5%D/NSS/2",
+     "strength": "1000 ml",
+     "units": "bag",
+     "qty": 5,
+     "day": 1,
+     "lastDay": 2
+    },
+    {
+     "name": "ORS",
+     "strength": null,
+     "units": "ซอง",
+     "qty": 7,
+     "day": 1,
+     "lastDay": 2
+    }
+   ],
+   "legacy": {
+    "hints": [
+     {
+      "kind": "dx",
+      "code": "A91",
+      "diagtype": 1,
+      "reason": "รหัสจาก ER/OPD ตอนรับไว้ — ตรวจสอบว่ายังเป็นการวินิจฉัยหลักเมื่อสิ้นสุดการรักษาหรือไม่",
+      "evidence": [
+       "วินิจฉัยแรกรับ: DHF"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "admit"
+     },
+     {
+      "kind": "dx",
+      "code": "D69.6",
+      "diagtype": 2,
+      "reason": "เกล็ดเลือดต่ำ (ถ้าไม่ใช่ส่วนหนึ่งของโรคหลัก เช่น ไข้เลือดออก)",
+      "evidence": [
+       "CBC: Platelet 62 10^3/uL"
+      ],
+      "confidence": 0.5,
+      "source": "rule",
+      "origin": "rule"
+     }
+    ],
+    "alerts": [
+     [
+      "err",
+      "ไม่มีการวินิจฉัยหลัก (PDx)"
+     ]
+    ],
+    "level": "pending"
+   }
+  }
+ ]
+}

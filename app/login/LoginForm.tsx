@@ -47,7 +47,11 @@ export function LoginForm({ demo }: { demo: boolean }) {
       <button className={buttonClass("primary")} disabled={busy}>
         {busy ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
       </button>
-      {demo && <p className="text-center text-xs text-amber-700">โหมด demo — ใช้บัญชีจาก DEMO_USERNAME / DEMO_PASSWORD ใน .env.local</p>}
+      {demo ? (
+        <p className="text-center text-xs text-amber-700">โหมด demo — ใช้บัญชีจาก DEMO_USERNAME / DEMO_PASSWORD ใน .env.local</p>
+      ) : (
+        <p className="text-center text-xs text-muted">ใช้ชื่อผู้ใช้และรหัสผ่านเดียวกับระบบ ppc-hos</p>
+      )}
     </form>
   );
 }

@@ -1,44 +1,72 @@
-// lib/ai/types.ts
+// lib/ai/types.ts — ชนิดข้อมูลของ AI แนะนำรหัส (รูปแบบเดียวกับโปรแกรมเดิม / สนามลอง AI ให้รหัส)
 
-import type { CodeSystem } from "@/lib/appdb/types";
-import type { CodingIssue } from "@/lib/coding/checks";
-import type { DiagType, OrType } from "@/lib/patients/types";
+import type { HintKind, RuleHint } from "@/lib/coding/legacyRules";
+import type { DiagType, OrType, Sex } from "@/lib/patients/types";
+
+export type { HintKind };
 
 /**
  * ข้อมูลที่อนุญาตให้ส่ง AI — สร้างจาก deidentify() เท่านั้น
- * มีแต่ข้อมูลมีโครงสร้าง: รหัสเดิม, lab (ตัวเลข), ยา, หัตถการ, LOS, อายุ, เพศ
- * วันที่ทุกตัวแปลงเป็น "วันที่นับจาก admit" (day 0 = วัน admit)
+ * มีเฉพาะข้อมูลมีโครงสร้าง: อายุ, เพศ, LOS, สถานะจำหน่าย, สัญญาณชีพ (ตัวเลข), รหัสเดิม, lab (ตัวเลข), ยา, หัตถการ
+ * วันที่ทุกตัวเป็น "วันที่ของการนอน" D1 = วัน admit (แบบโปรแกรมเดิม)
+ * ไม่มี free text: CC/HPI/PMH/การวินิจฉัยแรกรับที่พิมพ์/Course ที่แพทย์เขียน (กฎข้อ 2)
  */
 export interface DeidentifiedCase {
   age: string; // "45" | "90+" | "unknown"
-  sex: "M" | "F" | "U";
+  sex: Sex;
   losDays: number | null;
   stillAdmitted: boolean;
-  existingDiagnoses: { id: string; code: string; type: DiagType }[];
-  procedures: { id: string; code: string; day: number | null }[];
-  labs: { id: string; test: string; value: string; unit: string | null; ref: string | null; day: number | null }[];
-  drugs: { id: string; name: string; day: number | null }[];
+  dischargeStatus: string | null;
+  dischargeType: string | null;
+  vitals: { bps: number | null; bpd: number | null; pulse: number | null; rr: number | null; temperature: number | null; bw: number | null } | null;
+  admitDx: { code: string; name: string | null }[];
+  diagnoses: { code: string; type: DiagType; name: string | null }[];
+  procedures: { code: string; name: string | null; day: number | null }[];
+  labs: { day: number | null; test: string; value: string; unit: string | null; ref: string | null; flag: "H" | "L" | "" }[];
+  drugs: { name: string; qty: number | null; firstDay: number | null; lastDay: number | null }[];
+  /** ข้อเสนอจากกฎ (เหตุผล + หลักฐานที่ไม่ใช่ free text) */
+  hints: { code: string; reason: string; evidence: string[] }[];
 }
 
-export interface AiSuggestion {
+export type ItemSource = "ai" | "rule" | "ai+rule" | "manual";
+
+/** รายการรหัสหนึ่งตัว (จาก AI / กฎ / แพทย์เพิ่ม) ก่อนตรวจ */
+export interface CodeItem {
+  kind: HintKind;
   code: string;
-  system: CodeSystem;
-  /** ประเภทการวินิจฉัย (ICD-10) — null สำหรับหัตถการ */
-  diagtype: DiagType | null;
-  description: string;
-  rationale: string;
-  /** id ของข้อมูลใน DeidentifiedCase ที่รองรับรหัสนี้ */
+  name?: string | null;
+  diagtype: number | null;
+  reason: string;
   evidence: string[];
+  confidence: number;
+  source: ItemSource;
+  origin?: RuleHint["origin"];
+  /** หัตถการที่แพทย์เพิ่มเอง */
+  procClass?: OrType | null;
+  procDate?: string | null;
 }
 
-export interface CheckedSuggestion extends AiSuggestion {
-  /** null = ยังไม่มี codebook ให้ตรวจ */
-  inCodebook: boolean | null;
-  codebookDescription: string | null;
-  /** ICD-9-CM: OR/Non-OR ตามตาราง ORP (null = ไม่ทราบ) */
-  orType: OrType | null;
-  evidenceLabels: string[];
-  warnings: string[];
+/** รายการหลังรวม (merge) + ตรวจกับ codebook แล้ว — ที่แสดงบนหน้าจอ */
+export interface MergedItem extends CodeItem {
+  key: string;
+  name: string | null;
+  formatOk: boolean;
+  inBook: boolean;
+  /** มีอยู่แล้วใน HOSxP */
+  already: boolean;
+  procClass: OrType | null;
+  /** หลักฐานไม่ตรงกับข้อมูลในชาร์ต (กฎหลักฐาน) */
+  evidenceUnmatched: boolean;
+}
+
+/** ผลจาก AI หนึ่งครั้ง (เก็บใน ai_runs.result — ไม่มีข้อมูลระบุตัวตน) */
+export interface AiAnalysis {
+  items: CodeItem[];
+  remarks: string[];
+  draft: string;
+  /** รหัสที่ AI เสนอแต่ไม่อ้างหลักฐานเลย → ตัดออก (กฎหลักฐาน) */
+  droppedNoEvidence: string[];
+  secs: number;
 }
 
 export type ProviderName = "gemini" | "rules";
@@ -46,28 +74,16 @@ export type ProviderName = "gemini" | "rules";
 export interface AiProvider {
   readonly name: ProviderName;
   readonly model: string | null;
-  suggestCodes(input: DeidentifiedCase): Promise<AiSuggestion[]>;
-  draftCourse(input: DeidentifiedCase): Promise<string>;
+  /** วิเคราะห์ทั้งรหัส + ร่าง Course ในครั้งเดียว (แบบโปรแกรมเดิม) */
+  analyze(prompt: string): Promise<Omit<AiAnalysis, "secs" | "droppedNoEvidence">>;
 }
 
-export interface SuggestResult {
+export interface AnalyzeResult extends AiAnalysis {
   runId: number;
   provider: ProviderName;
   model: string | null;
   fallbackReason: string | null;
-  suggestions: CheckedSuggestion[];
-  /** รหัสที่ถูกตัดเพราะไม่อ้างหลักฐานที่มีอยู่จริง (กฎหลักฐาน) */
-  droppedNoEvidence: { code: string; system: CodeSystem }[];
   createdAt: string;
 }
 
-export interface CourseResult {
-  runId: number;
-  provider: ProviderName;
-  model: string | null;
-  fallbackReason: string | null;
-  text: string;
-  createdAt: string;
-}
-
-export type { CodingIssue };
+export type { DiagType };

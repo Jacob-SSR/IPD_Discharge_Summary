@@ -85,6 +85,7 @@ function isDefinitiveDiagnosis(code: string): boolean {
 export function checkCodeSet(
   set: CodeSet,
   books?: { icd10: Codebook; icd9: Codebook },
+  opts: { skipCodebook?: boolean } = {},
 ): CodingIssue[] {
   const issues: CodingIssue[] = [];
   const dx = set.diagnoses;
@@ -218,6 +219,7 @@ export function checkCodeSet(
   }
 
   // ── รูปแบบรหัส + codebook (ห้ามซ่อน) ──────────────────────────────────────
+  if (opts.skipCodebook) return issues;
   const b = books ?? { icd10: getCodebook("ICD10"), icd9: getCodebook("ICD9CM") };
   const check = (system: CodeSystem, code: string, book: Codebook) => {
     if (!isValidFormat(system, code)) {

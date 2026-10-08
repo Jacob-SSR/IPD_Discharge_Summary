@@ -10,6 +10,12 @@ describe("สิทธิ์ตาม role ของ ppchos.users", () => {
     expect(isAllowedRole("NURSE_OPD")).toBe(false);
     expect(isAllowedRole("USER")).toBe(false);
   });
+  it("* = ทุกบัญชีเข้าได้", () => {
+    const old = process.env.APP_ALLOWED_ROLES;
+    process.env.APP_ALLOWED_ROLES = "*";
+    expect(isAllowedRole("NURSE_OPD")).toBe(true);
+    process.env.APP_ALLOWED_ROLES = old;
+  });
   it("ยืนยันรหัสได้เฉพาะ APP_DECIDER_ROLES", () => {
     expect(canDecide({ username: "a", name: null, role: "DOCTOR" })).toBe(true);
     expect(canDecide({ username: "a", name: null, role: "FINANCE" })).toBe(false);

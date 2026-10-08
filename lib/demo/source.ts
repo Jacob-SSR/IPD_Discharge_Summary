@@ -9,7 +9,7 @@ import type {
   PatientSource,
   RwRow,
 } from "@/lib/patients/types";
-import { buildDemoAdmissions, DEMO_DOCTORS, DEMO_HISTORY, DEMO_WARDS } from "./data";
+import { buildDemoAdmissions, demoGroupingHistory, DEMO_DOCTORS, DEMO_WARDS } from "./data";
 
 function inRange(d: string | null, from?: string, to?: string): boolean {
   if (!from && !to) return true;
@@ -59,6 +59,7 @@ function toRow(a: AdmissionDetail): AdmissionRow {
     pdxDoctor: a.pdxDoctor,
     pdx: a.pdx,
     los: a.los,
+    dischargeType: a.dischargeType,
     drg: a.drg,
     rw: a.rw,
     adjrw: a.adjrw,
@@ -83,8 +84,17 @@ export const demoSource: PatientSource = {
     return { wards: DEMO_WARDS, doctors: DEMO_DOCTORS };
   },
 
-  async historicalGroups(pdx) {
-    return DEMO_HISTORY[pdx] ?? [];
+  async groupingHistory(pdx) {
+    return demoGroupingHistory(pdx);
+  },
+
+  async codingOf(ans) {
+    const set = new Set(ans);
+    return Object.fromEntries(
+      buildDemoAdmissions(todayIso())
+        .filter((a) => set.has(a.an))
+        .map((a) => [a.an, { diagnoses: a.diagnoses, procedures: a.procedures }]),
+    );
   },
 
   async rwRows(from, to) {

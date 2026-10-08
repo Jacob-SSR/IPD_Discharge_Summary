@@ -2,17 +2,21 @@
 // SQL อ่านอย่างเดียวสำหรับ HOSxP — ทุก query ผ่าน hosxpQuery() ซึ่งตรวจว่าเป็น SELECT
 // ตาราง/ฟิลด์ที่ใช้ต้องตรงกับ lib/hosxp/schema.ts (scripts/check-schema.ts ใช้ตรวจ)
 
+import { procClass } from "@/lib/coding/codebook";
 import { normalizeIcd10, normalizeIcd9 } from "@/lib/coding/icd";
 import { addDays, normalizeDate, todayIso } from "@/lib/date";
+import { aggregateHistory, type GroupedCase } from "@/lib/drg/history";
 import type {
+  AdmissionCoding,
   AdmissionDetail,
   AdmissionFilter,
   AdmissionRow,
   CodeRef,
   DiagType,
   FilterOptions,
-  HistoricalGroup,
+  GroupingHistory,
   RwRow,
+  Screen,
   Sex,
 } from "@/lib/patients/types";
 import { resolveColumns, type ResolvedColumns } from "./columns";
@@ -59,7 +63,7 @@ function listSelect(c: ResolvedColumns): string {
 SELECT i.an, i.hn, i.regdate, i.regtime, i.dchdate, i.dchtime,
        i.ward, w.name AS ward_name,
        ${adm} AS admdoctor, da.name AS admdoctor_name,
-       i.dch_doctor, dd.name AS dch_doctor_name,
+       i.dch_doctor, dd.name AS dch_doctor_name, i.dchtype, dt.name AS dchtype_name,
        CONCAT(IFNULL(p.pname,''), IFNULL(p.fname,''), ' ', IFNULL(p.lname,'')) AS ptname,
        p.sex, s.age_y, s.drg, s.rw, s.adjrw,
        DATEDIFF(i.dchdate, i.regdate) AS los,
@@ -76,7 +80,8 @@ LEFT JOIN patient p ON p.hn = i.hn
 LEFT JOIN an_stat s ON s.an = i.an
 LEFT JOIN ward w ON w.ward = i.ward
 LEFT JOIN doctor da ON da.code = ${c.admitDoctor ? `i.${c.admitDoctor}` : "NULL"}
-LEFT JOIN doctor dd ON dd.code = i.dch_doctor`;
+LEFT JOIN doctor dd ON dd.code = i.dch_doctor
+LEFT JOIN dchtype dt ON dt.dchtype = i.dchtype`;
 }
 
 const NO_PDX = "NOT EXISTS (SELECT 1 FROM iptdiag x WHERE x.an = i.an AND x.diagtype = '1')";
@@ -136,6 +141,7 @@ function mapListRow(r: Row): AdmissionRow {
     // HOSxP เก็บรหัสแบบไม่มีจุด (J189) → แปลงเป็น J18.9 ให้ตรงกับ codebook/กฎ
     pdx: r.pdx == null ? null : normalizeIcd10(String(r.pdx)),
     los: num(r.los),
+    dischargeType: ref(r.dchtype, r.dchtype_name),
     drg: str(r.drg),
     rw: num(r.rw),
     adjrw: num(r.adjrw),
@@ -168,12 +174,12 @@ export async function fetchAdmission(an: string): Promise<AdmissionDetail | null
        CONCAT_WS(' ', NULLIF(TRIM(p.addrpart),''),
          IF(IFNULL(TRIM(p.moopart),'') = '', NULL, CONCAT('ม.', TRIM(p.moopart))),
          t.full_name) AS address,
-       pt.name AS pttype_name, i.dchstts, ds.name AS dchstts_name, i.dchtype, dt.name AS dchtype_name
+       pt.name AS pttype_name, i.dchstts, ds.name AS dchstts_name,
+       ${c.iptVn ? "i.vn" : "NULL"} AS admit_vn, ${c.prediag ? `i.${c.prediag}` : "NULL"} AS prediag
      ${listFrom(c)}
      LEFT JOIN thaiaddress t ON t.addressid = s.aid
      LEFT JOIN pttype pt ON pt.pttype = s.pttype
      LEFT JOIN dchstts ds ON ds.dchstts = i.dchstts
-     LEFT JOIN dchtype dt ON dt.dchtype = i.dchtype
      WHERE i.an = ? LIMIT 1`,
     [an],
   );
@@ -185,7 +191,10 @@ export async function fetchAdmission(an: string): Promise<AdmissionDetail | null
   const rxDate = c.rxDate ? `o.${c.rxDate}` : "NULL";
   const labWhere = c.labHasAn ? "(h.an = ? OR h.vn = ?)" : "h.vn = ?";
 
-  const [diag, oper, labs, drugs] = await Promise.all([
+  const vn = str(h.admit_vn);
+  const screenCols = c.screen.map((x) => `sc.${x}`).join(", ");
+
+  const [diag, oper, labs, drugs, screen, admitDx] = await Promise.all([
     hosxpQuery<Row>(
       `SELECT d.icd10, d.diagtype, d.doctor, doc.name AS doctor_name, cd.name AS icd_name
        FROM iptdiag d
@@ -223,6 +232,12 @@ export async function fetchAdmission(an: string): Promise<AdmissionDetail | null
        ORDER BY rxdate, d.name`,
       [an],
     ),
+    vn && screenCols
+      ? hosxpQuery<Row>(`SELECT ${screenCols} FROM opdscreen sc WHERE sc.vn = ? LIMIT 1`, [vn])
+      : Promise.resolve([] as Row[]),
+    vn
+      ? hosxpQuery<Row>("SELECT d.icd10 FROM ovstdiag d WHERE d.vn = ? ORDER BY d.diagtype, d.icd10", [vn])
+      : Promise.resolve([] as Row[]),
   ]);
 
   const row = mapListRow(h);
@@ -234,7 +249,6 @@ export async function fetchAdmission(an: string): Promise<AdmissionDetail | null
     phone: str(h.hometel),
     pttypeName: str(h.pttype_name),
     dischargeStatus: ref(h.dchstts, h.dchstts_name),
-    dischargeType: ref(h.dchtype, h.dchtype_name),
     diagnoses: diag.map((d) => ({
       icd10: normalizeIcd10(String(d.icd10 ?? "")),
       diagtype: diagtype(d.diagtype),
@@ -247,6 +261,7 @@ export async function fetchAdmission(an: string): Promise<AdmissionDetail | null
       return {
         icd9,
         ext,
+        orType: procClass(icd9),
         name: str(o.icd_name),
         opDate: normalizeDate(o.opdate),
         doctorCode: str(o.doctor),
@@ -269,6 +284,30 @@ export async function fetchAdmission(an: string): Promise<AdmissionDetail | null
       units: str(d.units),
       qty: num(d.qty),
     })),
+    screen: screen.length ? mapScreen(screen[0]) : null,
+    prediag: str(h.prediag),
+    admitDx: [...new Set(admitDx.map((d) => normalizeIcd10(String(d.icd10 ?? ""))).filter(Boolean))],
+  };
+}
+
+/** HOSxP เก็บค่าที่ไม่ได้วัดเป็น 0 ไม่ใช่ NULL (ยืนยันจาก rca) → ถือว่าไม่มีค่า */
+function vital(v: unknown): number | null {
+  const n = num(v);
+  return n == null || n === 0 ? null : n;
+}
+
+export function mapScreen(r: Row): Screen {
+  return {
+    cc: str(r.cc),
+    hpi: str(r.hpi),
+    pmh: str(r.pmh),
+    bps: vital(r.bps),
+    bpd: vital(r.bpd),
+    pulse: vital(r.pulse),
+    temperature: vital(r.temperature),
+    rr: vital(r.rr),
+    bw: vital(r.bw),
+    height: vital(r.height),
   };
 }
 
@@ -298,33 +337,62 @@ export async function fetchFilterOptions(): Promise<FilterOptions> {
   };
 }
 
-// ── ผลจัดกลุ่มย้อนหลัง (ใช้ประมาณ RW) ────────────────────────────────────────
-export async function fetchHistoricalGroups(
-  pdx: string,
-  from: string,
-  to: string,
-): Promise<HistoricalGroup[]> {
-  const rows = await hosxpQuery<Row>(
-    `SELECT s.drg, COUNT(*) AS n, AVG(s.rw) AS avg_rw, AVG(s.adjrw) AS avg_adjrw,
-            AVG((SELECT COUNT(*) FROM iptdiag y WHERE y.an = s.an AND y.diagtype <> '1')) AS avg_sdx
+// ── ผลจัดกลุ่มย้อนหลัง (ใช้ประมาณ DRG/RW แบบ 4 ระดับ) ───────────────────────
+const HISTORY_LIMIT = 3000;
+
+export async function fetchGroupingHistory(pdx: string, from: string, to: string): Promise<GroupingHistory> {
+  const key = pdx.replace(/\./g, "").toUpperCase();
+  const cases = await hosxpQuery<Row>(
+    `SELECT s.an, s.drg, s.rw
      FROM an_stat s
      JOIN ipt i ON i.an = s.an
      JOIN iptdiag d ON d.an = s.an AND d.diagtype = '1'
      WHERE REPLACE(d.icd10, '.', '') = ? AND i.dchdate BETWEEN ? AND ?
        AND s.drg IS NOT NULL AND s.drg <> ''
-     GROUP BY s.drg
-     ORDER BY n DESC
-     LIMIT 10`,
-    [pdx.replace(/\./g, ""), from, to],
+     ORDER BY i.dchdate DESC
+     LIMIT ${HISTORY_LIMIT}`,
+    [key, from, to],
   );
-  return rows.map((r) => ({
-    drg: String(r.drg),
-    n: Number(r.n),
-    avgRw: num(r.avg_rw),
-    avgAdjRw: num(r.avg_adjrw),
-    hasOr: null,
-    avgSdx: num(r.avg_sdx),
-  }));
+  const coding = await fetchCoding(cases.map((r) => String(r.an)));
+  const grouped: GroupedCase[] = cases.map((r) => {
+    const cd = coding[String(r.an)];
+    return {
+      drg: String(r.drg),
+      rw: num(r.rw),
+      sdx: (cd?.diagnoses ?? []).filter((x) => ["2", "3", "4"].includes(x.diagtype)).map((x) => x.icd10),
+      hasOr: (cd?.procedures ?? []).some((x) => procClass(x.icd9) === "OR"),
+    };
+  });
+  return aggregateHistory(key, grouped);
+}
+
+// ── รหัสที่ลงไว้ของหลาย AN (จุดสถานะในรายชื่อ / ผลจัดกลุ่มย้อนหลัง) ───────────
+const IN_CHUNK = 500;
+
+export async function fetchCoding(ans: string[]): Promise<Record<string, AdmissionCoding>> {
+  const out: Record<string, AdmissionCoding> = {};
+  const list = [...new Set(ans)].filter((a) => /^[0-9]{1,15}$/.test(a));
+  for (const a of list) out[a] = { diagnoses: [], procedures: [] };
+  for (let i = 0; i < list.length; i += IN_CHUNK) {
+    const chunk = list.slice(i, i + IN_CHUNK);
+    const ph = chunk.map(() => "?").join(",");
+    const [diag, oper] = await Promise.all([
+      hosxpQuery<Row>(`SELECT d.an, d.icd10, d.diagtype, d.doctor FROM iptdiag d WHERE d.an IN (${ph})`, chunk),
+      hosxpQuery<Row>(
+        `SELECT o.an, o.icd9 FROM iptoprt o WHERE o.an IN (${ph}) AND o.icd9 IS NOT NULL AND o.icd9 <> ''`,
+        chunk,
+      ),
+    ]);
+    for (const d of diag) {
+      out[String(d.an)]?.diagnoses.push({
+        icd10: normalizeIcd10(String(d.icd10 ?? "")),
+        diagtype: diagtype(d.diagtype),
+        doctorCode: str(d.doctor),
+      });
+    }
+    for (const o of oper) out[String(o.an)]?.procedures.push({ icd9: splitIcd9(String(o.icd9 ?? "")).icd9 });
+  }
+  return out;
 }
 
 // ── รายงาน RW/CMI (RW จริงจาก an_stat) ───────────────────────────────────────

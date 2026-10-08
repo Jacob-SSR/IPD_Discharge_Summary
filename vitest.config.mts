@@ -16,6 +16,8 @@ export default defineConfig({
       GEMINI_PAID_TIER: "false",
       NHSO_RATE_PER_ADJRW: "8350",
       HOSPITAL_NAME: "โรงพยาบาลทดสอบ",
+      HOSPITAL_CODE: "99999",
+      HOSPITAL_PROVINCE: "ทดสอบ",
       JWT_SECRET: "test-secret-test-secret-test-secret-0000",
       APP_DB_FILE: ".data/test-appdb.json",
       APP_USERS_TABLE: "users",

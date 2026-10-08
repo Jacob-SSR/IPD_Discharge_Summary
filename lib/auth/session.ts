@@ -17,7 +17,9 @@ export interface Session {
 
 /** role ที่เข้าใช้ระบบได้ (APP_ALLOWED_ROLES) — ใช้ทั้งตอน login และใน proxy ทุก request */
 export function isAllowedRole(role: string): boolean {
-  return allowedRoles().includes(role.toUpperCase());
+  const allowed = allowedRoles();
+  // "*" = ทุกบัญชีใน ppchos.users เข้าได้ (เหมือน ppc-hos)
+  return allowed.includes("*") || allowed.includes(role.toUpperCase());
 }
 
 /** role ที่ขอคำแนะนำ AI และยืนยัน/ไม่ยืนยัน/เพิ่มรหัสได้ (APP_DECIDER_ROLES) */

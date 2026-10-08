@@ -8,8 +8,9 @@ import { appMode } from "@/lib/env";
 import {
   fetchAdmission,
   fetchAdmissions,
+  fetchCoding,
   fetchFilterOptions,
-  fetchHistoricalGroups,
+  fetchGroupingHistory,
   fetchRwRows,
 } from "@/lib/hosxp/queries";
 import type { PatientSource } from "./types";
@@ -20,8 +21,9 @@ const hosxpSource: PatientSource = {
     cachedQuery(["list", JSON.stringify(f)], () => fetchAdmissions(f), 60),
   getAdmission: (an) => cachedQuery(["patient", an], () => fetchAdmission(an), 60),
   filterOptions: () => cachedQuery(["filter-options"], fetchFilterOptions, 3600),
-  historicalGroups: (pdx, from, to) =>
-    cachedQuery(["hist", pdx, from, to], () => fetchHistoricalGroups(pdx, from, to), 86400),
+  groupingHistory: (pdx, from, to) =>
+    cachedQuery(["hist4", pdx, from, to], () => fetchGroupingHistory(pdx, from, to), 86400),
+  codingOf: (ans) => (ans.length ? fetchCoding(ans) : Promise.resolve({})),
   rwRows: (from, to) => cachedQuery(["rw", from, to], () => fetchRwRows(from, to), 600),
 };
 

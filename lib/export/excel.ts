@@ -3,18 +3,19 @@
 
 import ExcelJS from "exceljs";
 import type { CourseText } from "@/lib/appdb/types";
-import type { FinalCode } from "@/lib/coding/final";
+import { ORIGIN_LABEL, type FinalCode } from "@/lib/coding/final";
 import { formatThaiDate, formatTime } from "@/lib/date";
-import { DIAGTYPE_LABEL, type AdmissionDetail } from "@/lib/patients/types";
+import { DIAGTYPE_LABEL_TH, type AdmissionDetail } from "@/lib/patients/types";
 
-const MINT = "FFD6F0E0";
-const MINT_DARK = "FF1A5233";
+const MINT = "FFE3F3F0";
+const MINT_DARK = "FF0B5C54";
 
 export async function dischargeSummaryWorkbook(
   a: AdmissionDetail,
-  codes: FinalCode[],
+  codes: { dx: FinalCode[]; px: FinalCode[] },
   course: CourseText | null,
   hospital: string,
+  drgLine: string,
 ): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   wb.creator = hospital;
@@ -41,6 +42,7 @@ export async function dischargeSummaryWorkbook(
     ["แพทย์ผู้รับไว้", a.admitDoctor?.name ?? "-"],
     ["แพทย์ผู้จำหน่าย", a.dischargeDoctor?.name ?? "-"],
     ["สถานะ/ประเภทการจำหน่าย", `${a.dischargeStatus?.name ?? "-"} / ${a.dischargeType?.name ?? "-"}`],
+    ["DRG / RW / AdjRW", drgLine],
   ];
   for (const [k, v] of info) {
     const r = ws.addRow([k, v]);
@@ -57,16 +59,22 @@ export async function dischargeSummaryWorkbook(
     });
   };
 
-  header(["การวินิจฉัย", "ICD-10", "ชื่อโรค", "ที่มา"]);
-  for (const c of codes.filter((x) => x.system === "ICD10")) {
-    ws.addRow([DIAGTYPE_LABEL[c.diagtype ?? "4"], c.code, c.name ?? "", c.origin === "hosxp" ? "HOSxP" : "แพทย์ยืนยัน"]);
+  header(["การวินิจฉัย", "ICD-10-TM", "ชื่อโรค", "ที่มา"]);
+  for (const c of codes.dx) {
+    const r = ws.addRow([
+      `${DIAGTYPE_LABEL_TH[c.diagtype ?? "4"]}${c.replaced ? " (เสนอเปลี่ยน)" : ""}`,
+      c.code,
+      c.name ?? "",
+      ORIGIN_LABEL[c.origin],
+    ]);
+    if (c.replaced) r.font = { strike: true, color: { argb: "FF999999" } };
   }
   header(["หัตถการ", "ICD-9-CM", "ชื่อหัตถการ", "วันที่"]);
-  for (const c of codes.filter((x) => x.system === "ICD9CM")) {
+  for (const c of codes.px) {
     ws.addRow([
       c.orType === "OR" ? "OR" : c.orType === "NonOR" ? "Non-OR" : "-",
       c.ext ? `${c.code} ext ${c.ext}` : c.code,
-      c.name ?? "",
+      `${c.name ?? ""}${c.origin === "hosxp" ? "" : ` (${ORIGIN_LABEL[c.origin]})`}`,
       formatThaiDate(c.opDate),
     ]);
   }

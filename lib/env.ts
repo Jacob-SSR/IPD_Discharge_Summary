@@ -35,6 +35,15 @@ export function hospitalName(): string {
   return process.env.HOSPITAL_NAME!;
 }
 
+/** รหัสสถานพยาบาล 5 หลัก และจังหวัด (หัวแบบฟอร์ม Discharge Summary) */
+export function hospitalCode(): string {
+  return process.env.HOSPITAL_CODE!;
+}
+
+export function hospitalProvince(): string {
+  return process.env.HOSPITAL_PROVINCE!;
+}
+
 export function jwtSecret(): Uint8Array {
   const s = process.env.JWT_SECRET!;
   if (!s || s.length < 32) throw new Error("JWT_SECRET ต้องยาวอย่างน้อย 32 ตัวอักษร");

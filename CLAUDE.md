@@ -131,18 +131,22 @@ NHSO_RATE_PER_ADJRW=8350     # อัตรา สปสช. 2569
 - ทำทีละข้อ จบแต่ละข้อให้รัน `tsc --noEmit`, lint และ test ให้ผ่าน แล้วสรุปสิ่งที่เปลี่ยนสั้นๆ พร้อมเสนอ commit message ภาษาไทยแบบ conventional (ผู้ใช้ commit เอง)
 - ทุกฟีเจอร์ต้องทำงานได้ในโหมด `demo` ก่อน
 
-## สถานะปัจจุบัน (อัปเดตล่าสุด 6 ต.ค. 2569)
+## สถานะปัจจุบัน (อัปเดตล่าสุด 8 ต.ค. 2569)
 
-ทำครบทุกข้อ 1–6 แล้ว **แต่ยังไม่ได้รับไฟล์ `IPD_Discharge_Summary.zip`** จึงยังทำข้อ 0 ไม่ได้ —
-logic ที่สเปกบอกให้ "port แบบตรงตัว" เขียนขึ้นใหม่จากสเปก/มาตรฐาน และต้องเทียบกับของเดิมเมื่อได้ไฟล์:
+ทำครบทุกข้อ 1–6 แล้ว และ port หน้าจอ/logic ตาม **"สนามลอง AI ให้รหัส"** (artifact ของโปรแกรมเดิมที่ผู้ใช้ให้มา
+แทนไฟล์ `IPD_Discharge_Summary.zip` ซึ่งยังไม่ได้รับ): หน้าทำงาน 3 คอลัมน์, prompt + รูปแบบ JSON เดิม, merge_and_validate,
+กฎหลักฐาน/ผลตรวจรหัส (ผลตรงกับของเดิมทั้ง 22 ราย — `tests/legacy-rules.test.ts`), ประมาณ DRG 4 ระดับ + สูตร AdjRW ของ rw_estimator.py,
+codebook ICD-10-TM/ICD-9-CM (OR/Non-OR) และข้อมูลสมมติ 22 ราย
 
-- SQL (`lib/hosxp/queries.ts`) — ปรับตาม SQL ที่ ppc-hos-10667 ใช้กับ HOSxP จริงแล้ว (ipt.dch_doctor, an_stat.aid → thaiaddress.full_name,
-  an_stat.pttype, รหัสไม่มีจุด/มี extension) คอลัมน์ที่ต่างตามเวอร์ชันเลือกอัตโนมัติ (`lib/hosxp/columns.ts`)
-  ทดสอบกับฐานจำลอง 2 รุ่นแล้ว ยังไม่เคยต่อ HOSxP จริง
-- กฎตรวจรหัส (`lib/coding/rules.config.ts`) และเกณฑ์ lab ของ engine แบบกฎ (`lib/ai/rules.config.ts`, `CLINICAL_REVIEWED = false`) — ต้องให้แพทย์/ผู้ให้รหัสตรวจ
-- สูตร AdjRW (`lib/drg/adjrw.ts`, `ADJRW_FORMULA_VERIFIED = false`) — ต้องเทียบกับของเดิมและเพิ่ม test ด้วยเคสจากของเดิม
-- แบบฟอร์ม A4 — ยังไม่ได้เทียบกับ template เดิม
-- ยังไม่มี codebook จริง (`data/codebooks/*.csv`) และตาราง TDRG จริง (`data/tdrg/*.csv`) — ห้ามเดาค่า RW
+ข้อที่ต่างจากของเดิมโดยตั้งใจ (กฎข้อ 2): ของเดิมส่ง CC/HPI/PMH/วินิจฉัยแรกรับ/Course ที่แพทย์พิมพ์ให้ AI —
+ที่นี่**ไม่ส่ง free text** (แสดงในหน้าจออย่างเดียว) จนกว่าจะมี de-identification ข้อความอิสระที่ผ่านการตรวจ
+
+ยังต้องตรวจ/ยืนยัน:
+- เกณฑ์ lab ของกฎหลักฐาน (`lib/coding/legacyRules.ts`, `CLINICAL_REVIEWED = false`) อนุมานจากผลของโปรแกรมเดิม — ให้แพทย์/ผู้ให้รหัสตรวจ
+- ตาราง TDRG 6.3 จริง (`data/tdrg/tdrg_rw_table.csv`) ยังไม่มี — ค่าใน `data/tdrg/demo/` เป็นค่าสมมติ ห้ามเดาค่า RW
+- codebook จาก OCR ยังไม่ได้ตรวจทาน
+- SQL (`lib/hosxp/queries.ts`) ปรับตาม ppc-hos-10667 / rca แล้ว (ipt.dch_doctor, ipt.vn → opdscreen/ovstdiag, an_stat.aid/pttype,
+  รหัสไม่มีจุด/มี extension) คอลัมน์ที่ต่างตามเวอร์ชันเลือกอัตโนมัติ (`lib/hosxp/columns.ts`) ทดสอบกับฐานจำลอง 3 รุ่น ยังไม่เคยต่อ HOSxP จริง
 
 ฐานข้อมูลแอป: ใช้ฐาน `ppchos` เดิมของ ppc-hos (ตาราง `ipdsum_*`, `docs/sql/appdb.sql`) และ login ด้วย `ppchos.users`
-สิทธิ์ตาม role: `APP_ALLOWED_ROLES` (เข้าดู) / `APP_DECIDER_ROLES` (ยืนยันรหัส)
+(ชื่อผู้ใช้/รหัสผ่านเดียวกับ ppc-hos และ rca) สิทธิ์ตาม role: `APP_ALLOWED_ROLES` (เข้าดู, `*` = ทุกบัญชี) / `APP_DECIDER_ROLES` (ยืนยันรหัส)

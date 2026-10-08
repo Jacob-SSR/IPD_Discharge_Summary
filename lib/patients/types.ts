@@ -19,10 +19,10 @@ export const DIAGTYPE_LABEL: Record<DiagType, string> = {
 };
 
 export const DIAGTYPE_LABEL_TH: Record<DiagType, string> = {
-  "1": "โรคหลัก",
+  "1": "การวินิจฉัยหลัก",
   "2": "โรคร่วม",
-  "3": "โรคแทรก",
-  "4": "อื่นๆ",
+  "3": "โรคแทรกซ้อน",
+  "4": "อื่น ๆ",
   "5": "สาเหตุภายนอก",
 };
 
@@ -49,6 +49,8 @@ export interface Procedure {
   opDate: string | null;
   doctorCode: string | null;
   doctorName: string | null;
+  /** OR / Non-OR ตาม ICD-9-CM ฉบับ สรท. (null = ไม่ทราบ) */
+  orType?: OrType | null;
 }
 
 export interface LabResult {
@@ -68,6 +70,22 @@ export interface DrugOrder {
   strength: string | null;
   units: string | null;
   qty: number | null;
+  /** วันสุดท้ายที่ได้รับ (กรณีรวมหลายวันเป็นรายการเดียว) */
+  lastDate?: string | null;
+}
+
+/** ข้อมูลคัดกรองแรกรับ (opdscreen ของ visit ที่ admit) — CC/HPI/PMH เป็น free text ห้ามส่ง AI */
+export interface Screen {
+  cc: string | null;
+  hpi: string | null;
+  pmh: string | null;
+  bps: number | null;
+  bpd: number | null;
+  pulse: number | null;
+  temperature: number | null;
+  rr: number | null;
+  bw: number | null;
+  height: number | null;
 }
 
 /** แถวในหน้ารายชื่อ */
@@ -88,6 +106,7 @@ export interface AdmissionRow {
   pdxDoctor: CodeRef | null;
   pdx: string | null;
   los: number | null;
+  dischargeType: CodeRef | null;
   drg: string | null;
   rw: number | null;
   adjrw: number | null;
@@ -101,11 +120,15 @@ export interface AdmissionDetail extends AdmissionRow {
   phone: string | null;
   pttypeName: string | null;
   dischargeStatus: CodeRef | null;
-  dischargeType: CodeRef | null;
   diagnoses: Diagnosis[];
   procedures: Procedure[];
   labs: LabResult[];
   drugs: DrugOrder[];
+  screen: Screen | null;
+  /** การวินิจฉัยแรกรับที่แพทย์พิมพ์ (free text — แสดงอย่างเดียว ห้ามส่ง AI) */
+  prediag: string | null;
+  /** รหัสที่ลงไว้ตอน ER/OPD ก่อนรับไว้ (ไม่ใช่การวินิจฉัยสุดท้าย) */
+  admitDx: string[];
 }
 
 export type PendingStatus = "all" | "noPdx" | "admitted";
@@ -131,16 +154,27 @@ export interface FilterOptions {
   doctors: CodeRef[];
 }
 
-/** ผลจัดกลุ่ม DRG ย้อนหลังของ PDx เดียวกัน (ใช้ประมาณ RW) */
-export interface HistoricalGroup {
-  drg: string;
-  n: number;
-  avgRw: number | null;
-  avgAdjRw: number | null;
-  /** มีหัตถการ OR หรือไม่ (null = ไม่ทราบ) */
-  hasOr: boolean | null;
-  /** จำนวน SDx เฉลี่ยของกลุ่ม */
-  avgSdx: number | null;
+/** จำนวนเคส (DRG → จำนวน) */
+export type DrgCounts = Record<string, number>;
+
+/**
+ * ผลจัดกลุ่มย้อนหลังของ PDx หนึ่งตัว แยก 4 ระดับ (แบบ rw_estimator.py ของโปรแกรมเดิม)
+ *   t1: "<หมวด SDx เรียง,คั่นด้วย ,>#<OR 0/1>"   t2: "<จำนวน SDx 0/1/2+>#<OR>"
+ *   t3: "<OR>"                                   t4: รวมทุกเคสของ PDx
+ */
+export interface GroupingHistory {
+  t1: Record<string, DrgCounts>;
+  t2: Record<string, DrgCounts>;
+  t3: Record<string, DrgCounts>;
+  t4: DrgCounts;
+  /** RW เฉลี่ยของ DRG (ใช้เมื่อไม่มีในตาราง TDRG) */
+  drgRw: Record<string, number>;
+}
+
+/** รหัสที่ลงไว้ของแต่ละ AN (ใช้คำนวณผลตรวจกฎในหน้ารายชื่อ) */
+export interface AdmissionCoding {
+  diagnoses: Pick<Diagnosis, "icd10" | "diagtype" | "doctorCode">[];
+  procedures: Pick<Procedure, "icd9">[];
 }
 
 /** แถวสำหรับรายงาน RW/CMI (RW จริงจาก an_stat) */
@@ -161,6 +195,8 @@ export interface PatientSource {
   listAdmissions(filter: AdmissionFilter): Promise<AdmissionRow[]>;
   getAdmission(an: string): Promise<AdmissionDetail | null>;
   filterOptions(): Promise<FilterOptions>;
-  historicalGroups(pdx: string, from: string, to: string): Promise<HistoricalGroup[]>;
+  groupingHistory(pdx: string, from: string, to: string): Promise<GroupingHistory>;
+  /** รหัสที่ลงไว้ของหลาย AN พร้อมกัน (สำหรับจุดสถานะในรายชื่อ) */
+  codingOf(ans: string[]): Promise<Record<string, AdmissionCoding>>;
   rwRows(from: string, to: string): Promise<RwRow[]>;
 }

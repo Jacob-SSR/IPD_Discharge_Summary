@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { Activity, BarChart3, BrainCircuit, ClipboardList, LogOut, PlugZap } from "lucide-react";
 
 const NAV = [
-  { href: "/patients", label: "ผู้ป่วยใน", icon: ClipboardList },
+  { href: "/patients", label: "สรุป + AI แนะนำรหัส", icon: ClipboardList },
   { href: "/reports/rw", label: "รายงาน RW/CMI", icon: BarChart3 },
   { href: "/reports/ai", label: "ผลงาน AI", icon: BrainCircuit },
   { href: "/system", label: "ตรวจการเชื่อมต่อ", icon: PlugZap },
@@ -33,15 +33,15 @@ export function AppShell({
   }
   return (
     <div className="min-h-screen">
-      <header className="no-print sticky top-0 z-20 border-b border-mint-100 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-          <Link href="/patients" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-mint-600 text-white">
+      <header className="no-print glass sticky top-0 z-20 border-x-0 border-t-0">
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2">
+          <Link href="/patients" className="group flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-[var(--accent-ink)] transition-transform group-hover:rotate-[-8deg] group-hover:scale-105">
               <Activity size={18} />
             </span>
             <span className="leading-tight">
-              <span className="block text-sm font-semibold text-mint-800">IPD Discharge Summary</span>
-              <span className="block text-[11px] text-slate-500">{hospital}</span>
+              <span className="block text-sm font-semibold text-ink">IPD Discharge Summary</span>
+              <span className="block text-[11px] text-muted">{hospital}</span>
             </span>
           </Link>
           <nav className="flex flex-wrap gap-1">
@@ -51,8 +51,8 @@ export function AppShell({
                 <Link
                   key={href}
                   href={href}
-                  className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm ${
-                    active ? "bg-mint-100 font-medium text-mint-800" : "text-slate-600 hover:bg-mint-50"
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                    active ? "bg-accent-soft font-medium text-accent" : "text-muted hover:bg-surface-2 hover:text-ink"
                   }`}
                 >
                   <Icon size={15} />
@@ -78,7 +78,7 @@ export function AppShell({
           </div>
         </div>
       </header>
-      <main className="print-area mx-auto max-w-7xl px-4 py-6">{children}</main>
+      <main className="print-area mx-auto max-w-[1440px] px-4 pt-3 pb-8">{children}</main>
     </div>
   );
 }

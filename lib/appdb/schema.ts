@@ -29,7 +29,7 @@ export const APPDB_SCHEMA: string[] = [
     code        VARCHAR(10)  NOT NULL,
     code_system ENUM('ICD10','ICD9CM') NOT NULL,
     source      ENUM('ai','rules','manual') NOT NULL,
-    action      ENUM('accept','reject','add','remove') NOT NULL,
+    action      ENUM('accept','reject','undo','add','remove') NOT NULL,
     diagtype    CHAR(1) NULL,
     or_type     ENUM('OR','NonOR') NULL,
     op_date     DATE NULL,

@@ -13,6 +13,10 @@ export const OPDATE_CANDIDATES = ["opdate", "begin_date_time", "begin_datetime",
 export const RXDATE_CANDIDATES = ["rxdate", "vstdate"] as const;
 /** แพทย์ผู้ทำหัตถการใน iptoprt */
 export const OPDOCTOR_CANDIDATES = ["doctor", "opdoctor", "doctor_code"] as const;
+/** การวินิจฉัยแรกรับที่แพทย์พิมพ์ใน ipt (free text — แสดงอย่างเดียว ห้ามส่ง AI) */
+export const PREDIAG_CANDIDATES = ["prediag", "pre_diag", "admit_diag"] as const;
+/** คอลัมน์ของ opdscreen ที่ใช้ (มีครบหรือไม่แล้วแต่เวอร์ชัน) */
+export const SCREEN_COLUMNS = ["cc", "hpi", "pmh", "bps", "bpd", "pulse", "temperature", "rr", "bw", "height"] as const;
 
 export interface ResolvedColumns {
   /** ipt.<col> หรือ null ถ้าไม่มี (ตัวกรอง "แพทย์ผู้รับไว้" จะไม่มีผล) */
@@ -22,6 +26,11 @@ export interface ResolvedColumns {
   rxDate: string | null;
   /** lab ของผู้ป่วยในผูกกับ AN ผ่าน lab_head.an (ถ้ามี) และ/หรือ lab_head.vn */
   labHasAn: boolean;
+  /** ipt.vn (visit ที่ admit) — ใช้ดึง opdscreen / ovstdiag แรกรับ */
+  iptVn: boolean;
+  prediag: string | null;
+  /** คอลัมน์ของ opdscreen ที่มีจริง (ว่าง = ไม่มีตาราง/อ่านไม่ได้) */
+  screen: string[];
 }
 
 let cached: Promise<ResolvedColumns> | null = null;
@@ -42,11 +51,12 @@ export function pick(cols: Set<string>, candidates: readonly string[]): string |
 export function resolveColumns(): Promise<ResolvedColumns> {
   if (!cached) {
     cached = (async () => {
-      const [ipt, oprt, lab, item] = await Promise.all([
+      const [ipt, oprt, lab, item, screen] = await Promise.all([
         tableColumns("ipt"),
         tableColumns("iptoprt"),
         tableColumns("lab_head"),
         tableColumns("opitemrece"),
+        tableColumns("opdscreen"),
       ]);
       return {
         admitDoctor: pick(ipt, ADMIT_DOCTOR_CANDIDATES),
@@ -54,6 +64,9 @@ export function resolveColumns(): Promise<ResolvedColumns> {
         opDoctor: pick(oprt, OPDOCTOR_CANDIDATES),
         rxDate: pick(item, RXDATE_CANDIDATES),
         labHasAn: lab.has("an"),
+        iptVn: ipt.has("vn"),
+        prediag: pick(ipt, PREDIAG_CANDIDATES),
+        screen: screen.has("vn") ? SCREEN_COLUMNS.filter((c) => screen.has(c)) : [],
       };
     })().catch((e) => {
       cached = null;

@@ -26,4 +26,7 @@ export const HOSXP_COLUMNS: Record<string, readonly string[]> = {
   lab_items: ["lab_items_code", "lab_items_name", "lab_items_unit", "lab_items_normal_value"],
   opitemrece: ["an", "icode", "qty"],
   drugitems: ["icode", "name", "strength", "units"],
+  // visit ที่ admit (ipt.vn): สัญญาณชีพ/CC แรกรับ + รหัสที่ลงไว้ตอน ER/OPD
+  opdscreen: ["vn"],
+  ovstdiag: ["vn", "icd10", "diagtype"],
 };

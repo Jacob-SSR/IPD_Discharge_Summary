@@ -1,0 +1,41 @@
+{
+ "refs": [
+  [
+   "สรท. (TCMC) การจัดกลุ่มวินิจฉัยโรคร่วมไทยและน้ำหนักสัมพัทธ์ ฉบับ 6.3 (TDRG 6.3.4)",
+   "https://www.tcmc.or.th"
+  ],
+  [
+   "สรท. Thai Diagnosis Related Group, TDRG version 6.3 — สูตร AdjRW (เอกสารนำเสนอ สปสช. 25 เม.ย. 2567)",
+   "https://www.sshos.go.th/wp-content/uploads/2024/04/25-4-67-ThaiDRGver634NHSO20240425NK2.pdf"
+  ],
+  [
+   "สรท. โปรแกรม TDRG Seeker TDS6307 (ม.ค. 2569) สำหรับตรวจสอบผลจัดกลุ่มรายราย",
+   "https://www.tcmc.or.th/program-drg-seeker-tds6307-S0177"
+  ],
+  [
+   "สปสช. อัตราจ่ายผู้ป่วยใน ปีงบประมาณ 2569 = 8,350 บาทต่อ AdjRW (Hfocus, ก.พ. 2569)",
+   "https://www.hfocus.org/content/2026/02/36919"
+  ],
+  [
+   "สรท. การเปลี่ยนแปลงของกลุ่มวินิจฉัยโรคร่วมไทย จากฉบับ 5.1 เป็น 6.3 (29 ส.ค. 2567) — ค่า ORP: 0 = Non-OR, 1–6 = OR",
+   "https://www.tcmc.or.th/_content_html_editor_upload/files/B847AE22-7B81-CD30-057C-4C2F274492CA.pdf"
+  ],
+  [
+   "WHO. ICD-10 Volume 1 Tabular list, Fifth edition 2016 — ใช้ค้นหารหัส ICD-10 และระบบ dagger/asterisk",
+   "https://icd.who.int/browse10/2016/en"
+  ],
+  [
+   "WHO. ICD-10 Volume 2 Instruction manual, Fifth edition 2016 — หมวด 4.5 Morbidity: main condition, 4.5.2 แนวทางการให้รหัส, 4.5.3 Rules MB1–MB5",
+   "https://icd.who.int/browse10/Content/statichtml/ICD10Volume2_en_2016.pdf"
+  ],
+  [
+   "กระทรวงสาธารณสุข. ICD-10-TM 2009 Tabular List of Diseases, Volume 1ก (A–L) — ชื่อโรคภาษาไทย (อ่านด้วย OCR)",
+   "https://www.thcc.or.th"
+  ],
+  [
+   "ICD-9-CM Tabular list of procedures (FY15) ฉบับ สรท. — OR procedure / Non-OR procedure but affects ThaiDRG",
+   "https://www.tcmc.or.th"
+  ]
+ ],
+ "base_rate": 8350
+}

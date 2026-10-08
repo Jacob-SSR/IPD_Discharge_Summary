@@ -18,7 +18,7 @@ export async function GET(req: Request) {
       validFormat: isValidFormat(system, code),
       inCodebook: book.size ? book.has(code) : null,
       entry: book.get(code),
-      matches: book.search(q, 10),
+      matches: book.search(q, 15),
       codebook: { source: book.source, isDemo: book.isDemo, size: book.size },
     });
   } catch (e) {

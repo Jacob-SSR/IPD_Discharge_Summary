@@ -9,6 +9,8 @@ import {
   ADMIT_DOCTOR_CANDIDATES,
   OPDATE_CANDIDATES,
   OPDOCTOR_CANDIDATES,
+  PREDIAG_CANDIDATES,
+  SCREEN_COLUMNS,
   resolveColumns,
   RXDATE_CANDIDATES,
 } from "@/lib/hosxp/columns";
@@ -65,6 +67,13 @@ async function main() {
   show("iptoprt แพทย์ผู้ทำหัตถการ", c.opDoctor, OPDOCTOR_CANDIDATES, "ไม่แสดงชื่อแพทย์ผู้ทำหัตถการ");
   show("opitemrece วันที่สั่งยา", c.rxDate, RXDATE_CANDIDATES, "ยาไม่มีวันที่ (AI/กฎไม่รู้ว่าให้วันไหน)");
   console.log(`✓ lab ผู้ป่วยใน: ${c.labHasAn ? "lab_head.an หรือ lab_head.vn = AN" : "lab_head.vn = AN"}`);
+  show("ipt.vn (visit ที่ admit)", c.iptVn ? "vn" : null, ["vn"], "ไม่มี CC/HPI/สัญญาณชีพแรกรับ และรหัสจาก ER/OPD");
+  show("ipt การวินิจฉัยแรกรับ", c.prediag, PREDIAG_CANDIDATES, "ไม่แสดงการวินิจฉัยแรกรับที่แพทย์พิมพ์");
+  const missingScreen = SCREEN_COLUMNS.filter((x) => !c.screen.includes(x));
+  if (!c.screen.length) {
+    console.log("! opdscreen: อ่านไม่ได้ — ไม่มี CC/HPI/สัญญาณชีพแรกรับ");
+    problems++;
+  } else console.log(`✓ opdscreen: ${c.screen.join(", ")}${missingScreen.length ? ` (ไม่มี ${missingScreen.join(", ")})` : ""}`);
 
   console.log(problems ? `\nพบ ${problems} จุดที่ต้องปรับ queries ให้ตรงกับ HOSxP ของโรงพยาบาล` : "\nตาราง/ฟิลด์ครบทุกจุด");
   await closeHosxpPool();

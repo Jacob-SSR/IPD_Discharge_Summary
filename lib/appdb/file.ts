@@ -109,6 +109,12 @@ export function createFileAppDb(file: string): AppDb {
         const list = d.aiRuns.filter((r) => r.an === an && r.kind === kind);
         return list.length ? list[list.length - 1] : null;
       }, false),
+    listAiRunsForAn: (an) => run((d) => d.aiRuns.filter((r) => r.an === an), false),
+    ansWithAiRuns: (ans) =>
+      run((d) => {
+        const want = new Set(ans);
+        return new Set(d.aiRuns.filter((r) => r.kind === "suggest" && r.provider === "gemini" && want.has(r.an)).map((r) => r.an));
+      }, false),
     listAiRunsInRange: (from, to) =>
       run(
         (d) => d.aiRuns.filter((x) => day(x.createdAt) >= from && day(x.createdAt) <= to),

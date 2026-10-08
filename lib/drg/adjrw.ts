@@ -1,38 +1,28 @@
 // lib/drg/adjrw.ts
-// สูตร AdjRW (ปรับค่าน้ำหนักตามวันนอน) — โครงตาม TDRG version 6
-//   นอนสั้น   LOS < WtLOS/3 : AdjRW = RW0d + (RW − RW0d) × LOS / (WtLOS/3)
-//   นอนนาน   LOS > OT      : AdjRW = RW + (LOS − OT) × of × RW / WtLOS
-//   ปกติ                    : AdjRW = RW
-//
-// ⚠️ ADJRW_FORMULA_VERIFIED = false
-//    สูตรนี้ยังไม่ได้เทียบกับโปรแกรมเดิม (legacy) และคู่มือ TDRG 6.3 ฉบับที่โรงพยาบาลใช้
-//    เพราะยังไม่ได้รับไฟล์ IPD_Discharge_Summary.zip — ห้ามใช้ตัดสินใจทางการเงินจนกว่าจะยืนยัน
-//    และเพิ่ม unit test ด้วยเคสจริงจากของเดิม (ดู lib/drg/adjrw.test.ts)
-//    AdjRW "จริง" ของระบบมาจาก an_stat (ผล grouper ของ HOSxP) ไม่ใช่จากสูตรนี้
+// AdjRW ตามเกณฑ์วันนอน TDRG 6.3 — port จาก rw_estimator.py ของโปรแกรมเดิม (สนามลอง AI ให้รหัส)
+//   นอน < 24 ชม. (LOS < 1)        → RW0d
+//   LOS < ⌈WtLOS/3⌉               → RW0d + LOS × (RW − RW0d) / ⌈WtLOS/3⌉
+//   ⌈WtLOS/3⌉ ≤ LOS ≤ OT          → RW
+//   LOS > OT                      → ไม่คำนวณ (ต้องยืนยันด้วย TDS/TGrp)
+// อ้างอิง: สรท. TDRG 6.3 (เอกสาร สปสช. 25 เม.ย. 2567) — ดู data/tdrg/refs.json
+// ⚠️ ค่าในตาราง RW/WtLOS/OT/RW0d ต้องมาจากคู่มือ TDRG 6.3 ตัวจริง (ตาราง demo เป็นค่าสมมติ)
 
 import type { DrgParams } from "./tables";
 
-export const ADJRW_FORMULA_VERIFIED = false;
-
-export type LosKind = "short" | "normal" | "long";
+/** สูตรตรงกับโปรแกรมเดิมแล้ว — แต่ค่าตาราง TDRG ยังต้องยืนยัน */
+export const ADJRW_FORMULA_VERIFIED = true;
 
 export interface AdjRwResult {
-  adjrw: number;
-  kind: LosKind;
+  adjrw: number | null;
+  note: string;
 }
 
-function round4(n: number): number {
-  return Math.round(n * 10_000) / 10_000;
-}
-
-export function computeAdjRw(p: DrgParams, losDays: number): AdjRwResult {
-  const los = Math.max(0, losDays);
-  const lowTrim = p.wtlos / 3;
-  if (p.rw0d != null && los < lowTrim && lowTrim > 0) {
-    return { adjrw: round4(p.rw0d + ((p.rw - p.rw0d) * los) / lowTrim), kind: "short" };
-  }
-  if (p.of != null && los > p.ot && p.wtlos > 0) {
-    return { adjrw: round4(p.rw + ((los - p.ot) * p.of * p.rw) / p.wtlos), kind: "long" };
-  }
-  return { adjrw: round4(p.rw), kind: "normal" };
+export function computeAdjRw(t: DrgParams | undefined, los: number | null): AdjRwResult {
+  if (!t || los == null) return { adjrw: null, note: "แสดงเฉพาะ RW" };
+  const low = Math.ceil(t.wtlos / 3);
+  const rw0d = t.rw0d ?? t.rw;
+  if (los < 1) return { adjrw: rw0d, note: "นอน < 24 ชม. ใช้ RW0d" };
+  if (los < low) return { adjrw: +(rw0d + (los * (t.rw - rw0d)) / low).toFixed(4), note: `วันนอนน้อยกว่า ${low} วัน (WtLOS/3)` };
+  if (los <= t.ot) return { adjrw: t.rw, note: `วันนอนอยู่ในช่วงปกติ (${low}–${t.ot} วัน)` };
+  return { adjrw: null, note: `วันนอนเกิน OT (${t.ot} วัน) ต้องยืนยันด้วย TDS/TGrp` };
 }

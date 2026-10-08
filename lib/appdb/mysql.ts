@@ -174,6 +174,22 @@ export function createMysqlAppDb(url: string): AppDb {
       const rows = await q(`SELECT * FROM ${T.aiRuns} WHERE an = ? AND kind = ? ORDER BY id DESC LIMIT 1`, [an, kind]);
       return rows.length ? mapRun(rows[0]) : null;
     },
+    async listAiRunsForAn(an) {
+      return (await q(`SELECT * FROM ${T.aiRuns} WHERE an = ? ORDER BY id`, [an])).map(mapRun);
+    },
+    async ansWithAiRuns(ans) {
+      const out = new Set<string>();
+      for (let i = 0; i < ans.length; i += 500) {
+        const chunk = ans.slice(i, i + 500);
+        if (!chunk.length) continue;
+        const rows = await q(
+          `SELECT DISTINCT an FROM ${T.aiRuns} WHERE kind = 'suggest' AND provider = 'gemini' AND an IN (${chunk.map(() => "?").join(",")})`,
+          chunk,
+        );
+        for (const r of rows) out.add(String(r.an));
+      }
+      return out;
+    },
     async listAiRunsInRange(from, to) {
       return (
         await q(`SELECT * FROM ${T.aiRuns} WHERE created_at >= ? AND created_at < DATE_ADD(?, INTERVAL 1 DAY) ORDER BY id`, [from, to])

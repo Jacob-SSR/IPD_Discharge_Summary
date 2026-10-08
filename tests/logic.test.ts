@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CodeDecision } from "@/lib/appdb/types";
-import { buildFinalCodes, codesToClipboardText, latestDecisions, suggestionState } from "@/lib/coding/final";
+import { acceptedItems, decisionView, merge, type BookLookup } from "@/lib/ai/merge";
+import { acceptedLabel, copyText, finalCodes } from "@/lib/coding/final";
 import { fiscalYearBE, fiscalYearRange, formatThaiDate, quickRange } from "@/lib/date";
 import { buildDemoAdmissions } from "@/lib/demo/data";
 import { matchesFilter } from "@/lib/demo/source";
@@ -57,31 +58,46 @@ describe("ตัวกรองรายชื่อ", () => {
   it("demo: รอสรุป = ไม่มี PDx หรือยังนอนอยู่", () => {
     const all = buildDemoAdmissions("2026-10-06");
     const pending = all.filter((a) => matchesFilter(a, { pending: true })).map((a) => a.an);
-    expect(pending.sort()).toEqual(["690000021", "690000022", "690000023"]);
-    expect(all.filter((a) => matchesFilter(a, { pending: true, pendingStatus: "noPdx" })).map((a) => a.an).sort()).toEqual(["690000021", "690000022"]);
+    const noPdx = ["690001259", "690001400", "690001401", "690001402", "690001403"];
+    expect(pending.sort()).toEqual(noPdx);
+    expect(all.filter((a) => matchesFilter(a, { pending: true, pendingStatus: "noPdx" })).map((a) => a.an).sort()).toEqual(noPdx);
+    expect(all.filter((a) => matchesFilter(a, { pending: true, pendingStatus: "admitted" })).map((a) => a.an).sort()).toEqual(["690001402", "690001403"]);
   });
 });
 
-describe("ชุดรหัสสุดท้าย", () => {
+describe("ชุดรหัสในแบบฟอร์ม (renderForm ของโปรแกรมเดิม)", () => {
   const a = { diagnoses: [{ icd10: "J18.9", diagtype: "1" as const, name: "Pneumonia", doctorCode: null, doctorName: null }], procedures: [] };
-  it("รวม HOSxP + ยอมรับ + เพิ่มเอง และการตัดสินใจล่าสุดชนะ", () => {
-    const decisions = [
-      D({ id: 1, action: "accept" }),
-      D({ id: 2, code: "D64.9", action: "accept" }),
-      D({ id: 3, code: "D64.9", action: "reject" }),
-      D({ id: 4, code: "99.04", system: "ICD9CM", source: "manual", action: "add", diagtype: null, orType: "NonOR" }),
-      D({ id: 5, code: "B96.2", source: "manual", action: "add" }),
-      D({ id: 6, code: "B96.2", source: "manual", action: "remove" }),
-    ];
-    expect(buildFinalCodes(a, decisions).map((c) => `${c.code}:${c.origin}`)).toEqual(["J18.9:hosxp", "E87.6:rules", "99.04:manual"]);
-    const latest = latestDecisions(decisions);
-    expect(suggestionState(latest, "1", "ICD10", "D64.9")).toBe("rejected");
-    expect(suggestionState(latest, "1", "ICD10", "X00")).toBe("pending");
-    expect(suggestionState(latest, "2", "ICD10", "E87.6")).toBe("pending");
+  const book: BookLookup = { name: () => null, procClass: (c) => (c.startsWith("99") ? "NonOR" : "OR") };
+  const items = merge(
+    a,
+    [],
+    [
+      { kind: "dx", code: "E87.6", diagtype: 2, reason: "", evidence: [], confidence: 0.8, source: "ai" },
+      { kind: "dx", code: "A41.9", diagtype: 1, reason: "", evidence: [], confidence: 0.7, source: "ai" },
+      { kind: "dx", code: "D64.9", diagtype: 2, reason: "", evidence: [], confidence: 0.5, source: "ai" },
+    ],
+    [],
+    book,
+  );
+  const decisions = [
+    D({ id: 1, action: "accept" }),
+    D({ id: 2, code: "D64.9", action: "accept" }),
+    D({ id: 3, code: "D64.9", action: "undo" }),
+    D({ id: 4, code: "A41.9", action: "accept", diagtype: "1" }),
+    D({ id: 5, code: "99.04", system: "ICD9CM", source: "manual", action: "add", diagtype: null, orType: "NonOR" }),
+  ];
+  const view = decisionView(decisions);
+  const all = merge(a, [], items.filter((x) => x.source !== "manual"), view.manual, book);
+  const acc = acceptedItems(all, view.state);
+
+  it("HOSxP + ยืนยันจาก AI + แพทย์เพิ่ม · PDx เดิมที่ถูกแทนขีดฆ่า", () => {
+    const { dx, px } = finalCodes(a, acc);
+    expect(dx.map((c) => `${c.code}:${c.origin}${c.replaced ? ":replaced" : ""}`)).toEqual(["A41.9:ai", "E87.6:ai", "J18.9:hosxp:replaced"]);
+    expect(px.map((c) => `${c.code}:${c.origin}:${c.orType}`)).toEqual(["99.04:manual:NonOR"]);
   });
-  it("ข้อความคัดลอกไปลง HOSxP", () => {
-    const text = codesToClipboardText(buildFinalCodes(a, [D({}), D({ id: 2, code: "99.04", system: "ICD9CM", source: "manual", action: "add", diagtype: null, orType: "OR" })]));
-    expect(text).toBe("PDx: J18.9\nComorbidity: E87.6\nICD-9-CM: 99.04 (OR)");
+  it("ข้อความรหัสที่ยอมรับ + คัดลอก", () => {
+    expect(acceptedLabel(acc)).toBe("A41.9 (PDx), E87.6 (Comorbidity), 99.04 [หัตถการ]");
+    expect(copyText(acc)).toBe("A41.9 E87.6 99.04");
   });
 });
 

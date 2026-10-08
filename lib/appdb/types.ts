@@ -6,8 +6,8 @@ import type { DiagType, OrType } from "@/lib/patients/types";
 
 export type CodeSystem = "ICD10" | "ICD9CM";
 export type DecisionSource = "ai" | "rules" | "manual";
-/** accept/reject = ตัดสินรหัสที่ระบบเสนอ, add = แพทย์เพิ่มเอง, remove = ลบรหัสที่เพิ่มเอง */
-export type DecisionAction = "accept" | "reject" | "add" | "remove";
+/** accept/reject = ตัดสินรหัสที่ระบบเสนอ, undo = ยกเลิกการตัดสิน, add = แพทย์เพิ่มเอง, remove = ลบรหัสที่เพิ่มเอง */
+export type DecisionAction = "accept" | "reject" | "undo" | "add" | "remove";
 export type AiRunKind = "suggest" | "course";
 
 export interface CodeDecision {
@@ -88,6 +88,9 @@ export interface AppDb {
 
   addAiRun(r: NewAiRun): Promise<AiRun>;
   latestAiRun(an: string, kind: AiRunKind): Promise<AiRun | null>;
+  listAiRunsForAn(an: string): Promise<AiRun[]>;
+  /** AN ที่เคยวิเคราะห์ด้วย AI สำเร็จ (Gemini) — จุดสถานะในรายชื่อ */
+  ansWithAiRuns(ans: string[]): Promise<Set<string>>;
   listAiRunsInRange(from: string, to: string): Promise<AiRun[]>;
 
   getCourse(an: string): Promise<CourseText | null>;
