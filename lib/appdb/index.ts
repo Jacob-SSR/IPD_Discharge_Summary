@@ -1,10 +1,9 @@
 // lib/appdb/index.ts
-// เลือก implementation: มี APP_DB_URL → MySQL (service appdb ใน Docker), ไม่มี → ไฟล์ JSON (อนุญาตเฉพาะโหมด demo)
-// ฐานนี้เป็นที่เดียวที่โปรแกรมสร้างตาราง — ห้ามอยู่บน server HOSxP / ppchos (guard.ts)
+// เลือก implementation: มี APP_DB_URL → MySQL (ฐาน ppchos — ตารางใหม่ ipdsum_* ของโปรแกรม), ไม่มี → ไฟล์ JSON (เฉพาะโหมด demo)
+// โปรแกรมสร้าง/เขียนเฉพาะตาราง ipdsum_* ไม่แตะตารางเดิมของ HOSxP
 
-import { appDbFile, appDbUrl, appMode, authDbConfig, hosxpConfig, isDemo } from "@/lib/env";
+import { appDbFile, appDbUrl, authDbConfig, isDemo } from "@/lib/env";
 import { createFileAppDb } from "./file";
-import { assertAppDbIsolated, type ServerRef } from "./guard";
 import { createMysqlAppDb } from "./mysql";
 import type { AppDb } from "./types";
 
@@ -14,15 +13,8 @@ export function appDb(): AppDb {
   if (instance) return instance;
   const url = appDbUrl();
   if (url) {
-    const protectedServers: ServerRef[] = [];
-    if (appMode() === "hosxp") {
-      const h = hosxpConfig();
-      protectedServers.push({ label: "HOSxP (HOSXP_DB_HOST)", host: h.host, port: h.port });
-    }
-    const a = authDbConfig();
-    if (a) protectedServers.push({ label: "ppchos (AUTH_DB_HOST)", host: a.host, port: a.port });
-    assertAppDbIsolated(url, protectedServers);
-    instance = createMysqlAppDb(url, { usersTable: !a });
+    // login ด้วย ppchos.users แบบอ่านอย่างเดียว (AUTH_DB_*) → ไม่สร้าง/ไม่เขียนตารางผู้ใช้
+    instance = createMysqlAppDb(url, { usersTable: !authDbConfig() });
   } else if (isDemo()) {
     instance = createFileAppDb(appDbFile());
   } else {

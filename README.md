@@ -41,66 +41,33 @@ codebook จริงจากโปรแกรมเดิม: ICD-10-TM 2009 
 
 ## ใช้งานจริงคู่กับ ppc-hos-10667 (เครื่องใน LAN)
 
-**ไม่สร้างตารางหรือเขียนข้อมูลบน server HOSxP / ppchos เลย** — ข้อมูลของโปรแกรม (การยืนยันรหัส, ผล AI, สรุปการรักษา, audit log)
-เก็บใน MariaDB ของโปรแกรมเองที่ `docker compose` รันให้ (service `appdb`, ตาราง `ipdsum_*` สร้างอัตโนมัติจาก
-[`docs/sql/appdb.sql`](docs/sql/appdb.sql) ตอนเริ่มครั้งแรก) โปรแกรมไม่ยอมเริ่มถ้า `APP_DB_URL` ชี้ไปที่ server HOSxP หรือ ppchos
+ข้อมูลของโปรแกรม (การยืนยันรหัส, ผล AI, สรุปการรักษา, audit log) เก็บใน**ตารางใหม่ 4 ตาราง `ipdsum_*` ในฐาน `ppchos`**
+(ไม่มีอยู่เดิมใน HOSxP — โปรแกรมเขียนเฉพาะตารางเหล่านี้ ไม่แตะตารางเดิมของ HOSxP) · Docker ใช้แค่ Redis
 
-| ต่อกับ | ใช้ทำอะไร | สิทธิ์ |
+| ต่อกับ | ใช้ทำอะไร | user / สิทธิ์ |
 |---|---|---|
-| HOSxP (`HOSXP_DB_*`) | ข้อมูลผู้ป่วยใน | อ่านอย่างเดียว (user SELECT + session read only + SQL guard) |
-| `ppchos.users` (`AUTH_DB_*`) | login ด้วยบัญชีเดียวกับ ppc-hos / rca | อ่านอย่างเดียว — ไม่อัปเกรดรหัสผ่านกลับ |
-| `appdb` ใน Docker (`APP_DB_URL`) | ข้อมูลของโปรแกรม | อ่าน/เขียน — ที่เดียวที่สร้างตาราง |
+| HOSxP (`HOSXP_DB_*`) | ข้อมูลผู้ป่วยใน | อ่านอย่างเดียว — [`create_readonly_user.sql`](docs/sql/create_readonly_user.sql) |
+| `ppchos.users` (`AUTH_DB_*`) | login ด้วยบัญชีเดียวกับ ppc-hos / rca | อ่านอย่างเดียว (user เดียวกับข้างบนได้) — ไม่อัปเกรดรหัสผ่านกลับ |
+| `ppchos.ipdsum_*` (`APP_DB_URL`) | ข้อมูลของโปรแกรม | เขียนได้เฉพาะ 4 ตารางนี้ — [`create_app_user.sql`](docs/sql/create_app_user.sql) |
+| Redis (`REDIS_URL`) | cache | Docker |
 
-1. **HOSxP:** ให้ DBA สร้าง user อ่านอย่างเดียว [`docs/sql/create_readonly_user.sql`](docs/sql/create_readonly_user.sql)
-   (อย่าใช้ user ของ ppc-hos เพราะเขียนได้ — หน้า `/system` จะแจ้งเตือนถ้า user มีสิทธิ์เขียน)
-2. **env:** `cp .env.example .env.production` แล้วกรอก — ค่าหลัก:
-   - `HOSXP_DB_HOST` / `HOSXP_DB_NAME` = `DB_HOST` / `DB_NAME` ของ ppc-hos, user = user อ่านอย่างเดียวจากข้อ 1
-   - `AUTH_DB_HOST` / `AUTH_DB_PORT` / `AUTH_DB_USER` / `AUTH_DB_PASS` = `DB_HOST2` / `DB_PORT` / `DB_USER` / `DB_PASS` ของ ppc-hos, `AUTH_DB_NAME=ppchos` (แบบเดียวกับ rca)
-   - `MARIADB_ROOT_PASSWORD` / `MARIADB_PASSWORD` สุ่มใหม่ แล้วใส่รหัสเดียวกันใน `APP_DB_URL=mysql://ipdsum:<MARIADB_PASSWORD>@appdb:3306/ipdsum`
+1. **DBA:**
+   - สร้างตาราง: `mysql -h <server> -u <admin> -p ppchos < docs/sql/appdb.sql`
+   - สร้าง user อ่านอย่างเดียว: [`docs/sql/create_readonly_user.sql`](docs/sql/create_readonly_user.sql) (อย่าใช้ user ของ ppc-hos เพราะเขียนได้ — หน้า `/system` จะขึ้นสีแดง)
+   - สร้าง user ของโปรแกรม: [`docs/sql/create_app_user.sql`](docs/sql/create_app_user.sql) (เขียนได้เฉพาะ `ipdsum_*`)
+2. **env:** `cp .env.example .env.local` (รันเอง) หรือ `.env.production` (Docker) แล้วกรอก — ค่าหลัก:
+   - `HOSXP_DB_*` = server / ฐาน `ppchos` + user อ่านอย่างเดียว
+   - `AUTH_DB_*` = server เดียวกัน, `AUTH_DB_NAME=ppchos`, user อ่านอย่างเดียว (แบบเดียวกับ rca)
+   - `APP_DB_URL=mysql://ipd_summary_app:<รหัส>@<server>:3306/ppchos`
    - `APP_ALLOWED_ROLES` (เข้าดูได้, `*` = ทุกบัญชี) / `APP_DECIDER_ROLES` (ยืนยันรหัสได้) ตาม role ใน `ppchos.users`
-   - `HOSPITAL_NAME` / `HOSPITAL_CODE` / `HOSPITAL_PROVINCE` (หัวแบบฟอร์ม)
-   - `JWT_SECRET` ใหม่ (ไม่ใช้ร่วมกับ ppc-hos — cookie ชื่อ `ipdsum_token` แยกกันอยู่แล้ว)
-3. **ตรวจโครงสร้าง HOSxP:** `npm run check-schema` (ต้องมี `.env.local` ค่าเดียวกัน) — พิมพ์เฉพาะชื่อตาราง/ฟิลด์
-   และบอกว่าคอลัมน์ที่ต่างกันตามเวอร์ชันถูกเลือกเป็นตัวไหน (DRG/RW/AdjRW, แพทย์ผู้รับไว้, วันที่/แพทย์ผู้ทำหัตถการ, วันที่สั่งยา ฯลฯ)
-4. **รัน:** `docker compose up -d --build` (app + appdb + redis) → `http://<เครื่องนี้>:3600` แล้วเปิด `/system` ตรวจว่าเขียวทุกช่อง
-   — ข้อมูลของโปรแกรมอยู่ใน volume `appdb-data` (สำรองด้วย `docker exec ipd-discharge-appdb mariadb-dump ...`)
+   - `HOSPITAL_NAME` / `HOSPITAL_CODE` / `HOSPITAL_PROVINCE` (หัวแบบฟอร์ม), `JWT_SECRET` ใหม่
+3. **ตรวจโครงสร้าง HOSxP:** `npm run check-schema` — พิมพ์เฉพาะชื่อตาราง/ฟิลด์ และบอกว่าคอลัมน์ที่ต่างกันตามเวอร์ชันถูกเลือกเป็นตัวไหน
+4. **รัน:**
+   - รันเอง: `docker compose -f docker-compose.redis.yml up -d` (Redis) + `REDIS_URL=redis://127.0.0.1:6379` ใน `.env.local` แล้ว `npm run build && npm start`
+   - หรือทั้งระบบใน Docker: `docker compose up -d --build` (app + redis) → `http://<เครื่องนี้>:3600`
+   - เปิด `/system` ตรวจว่าเขียวทุกช่อง
 5. **Gemini กับข้อมูลจริง:** เปิด billing แล้วตั้ง `GEMINI_PAID_TIER=true` (ไม่ตั้ง = แสดงเฉพาะผลจากกฎหลักฐาน)
 6. **ก่อนใช้จริง:** ให้ผู้ให้รหัสเทียบกับ HOSxP อย่างน้อย 10 ราย
-
-### รันโปรแกรมนอก Docker (npm run dev / npm start) แต่ใช้ฐานข้อมูลของโปรแกรมใน Docker
-
-```bash
-# 1) ใส่ใน .env.local
-MARIADB_ROOT_PASSWORD=<สุ่ม>      # openssl rand -hex 16
-MARIADB_DATABASE=ipdsum
-MARIADB_USER=ipdsum
-MARIADB_PASSWORD=<สุ่ม>
-APP_DB_URL=mysql://ipdsum:<MARIADB_PASSWORD>@127.0.0.1:3307/ipdsum
-REDIS_URL=redis://127.0.0.1:6379
-
-# 2) สร้างฐาน (MariaDB 10.11 ใช้แทน MySQL ได้) + Redis — ตาราง ipdsum_* สร้างให้อัตโนมัติ
-docker compose -f docker-compose.db.yml up -d --wait
-
-# 3) รันโปรแกรม แล้วเปิด /system ดูว่า "ฐานข้อมูลแอป" เป็นสีเขียว
-npm run dev
-```
-
-port 3307 / 6379 เปิดเฉพาะเครื่องนี้ (127.0.0.1) · ข้อมูลอยู่ใน volume `ipd-discharge-db_appdb-data` (ลบ container แล้วข้อมูลยังอยู่)
-
-### เคยรันเวอร์ชันเก่าที่สร้างตารางใน ppchos
-
-เวอร์ชันก่อนหน้าสร้างตาราง `ipdsum_*` ในฐานที่ `APP_DB_URL` ชี้ (ถ้าชี้ไปที่ `ppchos` = อยู่ในฐาน HOSxP)
-ตอนนี้โปรแกรมไม่ยอมสร้างตารางบน server ที่มีฐาน HOSxP แล้ว ให้ DBA ตรวจและลบตารางเก่า:
-
-```sql
-SHOW TABLES FROM ppchos LIKE 'ipdsum\_%';
--- ถ้าต้องการเก็บประวัติการยืนยันรหัสไว้ ให้ mysqldump 4 ตารางนี้ก่อน แล้วค่อยลบ
-DROP TABLE ppchos.ipdsum_code_decisions, ppchos.ipdsum_ai_runs, ppchos.ipdsum_course_texts, ppchos.ipdsum_audit_log;
-```
-
-ถ้าไม่ใช้บัญชี ppc-hos: ไม่ต้องตั้ง `AUTH_DB_*` แล้วสร้างบัญชีในตาราง `users` ของ appdb ด้วย
-`npm run create-user -- <username> DOCTOR "<ชื่อ>"` (appdb ไม่เปิด port ออกนอกเครื่อง — เปิด `ports: ["127.0.0.1:3307:3306"]` ชั่วคราว
-แล้วตั้ง `APP_DB_URL=mysql://ipdsum:<รหัส>@127.0.0.1:3307/ipdsum` ใน `.env.local`)
 
 ## คำสั่ง
 
@@ -110,7 +77,7 @@ npm run lint
 npm test            # vitest (deidentify, กฎตรวจรหัส, AdjRW, SQL guard, ฯลฯ)
 npm run check-schema
 npm run create-user -- <username> <role> "<ชื่อ>"
-npm run appdb-sql   # สร้าง docs/sql/appdb.sql ใหม่หลังแก้ lib/appdb/schema.ts (Docker ใช้ไฟล์นี้สร้างตาราง)
+npm run appdb-sql   # สร้าง docs/sql/appdb.sql ใหม่หลังแก้ lib/appdb/schema.ts
 ```
 
 ## โครงสร้าง

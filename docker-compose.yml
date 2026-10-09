@@ -1,10 +1,6 @@
-# app + appdb + redis — รันบน server ใน LAN (เครื่องที่ติดตั้ง Docker ไม่ใช่ server HOSxP)
-#   1) cp .env.example .env.production แล้วกรอกค่า
+# app + redis — รันบน server ใน LAN
+#   1) cp .env.example .env.production แล้วกรอกค่า (APP_MODE=hosxp ต้องมี APP_DB_URL และ user HOSxP อ่านอย่างเดียว)
 #   2) docker compose up -d --build   → เปิด http://<เครื่องนี้>:3600
-#
-# ตารางของโปรแกรม (ipdsum_*) สร้างใน service appdb (MariaDB ใน Docker) เท่านั้น
-#   - HOSxP: อ่านอย่างเดียว (HOSXP_DB_*)    - ppchos.users: อ่านอย่างเดียว (AUTH_DB_*)
-#   - ไม่มีการสร้างตารางหรือเขียนข้อมูลบน server HOSxP / ppchos (โปรแกรมไม่ยอมเริ่มถ้า APP_DB_URL ชี้ไปที่นั่น)
 services:
   app:
     build:
@@ -20,7 +16,7 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
       - APP_DB_FILE=/app/.data/appdb.json
-    # ถ้า HOSxP / ppchos อยู่บนเครื่องเดียวกับ Docker ใช้ host.docker.internal ได้
+    # ถ้า MySQL (HOSxP / ฐานแอป) อยู่บนเครื่องเดียวกับ Docker ใช้ host.docker.internal ได้
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -29,32 +25,7 @@ services:
       # วาง codebook / ตาราง TDRG จริงได้โดยไม่ต้อง build ใหม่ (ไม่บังคับ)
       # - ./data:/app/data:ro
     depends_on:
-      appdb:
-        condition: service_healthy
-      redis:
-        condition: service_started
-
-  # ฐานข้อมูลของโปรแกรม: การตัดสินใจรหัส, ผล AI (ไม่มีข้อมูลระบุตัวตน), สรุปการรักษา, audit log
-  # ไม่เปิด port ออกนอกเครื่อง — app ต่อผ่าน network ภายในของ compose (host = appdb)
-  appdb:
-    image: mariadb:10.11
-    container_name: ipd-discharge-appdb
-    restart: unless-stopped
-    env_file:
-      - .env.production   # ใช้ MARIADB_ROOT_PASSWORD / MARIADB_DATABASE / MARIADB_USER / MARIADB_PASSWORD
-    environment:
-      - TZ=Asia/Bangkok
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-    volumes:
-      - appdb-data:/var/lib/mysql
-      # สร้างตารางครั้งแรกที่ volume ยังว่าง
-      - ./docs/sql/appdb.sql:/docker-entrypoint-initdb.d/01-appdb.sql:ro
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
+      - redis
 
   redis:
     image: redis:7-alpine
@@ -66,5 +37,4 @@ services:
 
 volumes:
   app-data:
-  appdb-data:
   redis-data:

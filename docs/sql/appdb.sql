@@ -1,6 +1,7 @@
 -- docs/sql/appdb.sql — ตารางของแอป IPD Discharge Summary (สร้างจาก lib/appdb/schema.ts ห้ามแก้มือ)
--- รันอัตโนมัติใน Docker (service appdb ของ docker-compose.yml) ตอนสร้างฐานครั้งแรก — ไม่ต้องรันบน server HOSxP / ppchos
--- ตาราง users: ใช้เฉพาะเมื่อไม่ได้ตั้ง AUTH_DB_* (login ด้วย ppchos.users แบบอ่านอย่างเดียว)
+-- ตารางใหม่ของโปรแกรม (ipdsum_*) ไม่มีอยู่เดิมใน HOSxP — วางในฐาน ppchos
+-- ตาราง users: ppchos.users มีอยู่แล้ว คำสั่งแรกจะไม่ทำอะไร
+-- ใช้งาน (ถ้า user ของโปรแกรมไม่มีสิทธิ์ CREATE): mysql -h <server> -u <admin> -p ppchos < docs/sql/appdb.sql
 
 CREATE TABLE IF NOT EXISTS users (
   `user`  VARCHAR(50)  NOT NULL PRIMARY KEY,

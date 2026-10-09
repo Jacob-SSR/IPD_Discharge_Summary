@@ -148,7 +148,7 @@ codebook ICD-10-TM/ICD-9-CM (OR/Non-OR) และข้อมูลสมมต�
 - SQL (`lib/hosxp/queries.ts`) ปรับตาม ppc-hos-10667 / rca แล้ว (ipt.dch_doctor, ipt.vn → opdscreen/ovstdiag, an_stat.aid/pttype, DRG/RW/AdjRW จาก ipt ก่อนแล้วค่อย an_stat,
   รหัสไม่มีจุด/มี extension) คอลัมน์ที่ต่างตามเวอร์ชันเลือกอัตโนมัติ (`lib/hosxp/columns.ts`) ทดสอบกับฐานจำลอง 3 รุ่น ยังไม่เคยต่อ HOSxP จริง
 
-ฐานข้อมูลแอป: MariaDB ของโปรแกรมใน Docker (service `appdb` ใน docker-compose, ตาราง `ipdsum_*` จาก `docs/sql/appdb.sql`)
-**ผู้ใช้สั่ง: ห้ามสร้างตารางบน server HOSxP** — `lib/appdb/guard.ts` ไม่ยอมให้ `APP_DB_URL` ชี้ไป server HOSxP / ppchos
+ฐานข้อมูลแอป: **ผู้ใช้ตัดสินใจ (9 ต.ค. 2569) ให้เก็บตารางใหม่ `ipdsum_*` ในฐาน `ppchos` (ฐาน HOSxP ของ รพ.) และใช้ Docker แค่ Redis**
+— ตาราง `ipdsum_*` ไม่มีอยู่เดิมใน HOSxP โปรแกรมเขียนเฉพาะตารางเหล่านี้ (`docs/sql/appdb.sql`, user `docs/sql/create_app_user.sql` เขียนได้เฉพาะ `ipdsum_*`)
 login ด้วย `ppchos.users` แบบอ่านอย่างเดียว (`AUTH_DB_*` แบบ rca — ไม่อัปเกรดรหัสผ่านกลับ, `lib/auth/users.ts`)
 สิทธิ์ตาม role: `APP_ALLOWED_ROLES` (เข้าดู, `*` = ทุกบัญชี) / `APP_DECIDER_ROLES` (ยืนยันรหัส)

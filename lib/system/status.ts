@@ -75,7 +75,7 @@ export async function systemStatus(): Promise<StatusCheck[]> {
       key: "appdb",
       label: "ฐานข้อมูลแอป",
       state: db.kind === "file" ? "warn" : "ok",
-      detail: db.kind === "file" ? "ไฟล์ JSON (เฉพาะโหมด demo)" : "MariaDB ของโปรแกรม (APP_DB_URL — แยกจาก server HOSxP / ppchos)",
+      detail: db.kind === "file" ? "ไฟล์ JSON (เฉพาะโหมด demo)" : "MySQL (APP_DB_URL) — ตาราง ipdsum_* ของโปรแกรม",
     });
   } catch (e) {
     checks.push({ key: "appdb", label: "ฐานข้อมูลแอป", state: "error", detail: errText(e) });

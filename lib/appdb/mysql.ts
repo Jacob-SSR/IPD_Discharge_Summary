@@ -4,7 +4,6 @@
 
 import mysql, { type Pool, type ResultSetHeader, type RowDataPacket } from "mysql2/promise";
 import { appUsersTable } from "@/lib/env";
-import { assertNotHosxpServer, HOSXP_MARKER_SQL } from "./guard";
 import { APPDB_SCHEMA, T, usersTableSql } from "./schema";
 import type {
   AiRun,
@@ -83,14 +82,11 @@ export function createMysqlAppDb(url: string, opts: { usersTable: boolean } = { 
   function ensure(): Promise<void> {
     if (!ready) {
       ready = (async () => {
-        // ตรวจก่อนสร้างอะไรทั้งนั้น: server นี้ต้องไม่ใช่ server HOSxP (เช่นฐาน ppchos ที่มี ipt / an_stat)
-        const [marks] = await pool.query<Row[]>(HOSXP_MARKER_SQL);
-        assertNotHosxpServer(marks as { db: unknown; n: unknown }[]);
         for (const stmt of [...(users ? [usersTableSql(users)] : []), ...APPDB_SCHEMA]) {
           try {
             await pool.query(stmt);
           } catch (e) {
-            // user ไม่มีสิทธิ์ CREATE → ใช้ได้ถ้าสร้างตารางไว้แล้ว (Docker สร้างให้จาก docs/sql/appdb.sql ตอนเริ่มครั้งแรก)
+            // user ไม่มีสิทธิ์ CREATE → ใช้ได้ถ้า DBA สร้างตารางไว้แล้วด้วย docs/sql/appdb.sql
             const table = /CREATE TABLE IF NOT EXISTS (\S+)/.exec(stmt)?.[1] ?? "?";
             try {
               await pool.query(`SELECT 1 FROM ${table} LIMIT 0`);

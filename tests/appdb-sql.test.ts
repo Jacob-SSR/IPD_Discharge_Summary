@@ -12,3 +12,13 @@ describe("docs/sql/appdb.sql", () => {
     for (const s of APPDB_SCHEMA) expect(s).toMatch(/CREATE TABLE IF NOT EXISTS ipdsum_/);
   });
 });
+
+describe("docs/sql/create_app_user.sql", () => {
+  it("ให้สิทธิ์เขียนเฉพาะตาราง ipdsum_* ครบทุกตาราง ไม่มีสิทธิ์กับตารางอื่น", async () => {
+    const { T } = await import("@/lib/appdb/schema");
+    const sql = readFileSync(path.join(__dirname, "..", "docs", "sql", "create_app_user.sql"), "utf8");
+    const grants = sql.split("\n").filter((l) => /^GRANT/.test(l));
+    for (const t of Object.values(T)) expect(grants.some((g) => g.includes(`ppchos.${t} `))).toBe(true);
+    for (const g of grants) expect(g).toMatch(/^GRANT SELECT, INSERT, UPDATE ON ppchos\.ipdsum_\w+\s+TO /);
+  });
+});

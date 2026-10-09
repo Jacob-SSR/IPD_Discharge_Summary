@@ -1,9 +1,9 @@
 // lib/appdb/schema.ts
 // ตารางของฐานข้อมูลแอป (MySQL/MariaDB) — แยกจาก HOSxP โดยสิ้นเชิง
-// อยู่ในฐาน MariaDB ของโปรแกรมเองใน Docker (service appdb) — ไม่สร้างตารางบน server HOSxP / ppchos
-//   ตารางของแอปขึ้นต้นด้วย ipdsum_ · บัญชีผู้ใช้อ่านจาก ppchos.users แบบอ่านอย่างเดียว (AUTH_DB_*)
-//   หรือตาราง users ในฐานนี้ถ้าไม่ได้ตั้ง AUTH_DB_*
-// Docker รัน docs/sql/appdb.sql ให้ตอนสร้างฐานครั้งแรก และโปรแกรมสร้างซ้ำแบบ IF NOT EXISTS ตอนเริ่ม (ต้องตรงกับไฟล์นี้ — มี test ตรวจ)
+// อยู่ในฐาน ppchos (ผู้ใช้ตัดสินใจ) — เป็นตารางใหม่ของโปรแกรม ขึ้นต้นด้วย ipdsum_ ทั้งหมด ไม่มีอยู่เดิมใน HOSxP
+//   โปรแกรมเขียนเฉพาะตารางเหล่านี้ ไม่แตะตารางเดิมของ HOSxP
+//   บัญชีผู้ใช้อ่านจาก ppchos.users แบบอ่านอย่างเดียว (AUTH_DB_*) หรือ APP_USERS_TABLE ถ้าไม่ได้ตั้ง AUTH_DB_*
+// สร้างให้อัตโนมัติครั้งแรกที่ใช้ (CREATE TABLE IF NOT EXISTS) หรือให้ DBA รัน docs/sql/appdb.sql (ต้องตรงกับไฟล์นี้ — มี test ตรวจ)
 
 export const T = {
   decisions: "ipdsum_code_decisions",
