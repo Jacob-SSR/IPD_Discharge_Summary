@@ -1,7 +1,7 @@
 // คอลัมน์กลาง: แท็บ "ข้อมูลในชาร์ต" / "แบบฟอร์ม Discharge Summary" (A4 พิมพ์/บันทึก PDF, Export Excel)
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FileSpreadsheet, Printer } from "lucide-react";
 import { acceptedItems } from "@/lib/ai/merge";
 import type { MergedItem } from "@/lib/ai/types";
@@ -9,6 +9,7 @@ import { finalCodes } from "@/lib/coding/final";
 import { codeVt } from "@/components/motion";
 import { valOf } from "@/lib/drg/estimate";
 import type { WorkspaceBundle } from "@/lib/patients/bundle";
+import { clearSheetFit, fitSheetToPage } from "./printFit";
 import { baht, DT_TH, n4, orClass, orLabel, sexTh, thd } from "./shared";
 
 type Course = { an: string; text: string; saved: string } | null;
@@ -300,8 +301,20 @@ function FormSheet({ b, acc, note }: { b: WorkspaceBundle; acc: MergedItem[]; no
   const real = a.rw != null && !acc.length;
   const tag = (o: string) => (o === "hosxp" ? null : <span className={`ftag ${o === "manual" ? "man" : ""}`}>{o === "manual" ? "แพทย์เพิ่ม" : "ยืนยันจาก AI"}</span>);
   const draft = pending || acc.length > 0;
+  // พิมพ์ (ปุ่ม/Ctrl+P/คำสั่ง) → ย่อให้จบ A4 หน้าเดียว แล้วคืนค่าหลังพิมพ์
+  const sheet = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const before = () => { if (sheet.current) fitSheetToPage(sheet.current); };
+    const after = () => { if (sheet.current) clearSheetFit(sheet.current); };
+    window.addEventListener("beforeprint", before);
+    window.addEventListener("afterprint", after);
+    return () => {
+      window.removeEventListener("beforeprint", before);
+      window.removeEventListener("afterprint", after);
+    };
+  }, []);
   return (
-    <div className="sheet">
+    <div className="sheet" ref={sheet}>
       {draft && (
         <div className="fdraft">
           ร่างแบบสรุป — {pending ? "ยังไม่มีการวินิจฉัยหลักใน HOSxP · " : ""}รหัสที่มีป้ายสีต้องลงใน HOSxP โดยแพทย์/ผู้ให้รหัส
