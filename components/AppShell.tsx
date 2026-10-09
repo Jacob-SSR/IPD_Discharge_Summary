@@ -50,7 +50,7 @@ export function AppShell({
             </span>
             <span className="leading-tight">
               <span className="block text-sm font-semibold text-ink" style={{ fontFamily: "var(--serif)" }}>IPD Discharge Summary</span>
-              <span className="block text-[11px] text-muted">{hospital}</span>
+              <span className="block text-xs text-muted">{hospital}</span>
             </span>
           </Link>
           <nav className="flex flex-wrap gap-1">

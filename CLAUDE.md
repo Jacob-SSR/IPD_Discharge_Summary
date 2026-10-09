@@ -30,7 +30,7 @@
 - รูปแบบสามไฟล์: `types.ts` / `queries.ts` / `route.ts` + `page.tsx`
 - HOSxP: `mysql2/promise` pool แยกสำหรับ HOSxP (อ่านอย่างเดียว) ตั้งค่า charset ได้ (`tis620` / แก้ latin1) ผ่าน env
 - cache: `cachedQuery([keyParts], fn, ttl)` + `invalidate(prefix)` จาก `@/lib/cache` (Redis)
-- ธีม: **"กระดาษดิจิทัล"** ตาม `.impeccable.md` (ผู้ใช้เลือก 9 ต.ค. 2569 — สว่างเป็นหลัก, ฟอนต์ Taviraj/Anuphan/JetBrains Mono, แม่นยำ·เยือกเย็น·น่าเชื่อถือ) ใช้ component กลางแบบ KpiCard, SectionCard, ReportTable
+- ธีม: **"กระดาษดิจิทัล"** ตาม `.impeccable.md` (ผู้ใช้เลือก 9 ต.ค. 2569 — สว่างเป็นหลัก, ฟอนต์ Taviraj/IBM Plex Sans Thai Looped/JetBrains Mono, เนื้อหา 16px เล็กสุด 13px, แม่นยำ·เยือกเย็น·น่าเชื่อถือ) ใช้ component กลางแบบ KpiCard, SectionCard, ReportTable
 - วันที่: แสดงเป็น พ.ศ. (ปี + 543), ปีงบประมาณเริ่ม 1 ต.ค.
 - env ใช้ `process.env.X!` ไม่มีค่า fallback ที่ hardcode
 - deploy: Docker แบบ multi-stage + Docker Compose บน server ใน LAN

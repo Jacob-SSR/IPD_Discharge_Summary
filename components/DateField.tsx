@@ -17,7 +17,7 @@ export function DateField({
     <label className="flex flex-col gap-0.5 text-xs text-slate-500">
       {label}
       <input type="date" className={`${inputClass} py-1.5`} value={value} onChange={(e) => onChange(e.target.value)} />
-      <span className="h-4 text-[11px] text-mint-700">{isIsoDate(value) ? formatThaiDate(value) : ""}</span>
+      <span className="h-5 text-xs text-mint-700">{isIsoDate(value) ? formatThaiDate(value) : ""}</span>
     </label>
   );
 }

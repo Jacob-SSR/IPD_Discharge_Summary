@@ -43,7 +43,7 @@ export default function SystemPage() {
           ))}
         </ul>
       )}
-      <p className="mt-4 text-[11px] text-slate-500">
+      <p className="mt-4 text-xs text-slate-500">
         แสดงเฉพาะสถานะ ไม่แสดงข้อมูลผู้ป่วย/รหัสผ่าน/API key · ตรวจตาราง/ฟิลด์ HOSxP ทั้งหมดด้วย <code>npm run check-schema</code> บนเครื่องใน LAN
       </p>
     </SectionCard>

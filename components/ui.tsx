@@ -19,7 +19,7 @@ export function SectionCard({
     <section className={`rounded-md border border-mint-100 bg-white p-5 shadow-sm ${className}`}>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {Icon && <Icon size={16} className="text-mint-700" />}
-        <h2 className="text-[15px] font-semibold text-mint-800" style={{ fontFamily: "var(--serif)" }}>{title}</h2>
+        <h2 className="text-[17px] font-semibold text-mint-800" style={{ fontFamily: "var(--serif)" }}>{title}</h2>
         {actions && <div className="ml-auto flex flex-wrap items-center gap-2">{actions}</div>}
       </div>
       {children}
@@ -69,7 +69,7 @@ const BADGE = {
 
 export function Badge({ children, tone = "slate", title }: { children: ReactNode; tone?: keyof typeof BADGE; title?: string }) {
   return (
-    <span title={title} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${BADGE[tone]}`}>
+    <span title={title} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${BADGE[tone]}`}>
       {children}
     </span>
   );
