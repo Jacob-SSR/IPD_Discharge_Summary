@@ -179,7 +179,7 @@ function ChartView({
       <div className="chart-head">
         <h2>
           {a.patientName}{" "}
-          <span className="muted" style={{ fontSize: 14, fontWeight: 400 }}>
+          <span className="sub">
             {sexTh(a.sex)} {a.ageYears ?? "-"} ปี
           </span>
         </h2>

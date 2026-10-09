@@ -121,7 +121,7 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
         <h2>
           <span className="em">AI</span> แนะนำรหัส
         </h2>
-        <span className="muted" style={{ fontSize: 12 }}>{who}</span>
+        <span className="who">{who}</span>
       </div>
       <p className="ai-note">
         ข้อความที่ส่งให้ AI ตัดชื่อ/HN/AN/เลขบัตร/วันที่/ชื่อแพทย์ออก และส่งเฉพาะข้อมูลมีโครงสร้าง (รหัส, lab, ยา, หัตถการ, วันนอน, อายุ, เพศ)
@@ -159,7 +159,7 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
         <div key={r?.runId ?? "rules"}>
           <div className="grp">
             <span className="label">{aiRun ? "ข้อเสนอใหม่" : "จากกฎหลักฐาน (ยังไม่ได้ใช้ AI)"}</span>
-            <span className="muted" style={{ fontSize: 12 }}>{fresh.length} รายการ</span>
+            <span className="count">{fresh.length} รายการ</span>
           </div>
           {fresh.length ? (
             <div className="stagger">
@@ -176,13 +176,13 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
               ))}
             </div>
           ) : (
-            <p className="muted" style={{ fontSize: 13 }}>ไม่มีรหัสเพิ่มเติมที่แนะนำ</p>
+            <p className="muted">ไม่มีรหัสเพิ่มเติมที่แนะนำ</p>
           )}
           {man.length > 0 && (
             <>
               <div className="grp">
                 <span className="label">แพทย์เพิ่มเอง</span>
-                <span className="muted" style={{ fontSize: 12 }}>{man.length} รายการ</span>
+                <span className="count">{man.length} รายการ</span>
               </div>
               <div className="stagger">
                 {man.map((s, i) => (
