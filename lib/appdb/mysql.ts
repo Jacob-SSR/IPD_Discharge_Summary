@@ -4,6 +4,7 @@
 
 import mysql, { type Pool, type ResultSetHeader, type RowDataPacket } from "mysql2/promise";
 import { appUsersTable } from "@/lib/env";
+import { assertNotHosxpServer, HOSXP_MARKER_SQL } from "./guard";
 import { APPDB_SCHEMA, T, usersTableSql } from "./schema";
 import type {
   AiRun,
@@ -82,6 +83,9 @@ export function createMysqlAppDb(url: string, opts: { usersTable: boolean } = { 
   function ensure(): Promise<void> {
     if (!ready) {
       ready = (async () => {
+        // ตรวจก่อนสร้างอะไรทั้งนั้น: server นี้ต้องไม่ใช่ server HOSxP (เช่นฐาน ppchos ที่มี ipt / an_stat)
+        const [marks] = await pool.query<Row[]>(HOSXP_MARKER_SQL);
+        assertNotHosxpServer(marks as { db: unknown; n: unknown }[]);
         for (const stmt of [...(users ? [usersTableSql(users)] : []), ...APPDB_SCHEMA]) {
           try {
             await pool.query(stmt);

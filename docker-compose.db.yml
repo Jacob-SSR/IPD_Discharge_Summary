@@ -1,0 +1,41 @@
+# ฐานข้อมูลของโปรแกรม (MariaDB — ใช้แทน MySQL ได้) + Redis สำหรับรันโปรแกรมนอก Docker (npm run dev / npm start)
+#   docker compose -f docker-compose.db.yml up -d
+#   แล้วใน .env.local:
+#     APP_DB_URL=mysql://ipdsum:<MARIADB_PASSWORD>@127.0.0.1:3307/ipdsum
+#     REDIS_URL=redis://127.0.0.1:6379
+#
+# ตาราง ipdsum_* สร้างอัตโนมัติจาก docs/sql/appdb.sql ตอนเริ่มครั้งแรก — ไม่แตะ server HOSxP
+# เปิด port เฉพาะ 127.0.0.1 (เครื่องนี้เท่านั้น) · ถ้ารันทั้งระบบด้วย Docker ใช้ docker-compose.yml แทน
+name: ipd-discharge-db
+services:
+  appdb:
+    image: mariadb:10.11
+    container_name: ipd-discharge-appdb-local
+    restart: unless-stopped
+    env_file:
+      - .env.local   # MARIADB_ROOT_PASSWORD / MARIADB_DATABASE / MARIADB_USER / MARIADB_PASSWORD
+    environment:
+      - TZ=Asia/Bangkok
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - appdb-data:/var/lib/mysql
+      - ./docs/sql/appdb.sql:/docker-entrypoint-initdb.d/01-appdb.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  redis:
+    image: redis:7-alpine
+    container_name: ipd-discharge-redis-local
+    restart: unless-stopped
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    ports:
+      - "127.0.0.1:6379:6379"
+
+volumes:
+  appdb-data:

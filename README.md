@@ -67,6 +67,37 @@ codebook จริงจากโปรแกรมเดิม: ICD-10-TM 2009 
 5. **Gemini กับข้อมูลจริง:** เปิด billing แล้วตั้ง `GEMINI_PAID_TIER=true` (ไม่ตั้ง = แสดงเฉพาะผลจากกฎหลักฐาน)
 6. **ก่อนใช้จริง:** ให้ผู้ให้รหัสเทียบกับ HOSxP อย่างน้อย 10 ราย
 
+### รันโปรแกรมนอก Docker (npm run dev / npm start) แต่ใช้ฐานข้อมูลของโปรแกรมใน Docker
+
+```bash
+# 1) ใส่ใน .env.local
+MARIADB_ROOT_PASSWORD=<สุ่ม>      # openssl rand -hex 16
+MARIADB_DATABASE=ipdsum
+MARIADB_USER=ipdsum
+MARIADB_PASSWORD=<สุ่ม>
+APP_DB_URL=mysql://ipdsum:<MARIADB_PASSWORD>@127.0.0.1:3307/ipdsum
+REDIS_URL=redis://127.0.0.1:6379
+
+# 2) สร้างฐาน (MariaDB 10.11 ใช้แทน MySQL ได้) + Redis — ตาราง ipdsum_* สร้างให้อัตโนมัติ
+docker compose -f docker-compose.db.yml up -d --wait
+
+# 3) รันโปรแกรม แล้วเปิด /system ดูว่า "ฐานข้อมูลแอป" เป็นสีเขียว
+npm run dev
+```
+
+port 3307 / 6379 เปิดเฉพาะเครื่องนี้ (127.0.0.1) · ข้อมูลอยู่ใน volume `ipd-discharge-db_appdb-data` (ลบ container แล้วข้อมูลยังอยู่)
+
+### เคยรันเวอร์ชันเก่าที่สร้างตารางใน ppchos
+
+เวอร์ชันก่อนหน้าสร้างตาราง `ipdsum_*` ในฐานที่ `APP_DB_URL` ชี้ (ถ้าชี้ไปที่ `ppchos` = อยู่ในฐาน HOSxP)
+ตอนนี้โปรแกรมไม่ยอมสร้างตารางบน server ที่มีฐาน HOSxP แล้ว ให้ DBA ตรวจและลบตารางเก่า:
+
+```sql
+SHOW TABLES FROM ppchos LIKE 'ipdsum\_%';
+-- ถ้าต้องการเก็บประวัติการยืนยันรหัสไว้ ให้ mysqldump 4 ตารางนี้ก่อน แล้วค่อยลบ
+DROP TABLE ppchos.ipdsum_code_decisions, ppchos.ipdsum_ai_runs, ppchos.ipdsum_course_texts, ppchos.ipdsum_audit_log;
+```
+
 ถ้าไม่ใช้บัญชี ppc-hos: ไม่ต้องตั้ง `AUTH_DB_*` แล้วสร้างบัญชีในตาราง `users` ของ appdb ด้วย
 `npm run create-user -- <username> DOCTOR "<ชื่อ>"` (appdb ไม่เปิด port ออกนอกเครื่อง — เปิด `ports: ["127.0.0.1:3307:3306"]` ชั่วคราว
 แล้วตั้ง `APP_DB_URL=mysql://ipdsum:<รหัส>@127.0.0.1:3307/ipdsum` ใน `.env.local`)

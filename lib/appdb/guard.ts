@@ -25,3 +25,22 @@ export function assertAppDbIsolated(appDbUrl: string, protectedServers: ServerRe
     }
   }
 }
+
+/** ตารางที่มีเฉพาะในฐาน HOSxP — ถ้า server ของ APP_DB_URL มองเห็นตารางเหล่านี้ แปลว่าชี้ไปที่ server HOSxP */
+export const HOSXP_MARKER_TABLES = ["ipt", "an_stat", "iptdiag", "ovst"] as const;
+
+export const HOSXP_MARKER_SQL = `SELECT TABLE_SCHEMA AS db, COUNT(*) AS n
+  FROM information_schema.TABLES
+  WHERE TABLE_NAME IN (${HOSXP_MARKER_TABLES.map((t) => `'${t}'`).join(", ")})
+  GROUP BY TABLE_SCHEMA`;
+
+/** throw ถ้ามีฐานใดบน server นี้ที่มีตาราง HOSxP ครบอย่างน้อย 2 ตัว (ไม่บอกชื่อตารางอื่นของโรงพยาบาล) */
+export function assertNotHosxpServer(rows: { db: unknown; n: unknown }[]): void {
+  const hit = rows.find((r) => Number(r.n) >= 2);
+  if (hit) {
+    throw new Error(
+      `APP_DB_URL ชี้ไปที่ server ที่มีฐาน HOSxP (${String(hit.db)}) — ไม่สร้างตารางของโปรแกรมบน server นี้ ` +
+        `ใช้ฐานข้อมูลของแอปใน Docker (service appdb ใน docker-compose.yml)`,
+    );
+  }
+}

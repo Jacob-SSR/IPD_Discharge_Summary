@@ -40,3 +40,14 @@ describe("บัญชีผู้ใช้", () => {
     await expect(db.upsertUser({ user: "a", passweb: "b", name: null, role: null })).rejects.toThrow(/ppchos\.users/);
   });
 });
+
+describe("ตรวจเนื้อในของ server ก่อนสร้างตาราง", () => {
+  it("server ที่มีฐาน HOSxP (ipt + an_stat) → ไม่ยอมสร้างตาราง", async () => {
+    const { assertNotHosxpServer } = await import("@/lib/appdb/guard");
+    expect(() => assertNotHosxpServer([{ db: "ppchos", n: 4 }])).toThrow(/ppchos/);
+    expect(() => assertNotHosxpServer([{ db: "ipdsum", n: 0 }])).not.toThrow();
+    expect(() => assertNotHosxpServer([])).not.toThrow();
+    // ตารางชื่อซ้ำตัวเดียวในฐานอื่น ไม่ถือว่าเป็น HOSxP
+    expect(() => assertNotHosxpServer([{ db: "other", n: 1 }])).not.toThrow();
+  });
+});

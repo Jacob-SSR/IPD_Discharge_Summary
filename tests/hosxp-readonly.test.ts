@@ -27,3 +27,13 @@ describe("lib/hosxp อ่านอย่างเดียว", () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe("docs/sql/create_readonly_user.sql", () => {
+  it("ให้สิทธิ์ SELECT ครบทุกตารางที่ queries ใช้ + users (login) และไม่มีสิทธิ์อื่น", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { HOSXP_COLUMNS } = await import("@/lib/hosxp/schema");
+    const sql = readFileSync("docs/sql/create_readonly_user.sql", "utf8");
+    for (const t of [...Object.keys(HOSXP_COLUMNS), "users"]) expect(sql, t).toMatch(new RegExp(`GRANT SELECT ON ppchos\\.${t}\\b`));
+    expect(sql.split("\n").filter((l) => /^GRANT/.test(l) && !/^GRANT SELECT ON/.test(l))).toEqual([]);
+  });
+});
