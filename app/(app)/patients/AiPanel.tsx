@@ -2,8 +2,8 @@
 // กฎข้อ 6: ไม่มีปุ่ม "ยอมรับทั้งหมด" · ทุกการตัดสินใจบันทึกที่ server ทีละรหัส · มีข้อความว่าเป็นข้อเสนอแนะ ไม่ใช่การวินิจฉัย
 "use client";
 
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
-import { nth, ShinyText, sparkAt, spotlight } from "@/components/motion";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { codeVt, nth, Odometer } from "@/components/motion";
 import { acceptedItems, norm } from "@/lib/ai/merge";
 import type { MergedItem } from "@/lib/ai/types";
 import { fetchJson } from "@/lib/client/fetchJson";
@@ -20,7 +20,8 @@ interface Props {
   statusMsg: { text: string; err: boolean } | null;
   onAnalyze: () => void;
   onStop: () => void;
-  onBundle: (b: WorkspaceBundle) => void;
+  /** stamp = key รหัสที่เพิ่งยืนยัน (รหัสลอยไปลงตารางแล้วประทับตรา) */
+  onBundle: (b: WorkspaceBundle, stamp?: string | null) => void;
   onUseDraft: (draft: string) => void;
 }
 
@@ -65,25 +66,25 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
   const aiReady = bundle.ai.active === "gemini";
   const who = bundle.ai.active === "gemini" ? `Gemini · ${bundle.ai.model}` : "กฎหลักฐาน (ยังไม่ได้ตั้งค่า AI)";
 
-  async function decide(body: Record<string, unknown>, key: string, el?: HTMLElement) {
+  async function decide(body: Record<string, unknown>, key: string) {
     setPendingKey(key);
     setDecErr(null);
     try {
       const b = await fetchJson<WorkspaceBundle>("/api/decisions", { method: "POST", body: JSON.stringify({ an: a.an, ...body }) });
-      if (el && body.op === "accept") sparkAt(el);
-      onBundle(b);
+      onBundle(b, body.op === "accept" ? key : null);
+      // ปล่อยปุ่มหลังรหัสลอยไปลงตารางเสร็จ (browser ต้องเห็นการ์ดที่มีชื่อ view-transition ตอนถ่ายภาพก่อนเปลี่ยน)
+      window.setTimeout(() => setPendingKey((k) => (k === key ? null : k)), 450);
       return b;
     } catch (e) {
       setDecErr((e as Error).message);
-      return null;
-    } finally {
       setPendingKey(null);
+      return null;
     }
   }
 
-  function toggle(s: MergedItem, d: "accepted" | "rejected", e: MouseEvent<HTMLButtonElement>) {
+  function toggle(s: MergedItem, d: "accepted" | "rejected") {
     const op = state[s.key] === d ? "undo" : d === "accepted" ? "accept" : "reject";
-    void decide({ op, key: s.key }, s.key, e.currentTarget);
+    void decide({ op, key: s.key }, s.key);
   }
 
   function copy() {
@@ -115,10 +116,10 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
   }
 
   return (
-    <aside className={`pane ai ${busy ? "beam" : ""}`} aria-label="AI แนะนำรหัส">
+    <aside className={`pane ai ${busy ? "busy" : ""}`} aria-label="AI แนะนำรหัส" aria-busy={busy}>
       <div className="ai-head">
         <h2>
-          <span className="grad-text">AI</span> แนะนำรหัส
+          <span className="em">AI</span> แนะนำรหัส
         </h2>
         <span className="muted" style={{ fontSize: 12 }}>{who}</span>
       </div>
@@ -141,7 +142,7 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
         )}
       </div>
       <div className={`status ${status?.err ? "err" : ""}`} role="status">
-        {busy ? <ShinyText>AI กำลังอ่านชาร์ต… {secs} วินาที</ShinyText> : status?.text}
+        {busy ? <span className="typing">AI กำลังอ่านชาร์ต… {secs} วินาที</span> : status?.text}
       </div>
       {!busy && aiReady && r?.fallbackReason && r.provider === "rules" && <div className="warnline">{r.fallbackReason}</div>}
       {bundle.promptError && <div className="badline">ไม่ส่ง AI: {bundle.promptError}</div>}
@@ -163,7 +164,15 @@ export function AiPanel({ bundle, busy, otherBusy, statusMsg, onAnalyze, onStop,
           {fresh.length ? (
             <div className="stagger">
               {fresh.map((s, i) => (
-                <Sug key={s.key} s={s} i={i} dec={state[s.key]} disabled={!bundle.canDecide || pendingKey != null} onToggle={toggle} />
+                <Sug
+                  key={s.key}
+                  s={s}
+                  i={i}
+                  dec={state[s.key]}
+                  flying={pendingKey === s.key && state[s.key] !== "accepted"}
+                  disabled={!bundle.canDecide || pendingKey != null}
+                  onToggle={toggle}
+                />
               ))}
             </div>
           ) : (
@@ -253,6 +262,7 @@ function Sug({
   s,
   i,
   dec,
+  flying = false,
   disabled,
   onToggle,
   onDelete,
@@ -260,8 +270,10 @@ function Sug({
   s: MergedItem;
   i: number;
   dec?: "accepted" | "rejected";
+  /** กำลังกดยอมรับ → รหัสนี้จะลอยไปลงตารางรหัสที่ยืนยัน */
+  flying?: boolean;
   disabled?: boolean;
-  onToggle?: (s: MergedItem, d: "accepted" | "rejected", e: MouseEvent<HTMLButtonElement>) => void;
+  onToggle?: (s: MergedItem, d: "accepted" | "rejected") => void;
   onDelete?: () => void;
 }) {
   const pct = Math.round(s.confidence * 100);
@@ -275,9 +287,12 @@ function Sug({
   if (!s.formatOk) check = <div className="badline">รูปแบบรหัสไม่ถูกต้อง</div>;
   else if (!s.inBook) check = <div className="warnline">ไม่อยู่ในตารางรหัสอ้างอิง (ICD-10-TM / ICD-9-CM) — ตรวจรหัสอีกครั้งก่อนยอมรับ</div>;
   return (
-    <div className={`sug spot ${dec ?? ""}`} style={nth(i)} onMouseMove={spotlight}>
+    <div className={`sug ${dec ?? ""}`} style={nth(i)}>
       <div className="sug-top">
-        <span className="code">{s.code}</span>
+        {/* รหัสที่กำลังกดยอมรับ มีชื่อ view-transition เดียวกับแถวในตารางรหัสที่ยืนยัน → รหัสลอยจากการ์ดไปลงตาราง */}
+        <span className="code" style={flying ? { viewTransitionName: codeVt(s.key) } : undefined}>
+          {s.code}
+        </span>
         <span className={`tag ${s.diagtype === 1 ? "pdx" : ""}`}>{tag}</span>
         {s.kind === "proc" && <span className={`orp ${orClass(s.procClass)}`}>{orLabel(s.procClass)}</span>}
         {src}
@@ -307,10 +322,10 @@ function Sug({
       ) : (
         onToggle && (
           <div className="dec">
-            <button type="button" className="yes" aria-pressed={dec === "accepted"} disabled={disabled} onClick={(e) => onToggle(s, "accepted", e)}>
+            <button type="button" className="yes" aria-pressed={dec === "accepted"} disabled={disabled} onClick={() => onToggle(s, "accepted")}>
               ✓ ยอมรับ
             </button>
-            <button type="button" className="no" aria-pressed={dec === "rejected"} disabled={disabled} onClick={(e) => onToggle(s, "rejected", e)}>
+            <button type="button" className="no" aria-pressed={dec === "rejected"} disabled={disabled} onClick={() => onToggle(s, "rejected")}>
               ✗ ไม่ยอมรับ
             </button>
           </div>
@@ -329,7 +344,7 @@ function RwBox({ b }: { b: WorkspaceBundle }) {
       <div className="rwl">
         <span>{label}</span>
         <b>
-          DRG {e.drg} · {e.adjrw != null ? "AdjRW" : "RW"} {n4(valOf(e))}
+          DRG {e.drg} · {e.adjrw != null ? "AdjRW" : "RW"} <Odometer text={n4(valOf(e))} />
           <small>
             {e.note} · ตรงกัน {e.share}% จาก {e.n} ราย ({e.level_th}){e.alts.length ? ` · อาจเป็น ${e.alts.join(", ")}` : ""}
           </small>
@@ -346,7 +361,7 @@ function RwBox({ b }: { b: WorkspaceBundle }) {
         <div className="rwl">
           <span>จริงใน HOSxP (Grouper)</span>
           <b>
-            DRG {a.drg} · AdjRW {n4(a.adjrw)}
+            DRG {a.drg} · AdjRW <Odometer text={n4(a.adjrw)} />
             <small>≈ {baht(a.adjrw ?? 0, rate)} บาท</small>
           </b>
         </div>
@@ -357,12 +372,12 @@ function RwBox({ b }: { b: WorkspaceBundle }) {
       {st.after && line("ถ้าลงรหัสที่ยอมรับ/เพิ่ม", st.after)}
       {st.delta != null ? (
         <div className="rwd fade-swap" key={st.delta}>
-          RW {st.delta >= 0 ? "เพิ่มขึ้น" : "เปลี่ยน"} {st.delta >= 0 ? "+" : ""}{n4(st.delta)} · ≈ {baht(st.delta, rate)} บาท
+          RW {st.delta >= 0 ? "เพิ่มขึ้น" : "เปลี่ยน"} <Odometer text={`${st.delta >= 0 ? "+" : ""}${n4(st.delta)}`} /> · ≈ {baht(st.delta, rate)} บาท
         </div>
       ) : (
         st.after && !st.before && (
           <div className="rwd fade-swap">
-            RW โดยประมาณหลังสรุป {n4(valOf(st.after))} · ≈ {baht(valOf(st.after) ?? 0, rate)} บาท
+            RW โดยประมาณหลังสรุป <Odometer text={n4(valOf(st.after))} /> · ≈ {baht(valOf(st.after) ?? 0, rate)} บาท
           </div>
         )
       )}

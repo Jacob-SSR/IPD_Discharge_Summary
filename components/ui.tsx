@@ -16,10 +16,10 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <section className={`rounded-2xl border border-mint-100 bg-white p-5 shadow-sm ${className}`}>
+    <section className={`rounded-md border border-mint-100 bg-white p-5 shadow-sm ${className}`}>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {Icon && <Icon size={16} className="text-mint-700" />}
-        <h2 className="text-sm font-semibold text-mint-800">{title}</h2>
+        <h2 className="text-[15px] font-semibold text-mint-800" style={{ fontFamily: "var(--serif)" }}>{title}</h2>
         {actions && <div className="ml-auto flex flex-wrap items-center gap-2">{actions}</div>}
       </div>
       {children}
@@ -47,7 +47,7 @@ export function KpiCard({
     rose: "bg-rose-50 text-rose-800",
   } as const;
   return (
-    <div className={`flex flex-col gap-1 rounded-2xl p-4 ${tones[tone]}`}>
+    <div className={`flex flex-col gap-1 rounded-md p-4 ${tones[tone]}`}>
       <div className="flex items-center gap-2 text-xs font-semibold">
         {Icon && <Icon size={15} />}
         {label}
@@ -84,13 +84,13 @@ const BTN = {
 
 export function buttonClass(variant: keyof typeof BTN = "secondary", size: "sm" | "md" = "md"): string {
   const sz = size === "sm" ? "px-2.5 py-1 text-xs" : "px-3.5 py-2 text-sm";
-  return `inline-flex items-center justify-center gap-1.5 rounded-xl font-medium transition-colors disabled:cursor-not-allowed ${sz} ${BTN[variant]}`;
+  return `inline-flex items-center justify-center gap-1.5 rounded font-medium transition-colors disabled:cursor-not-allowed ${sz} ${BTN[variant]}`;
 }
 
 /** ข้อความบังคับในทุกหน้าที่แสดงคำแนะนำจาก AI (กฎข้อ 6) */
 export function AiDisclaimer({ className = "", kind = "codes" }: { className?: string; kind?: "codes" | "course" }) {
   return (
-    <div className={`flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 ${className}`}>
+    <div className={`flex items-start gap-2 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 ${className}`}>
       <Info size={15} className="mt-0.5 shrink-0" />
       {kind === "codes" ? (
         <p>
@@ -116,7 +116,7 @@ export function Spinner({ label = "กำลังโหลด…" }: { label?: 
 }
 
 export function ErrorBox({ message }: { message: string }) {
-  return <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">{message}</div>;
+  return <div className="rounded border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">{message}</div>;
 }
 
 export function EmptyState({ children }: { children: ReactNode }) {
@@ -124,4 +124,4 @@ export function EmptyState({ children }: { children: ReactNode }) {
 }
 
 export const inputClass =
-  "rounded-xl border border-mint-200 bg-white px-3 py-2 text-sm outline-none focus:border-mint-500 focus:ring-2 focus:ring-mint-100";
+  "rounded border border-mint-200 bg-white px-3 py-2 text-sm outline-none focus:border-mint-500 focus:ring-2 focus:ring-mint-100";

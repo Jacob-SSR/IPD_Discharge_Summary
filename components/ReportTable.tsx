@@ -26,7 +26,7 @@ export function ReportTable<T>({
   if (!rows.length) return <EmptyState>{empty}</EmptyState>;
   const align = (a?: string) => (a === "right" ? "text-right" : a === "center" ? "text-center" : "text-left");
   return (
-    <div className="overflow-x-auto rounded-xl border border-mint-100">
+    <div className="overflow-x-auto rounded border border-mint-100">
       <table className="report-table w-full text-sm">
         <thead>
           <tr>
