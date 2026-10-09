@@ -3,7 +3,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BlurText, CountUp } from "@/components/motion";
+import { BlurText, CountUp, Odometer, viewTransition } from "@/components/motion";
 import { fetchJson } from "@/lib/client/fetchJson";
 import { addDays, todayIso } from "@/lib/date";
 import type { ListItem, Tally, WorkspaceBundle } from "@/lib/patients/bundle";
@@ -53,6 +53,7 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
   const [course, setCourseState] = useState<{ an: string; text: string; saved: string } | null>(null);
   const saveTimer = useRef<number | undefined>(undefined);
   const [palette, setPalette] = useState(false);
+  const [stampKey, setStampKey] = useState<string | null>(null);
 
   // รายชื่อ
   useEffect(() => {
@@ -94,9 +95,12 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
     fetchJson<WorkspaceBundle>(`/api/patients/${cur}`)
       .then((b) => {
         if (off) return;
-        setBundle(b);
-        setCourseState({ an: b.admission.an, text: b.course?.text ?? "", saved: b.course ? "บันทึกไว้แล้ว" : "" });
-        setBundleError(null);
+        // พลิกหน้ากระดาษไปผู้ป่วยรายใหม่ (View Transition — ไม่รองรับก็เปลี่ยนทันที)
+        viewTransition(() => {
+          setBundle(b);
+          setCourseState({ an: b.admission.an, text: b.course?.text ?? "", saved: b.course ? "บันทึกไว้แล้ว" : "" });
+          setBundleError(null);
+        });
       })
       .catch((e: Error) => !off && setBundleError(e.message));
     return () => {
@@ -121,10 +125,15 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
     }
   }
 
-  /** อัปเดตทั้งหน้าหลังตัดสินใจ/วิเคราะห์ (server ส่ง bundle ใหม่กลับมา) */
+  /** อัปเดตทั้งหน้าหลังตัดสินใจ/วิเคราะห์ (server ส่ง bundle ใหม่กลับมา)
+   *  stamp = key รหัสที่เพิ่งยืนยัน → รหัสลอยจากการ์ดไปลงตาราง แล้วประทับตรา */
   const applyBundle = useCallback(
-    (b: WorkspaceBundle) => {
-      setBundle((old) => (old && old.admission.an !== b.admission.an ? old : b));
+    (b: WorkspaceBundle, stamp: string | null = null) => {
+      viewTransition(() => {
+        setBundle((old) => (old && old.admission.an !== b.admission.an ? old : b));
+        setStampKey(stamp);
+      });
+      if (stamp) window.setTimeout(() => setStampKey((k) => (k === stamp ? null : k)), 1400);
       setList((l) =>
         l && {
           ...l,
@@ -184,7 +193,9 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
     }
   }
 
-  const shown = bundle && bundle.admission.an === cur ? bundle : null;
+  // แสดงแผ่นเดิมไว้ (จางลง) จนกว่าแผ่นของผู้ป่วยรายใหม่จะมาถึง แล้วค่อยพลิกหน้า
+  const shown = bundle;
+  const stale = !!bundle && bundle.admission.an !== cur;
   const ordered = useMemo(() => [...items.filter((i) => i.pending), ...items.filter((i) => !i.pending)], [items]);
 
   // คีย์ลัด: Ctrl/⌘+K = command palette, Alt+↑/↓ = ผู้ป่วยก่อนหน้า/ถัดไป
@@ -211,7 +222,7 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
       id: "analyze",
       label: shown && !shown.admission.diagnoses.some((d) => d.diagtype === "1") ? "ให้ AI ร่างรหัส" : "วิเคราะห์ด้วย AI",
       hint: shown?.ai.active === "gemini" ? (shown.ai.model ?? "") : "ยังไม่ได้ตั้งค่า AI",
-      disabled: !shown || shown.ai.active !== "gemini" || !shown.canDecide || !!busyAn,
+      disabled: !shown || stale || shown.ai.active !== "gemini" || !shown.canDecide || !!busyAn,
       run: () => void analyze(),
     },
     { id: "chart", label: "เปิดแท็บ ข้อมูลในชาร์ต", run: () => setView("chart") },
@@ -263,7 +274,7 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
       <header className="ws-top">
         <div>
           <h1>
-            <span className="grad-text">AI แนะนำรหัส</span> <BlurText text="· สรุปเวชระเบียนผู้ป่วยใน" />
+            <span className="em">AI แนะนำรหัส</span> <BlurText text="· สรุปเวชระเบียนผู้ป่วยใน" />
             {mode === "demo" && <span className="demo-tag">ข้อมูลสมมติ</span>}
           </h1>
           <p>
@@ -295,7 +306,7 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
           </div>
           <div>
             <b>
-              <CountUp value={tally?.rwGain ?? 0} format={(n) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}`} />
+              <Odometer text={`${(tally?.rwGain ?? 0) >= 0 ? "+" : ""}${(tally?.rwGain ?? 0).toFixed(2)}`} />
             </b>
             <span title="รายที่ลงรหัสแล้ว = RW ที่เพิ่ม · รายรอสรุป = RW ทั้งราย">RW จาก AI (ประมาณ)</span>
           </div>
@@ -314,21 +325,24 @@ export function Workspace({ mode }: { mode: "demo" | "hosxp" }) {
           onFilter={setFilter}
           options={options}
         />
-        <CenterPane
-          key={cur ?? "none"}
-          bundle={shown}
-          error={bundleError}
-          view={view}
-          onView={setView}
-          course={courseNow}
-          onCourse={setCourse}
-          scanning={!!shown && busyAn === shown.admission.an}
-        />
+        <div className="chart-stack">
+          <CenterPane
+            key={shown?.admission.an ?? "none"}
+            bundle={shown}
+            stale={stale}
+            error={bundleError}
+            view={view}
+            onView={setView}
+            course={courseNow}
+            onCourse={setCourse}
+            stampKey={stampKey}
+          />
+        </div>
         <AiPanel
-          key={`ai-${cur ?? "none"}`}
+          key={`ai-${shown?.admission.an ?? "none"}`}
           bundle={shown}
           busy={!!shown && busyAn === shown.admission.an}
-          otherBusy={!!busyAn && busyAn !== cur}
+          otherBusy={(!!busyAn && busyAn !== cur) || stale}
           statusMsg={aiStatusMsg && aiStatusMsg.an === cur ? aiStatusMsg : null}
           onAnalyze={analyze}
           onStop={() => ctl.current?.abort()}

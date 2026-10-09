@@ -41,28 +41,33 @@ codebook จริงจากโปรแกรมเดิม: ICD-10-TM 2009 
 
 ## ใช้งานจริงคู่กับ ppc-hos-10667 (เครื่องใน LAN)
 
-**ไม่ต้องตั้งฐานข้อมูลใหม่** — แอปต้องมีที่เขียนข้อมูลของตัวเอง (การยืนยันรหัส, audit log, Course ที่บันทึก)
-เพราะห้ามเขียน HOSxP แต่ใช้ฐาน `ppchos` เดิม (`DB_HOST2` ของ ppc-hos) ได้เลย:
-ตารางของแอปขึ้นต้นด้วย `ipdsum_` ไม่ชนของเดิม และ login ด้วยบัญชีใน `ppchos.users` ชุดเดียวกับ ppc-hos
+ข้อมูลของโปรแกรม (การยืนยันรหัส, ผล AI, สรุปการรักษา, audit log) เก็บใน**ตารางใหม่ 4 ตาราง `ipdsum_*` ในฐาน `ppchos`**
+(ไม่มีอยู่เดิมใน HOSxP — โปรแกรมเขียนเฉพาะตารางเหล่านี้ ไม่แตะตารางเดิมของ HOSxP) · Docker ใช้แค่ Redis
 
-0. **บัญชีเข้าระบบ:** ใช้ชื่อผู้ใช้/รหัสผ่านเดียวกับ ppc-hos (ตาราง `ppchos.users` แบบเดียวกับ rca) — ใส่ `APP_ALLOWED_ROLES=*` ถ้าให้ทุกบัญชีเข้าได้
-1. **HOSxP:** ให้ DBA สร้าง user อ่านอย่างเดียว [`docs/sql/create_readonly_user.sql`](docs/sql/create_readonly_user.sql)
-   (อย่าใช้ user ของ ppc-hos เพราะเขียนได้ — หน้า `/system` จะแจ้งเตือนถ้า user มีสิทธิ์เขียน)
-2. **ฐานแอป:** รัน [`docs/sql/appdb.sql`](docs/sql/appdb.sql) ในฐาน `ppchos` (หรือให้แอปสร้างเองถ้า user มีสิทธิ์ CREATE)
-3. **env:** `cp .env.example .env.production` แล้วกรอก — ค่าหลัก:
-   - `HOSXP_DB_HOST` / `HOSXP_DB_NAME` = `DB_HOST` / `DB_NAME` ของ ppc-hos, user = user อ่านอย่างเดียวจากข้อ 1
-   - `APP_DB_URL=mysql://<DB_USER>:<DB_PASS>@<DB_HOST2>:3306/ppchos`, `APP_USERS_TABLE=ppchos.users`
-   - `APP_ALLOWED_ROLES` (เข้าดูได้) / `APP_DECIDER_ROLES` (ยืนยันรหัสได้) ตาม role ใน `ppchos.users`
-   - `HOSPITAL_NAME` / `HOSPITAL_CODE` / `HOSPITAL_PROVINCE` (หัวแบบฟอร์ม)
-   - `JWT_SECRET` ใหม่ (ไม่ใช้ร่วมกับ ppc-hos — cookie ชื่อ `ipdsum_token` แยกกันอยู่แล้ว)
-4. **ตรวจโครงสร้าง HOSxP:** `npm run check-schema` (ต้องมี `.env.local` ค่าเดียวกัน) — พิมพ์เฉพาะชื่อตาราง/ฟิลด์
-   และบอกว่าคอลัมน์ที่ต่างกันตามเวอร์ชันถูกเลือกเป็นตัวไหน (แพทย์ผู้รับไว้, วันที่/แพทย์ผู้ทำหัตถการ, วันที่สั่งยา, lab ผู้ป่วยใน)
-5. **รัน:** `docker compose up -d --build` → `http://<เครื่องนี้>:3600` แล้วเปิด `/system` ตรวจว่าเขียวทุกช่อง
-6. **Gemini กับข้อมูลจริง:** เปิด billing แล้วตั้ง `GEMINI_PAID_TIER=true` (ไม่ตั้ง = ใช้ engine แบบกฎอัตโนมัติ)
-7. **ก่อนใช้จริง:** ให้ผู้ให้รหัสเทียบกับ HOSxP อย่างน้อย 10 ราย
+| ต่อกับ | ใช้ทำอะไร | user / สิทธิ์ |
+|---|---|---|
+| HOSxP (`HOSXP_DB_*`) | ข้อมูลผู้ป่วยใน | อ่านอย่างเดียว — [`create_readonly_user.sql`](docs/sql/create_readonly_user.sql) |
+| `ppchos.users` (`AUTH_DB_*`) | login ด้วยบัญชีเดียวกับ ppc-hos / rca | อ่านอย่างเดียว (user เดียวกับข้างบนได้) — ไม่อัปเกรดรหัสผ่านกลับ |
+| `ppchos.ipdsum_*` (`APP_DB_URL`) | ข้อมูลของโปรแกรม | เขียนได้เฉพาะ 4 ตารางนี้ — [`create_app_user.sql`](docs/sql/create_app_user.sql) |
+| Redis (`REDIS_URL`) | cache | Docker |
 
-ถ้าไม่ใช้ ppchos: ตั้ง `APP_DB_URL` เป็นฐานอื่น + `APP_USERS_TABLE=users` แล้วสร้างบัญชีด้วย
-`npm run create-user -- <username> DOCTOR "<ชื่อ>"`
+1. **DBA:**
+   - สร้างตาราง: `mysql -h <server> -u <admin> -p ppchos < docs/sql/appdb.sql`
+   - สร้าง user อ่านอย่างเดียว: [`docs/sql/create_readonly_user.sql`](docs/sql/create_readonly_user.sql) (อย่าใช้ user ของ ppc-hos เพราะเขียนได้ — หน้า `/system` จะขึ้นสีแดง)
+   - สร้าง user ของโปรแกรม: [`docs/sql/create_app_user.sql`](docs/sql/create_app_user.sql) (เขียนได้เฉพาะ `ipdsum_*`)
+2. **env:** `cp .env.example .env.local` (รันเอง) หรือ `.env.production` (Docker) แล้วกรอก — ค่าหลัก:
+   - `HOSXP_DB_*` = server / ฐาน `ppchos` + user อ่านอย่างเดียว
+   - `AUTH_DB_*` = server เดียวกัน, `AUTH_DB_NAME=ppchos`, user อ่านอย่างเดียว (แบบเดียวกับ rca)
+   - `APP_DB_URL=mysql://ipd_summary_app:<รหัส>@<server>:3306/ppchos`
+   - `APP_ALLOWED_ROLES` (เข้าดูได้, `*` = ทุกบัญชี) / `APP_DECIDER_ROLES` (ยืนยันรหัสได้) ตาม role ใน `ppchos.users`
+   - `HOSPITAL_NAME` / `HOSPITAL_CODE` / `HOSPITAL_PROVINCE` (หัวแบบฟอร์ม), `JWT_SECRET` ใหม่
+3. **ตรวจโครงสร้าง HOSxP:** `npm run check-schema` — พิมพ์เฉพาะชื่อตาราง/ฟิลด์ และบอกว่าคอลัมน์ที่ต่างกันตามเวอร์ชันถูกเลือกเป็นตัวไหน
+4. **รัน:**
+   - รันเอง: `docker compose -f docker-compose.redis.yml up -d` (Redis) + `REDIS_URL=redis://127.0.0.1:6379` ใน `.env.local` แล้ว `npm run build && npm start`
+   - หรือทั้งระบบใน Docker: `docker compose up -d --build` (app + redis) → `http://<เครื่องนี้>:3600`
+   - เปิด `/system` ตรวจว่าเขียวทุกช่อง
+5. **Gemini กับข้อมูลจริง:** เปิด billing แล้วตั้ง `GEMINI_PAID_TIER=true` (ไม่ตั้ง = แสดงเฉพาะผลจากกฎหลักฐาน)
+6. **ก่อนใช้จริง:** ให้ผู้ให้รหัสเทียบกับ HOSxP อย่างน้อย 10 ราย
 
 ## คำสั่ง
 

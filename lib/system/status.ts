@@ -4,6 +4,7 @@
 
 import { aiStatus } from "@/lib/ai";
 import { appDb } from "@/lib/appdb";
+import { userSource } from "@/lib/auth/users";
 import { getCodebook } from "@/lib/coding/codebook";
 import { ADJRW_FORMULA_VERIFIED } from "@/lib/drg/adjrw";
 import { getTdrgTables } from "@/lib/drg/tables";
@@ -74,10 +75,19 @@ export async function systemStatus(): Promise<StatusCheck[]> {
       key: "appdb",
       label: "ฐานข้อมูลแอป",
       state: db.kind === "file" ? "warn" : "ok",
-      detail: db.kind === "file" ? "ไฟล์ JSON (เฉพาะโหมด demo)" : "MySQL (APP_DB_URL)",
+      detail: db.kind === "file" ? "ไฟล์ JSON (เฉพาะโหมด demo)" : "MySQL (APP_DB_URL) — ตาราง ipdsum_* ของโปรแกรม",
     });
   } catch (e) {
     checks.push({ key: "appdb", label: "ฐานข้อมูลแอป", state: "error", detail: errText(e) });
+  }
+
+  // บัญชีผู้ใช้ (ppchos.users อ่านอย่างเดียว หรือ users ในฐานแอป)
+  const users = userSource();
+  try {
+    await users.ping();
+    checks.push({ key: "users", label: "บัญชีผู้ใช้ (login)", state: "ok", detail: users.label });
+  } catch (e) {
+    checks.push({ key: "users", label: "บัญชีผู้ใช้ (login)", state: "error", detail: `${users.label}: ${errText(e)}` });
   }
 
   // Redis

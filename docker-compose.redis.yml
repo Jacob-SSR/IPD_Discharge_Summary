@@ -1,0 +1,13 @@
+# Redis (cache) อย่างเดียว สำหรับรันโปรแกรมนอก Docker (npm run dev / npm start)
+#   docker compose -f docker-compose.redis.yml up -d
+#   แล้วใน .env.local: REDIS_URL=redis://127.0.0.1:6379
+# เปิด port เฉพาะเครื่องนี้ (127.0.0.1) · ถ้ารันทั้งระบบด้วย Docker ใช้ docker-compose.yml (app + redis) แทน
+name: ipd-discharge-redis
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ipd-discharge-redis-local
+    restart: unless-stopped
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    ports:
+      - "127.0.0.1:6379:6379"

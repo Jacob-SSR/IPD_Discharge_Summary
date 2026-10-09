@@ -42,18 +42,14 @@ export function AppShell({
   }
   return (
     <div className="min-h-screen">
-      <div className="bg-fx" aria-hidden>
-        <i />
-        <i />
-      </div>
-      <header className="no-print glass sticky top-0 z-20 border-x-0 border-t-0">
+      <header className="no-print shell-head">
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2">
           <Link href="/patients" className="group flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-[var(--accent-ink)] transition-transform group-hover:rotate-[-8deg] group-hover:scale-105">
+            <span className="brand-mark">
               <Activity size={18} />
             </span>
             <span className="leading-tight">
-              <span className="block text-sm font-semibold text-ink">IPD Discharge Summary</span>
+              <span className="block text-sm font-semibold text-ink" style={{ fontFamily: "var(--serif)" }}>IPD Discharge Summary</span>
               <span className="block text-[11px] text-muted">{hospital}</span>
             </span>
           </Link>
@@ -64,7 +60,7 @@ export function AppShell({
                 <Link
                   key={href}
                   href={href}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                  className={`flex items-center gap-1.5 rounded px-3 py-1.5 text-sm transition-colors ${
                     active ? "bg-accent-soft font-medium text-accent" : "text-muted hover:bg-surface-2 hover:text-ink"
                   }`}
                 >
@@ -76,11 +72,11 @@ export function AppShell({
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm">
             {mode === "demo" ? (
-              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900" title="ใช้ข้อมูลสมมติ ไม่ได้ต่อ HOSxP">
+              <span className="-rotate-2 rounded-[3px] border-[1.5px] border-current px-2 py-0.5 text-xs font-semibold text-amber-700" title="ใช้ข้อมูลสมมติ ไม่ได้ต่อ HOSxP">
                 โหมด DEMO · ข้อมูลสมมติ
               </span>
             ) : (
-              <span className="rounded-full bg-mint-100 px-2.5 py-0.5 text-xs font-semibold text-mint-800">HOSxP (อ่านอย่างเดียว)</span>
+              <span className="rounded-[3px] border-[1.5px] border-current px-2 py-0.5 text-xs font-semibold text-mint-700">HOSxP (อ่านอย่างเดียว)</span>
             )}
             <span className="text-slate-600">
               {user.name ?? user.username} <span className="text-xs text-slate-400">({user.role})</span>

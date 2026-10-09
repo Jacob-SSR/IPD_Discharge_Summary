@@ -64,7 +64,8 @@ function mapRun(r: Row): AiRun {
   };
 }
 
-export function createMysqlAppDb(url: string): AppDb {
+/** usersTable: false = login ด้วย ppchos.users (AUTH_DB_*) — ไม่สร้าง/ไม่เขียนตารางผู้ใช้ในฐานนี้ */
+export function createMysqlAppDb(url: string, opts: { usersTable: boolean } = { usersTable: true }): AppDb {
   const pool: Pool = mysql.createPool({
     uri: url,
     charset: "UTF8MB4_UNICODE_CI",
@@ -73,16 +74,19 @@ export function createMysqlAppDb(url: string): AppDb {
     dateStrings: true,
   });
 
-  const users = appUsersTable();
+  const users = opts.usersTable ? appUsersTable() : null;
+  const noUsers = () => {
+    throw new Error("login ด้วย ppchos.users (AUTH_DB_*) — ไม่มีตารางผู้ใช้ในฐานข้อมูลของแอป");
+  };
   let ready: Promise<void> | null = null;
   function ensure(): Promise<void> {
     if (!ready) {
       ready = (async () => {
-        for (const stmt of [usersTableSql(users), ...APPDB_SCHEMA]) {
+        for (const stmt of [...(users ? [usersTableSql(users)] : []), ...APPDB_SCHEMA]) {
           try {
             await pool.query(stmt);
           } catch (e) {
-            // user ไม่มีสิทธิ์ CREATE (เช่นในฐาน ppchos ที่ใช้ร่วมกัน) → ใช้ได้ถ้า DBA สร้างตารางไว้แล้ว
+            // user ไม่มีสิทธิ์ CREATE → ใช้ได้ถ้า DBA สร้างตารางไว้แล้วด้วย docs/sql/appdb.sql
             const table = /CREATE TABLE IF NOT EXISTS (\S+)/.exec(stmt)?.[1] ?? "?";
             try {
               await pool.query(`SELECT 1 FROM ${table} LIMIT 0`);
@@ -120,6 +124,7 @@ export function createMysqlAppDb(url: string): AppDb {
     },
 
     async findUser(username) {
+      if (!users) return noUsers();
       const rows = await q(`SELECT \`user\`, passweb, name, role FROM ${users} WHERE \`user\` = ? LIMIT 1`, [username]);
       if (!rows.length) return null;
       const r = rows[0];
@@ -131,6 +136,7 @@ export function createMysqlAppDb(url: string): AppDb {
       } satisfies UserRecord;
     },
     async upsertUser(u) {
+      if (!users) return noUsers();
       await exec(
         `INSERT INTO ${users} (\`user\`, passweb, name, role) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE passweb = VALUES(passweb), name = VALUES(name), role = VALUES(role)`,
         [u.user, u.passweb, u.name, u.role],
@@ -138,6 +144,7 @@ export function createMysqlAppDb(url: string): AppDb {
     },
 
     async updatePassword(username, passweb) {
+      if (!users) return noUsers();
       await exec(`UPDATE ${users} SET passweb = ? WHERE \`user\` = ?`, [passweb, username]);
     },
 

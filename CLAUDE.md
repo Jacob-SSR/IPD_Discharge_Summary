@@ -30,7 +30,7 @@
 - รูปแบบสามไฟล์: `types.ts` / `queries.ts` / `route.ts` + `page.tsx`
 - HOSxP: `mysql2/promise` pool แยกสำหรับ HOSxP (อ่านอย่างเดียว) ตั้งค่า charset ได้ (`tis620` / แก้ latin1) ผ่าน env
 - cache: `cachedQuery([keyParts], fn, ttl)` + `invalidate(prefix)` จาก `@/lib/cache` (Redis)
-- ธีมเขียว/มินต์, ฟอนต์ Prompt/Sarabun, ใช้ component กลางแบบ KpiCard, SectionCard, ReportTable ถ้ามี
+- ธีม: **"กระดาษดิจิทัล"** ตาม `.impeccable.md` (ผู้ใช้เลือก 9 ต.ค. 2569 — สว่างเป็นหลัก, ฟอนต์ Taviraj/Anuphan/JetBrains Mono, แม่นยำ·เยือกเย็น·น่าเชื่อถือ) ใช้ component กลางแบบ KpiCard, SectionCard, ReportTable
 - วันที่: แสดงเป็น พ.ศ. (ปี + 543), ปีงบประมาณเริ่ม 1 ต.ค.
 - env ใช้ `process.env.X!` ไม่มีค่า fallback ที่ hardcode
 - deploy: Docker แบบ multi-stage + Docker Compose บน server ใน LAN
@@ -148,5 +148,7 @@ codebook ICD-10-TM/ICD-9-CM (OR/Non-OR) และข้อมูลสมมต�
 - SQL (`lib/hosxp/queries.ts`) ปรับตาม ppc-hos-10667 / rca แล้ว (ipt.dch_doctor, ipt.vn → opdscreen/ovstdiag, an_stat.aid/pttype, DRG/RW/AdjRW จาก ipt ก่อนแล้วค่อย an_stat,
   รหัสไม่มีจุด/มี extension) คอลัมน์ที่ต่างตามเวอร์ชันเลือกอัตโนมัติ (`lib/hosxp/columns.ts`) ทดสอบกับฐานจำลอง 3 รุ่น ยังไม่เคยต่อ HOSxP จริง
 
-ฐานข้อมูลแอป: ใช้ฐาน `ppchos` เดิมของ ppc-hos (ตาราง `ipdsum_*`, `docs/sql/appdb.sql`) และ login ด้วย `ppchos.users`
-(ชื่อผู้ใช้/รหัสผ่านเดียวกับ ppc-hos และ rca) สิทธิ์ตาม role: `APP_ALLOWED_ROLES` (เข้าดู, `*` = ทุกบัญชี) / `APP_DECIDER_ROLES` (ยืนยันรหัส)
+ฐานข้อมูลแอป: **ผู้ใช้ตัดสินใจ (9 ต.ค. 2569) ให้เก็บตารางใหม่ `ipdsum_*` ในฐาน `ppchos` (ฐาน HOSxP ของ รพ.) และใช้ Docker แค่ Redis**
+— ตาราง `ipdsum_*` ไม่มีอยู่เดิมใน HOSxP โปรแกรมเขียนเฉพาะตารางเหล่านี้ (`docs/sql/appdb.sql`, user `docs/sql/create_app_user.sql` เขียนได้เฉพาะ `ipdsum_*`)
+login ด้วย `ppchos.users` แบบอ่านอย่างเดียว (`AUTH_DB_*` แบบ rca — ไม่อัปเกรดรหัสผ่านกลับ, `lib/auth/users.ts`)
+สิทธิ์ตาม role: `APP_ALLOWED_ROLES` (เข้าดู, `*` = ทุกบัญชี) / `APP_DECIDER_ROLES` (ยืนยันรหัส)

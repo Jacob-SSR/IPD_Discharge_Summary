@@ -1,9 +1,9 @@
 // lib/appdb/schema.ts
 // ตารางของฐานข้อมูลแอป (MySQL/MariaDB) — แยกจาก HOSxP โดยสิ้นเชิง
-// ออกแบบให้วางในฐาน ppchos เดิม (DB_HOST2 ของ ppc-hos-10667) ได้เลย ไม่ต้องตั้งฐานใหม่:
-//   ตารางของแอปขึ้นต้นด้วย ipdsum_ ทั้งหมด จึงไม่ชนกับตารางเดิม
-//   บัญชีผู้ใช้อ่านจาก APP_USERS_TABLE (เช่น ppchos.users — มีอยู่แล้ว CREATE IF NOT EXISTS จะไม่แตะ)
-// สร้างให้อัตโนมัติครั้งแรกที่ใช้ หรือให้ DBA รัน docs/sql/appdb.sql เองก็ได้ (ต้องตรงกับไฟล์นี้ — มี test ตรวจ)
+// อยู่ในฐาน ppchos (ผู้ใช้ตัดสินใจ) — เป็นตารางใหม่ของโปรแกรม ขึ้นต้นด้วย ipdsum_ ทั้งหมด ไม่มีอยู่เดิมใน HOSxP
+//   โปรแกรมเขียนเฉพาะตารางเหล่านี้ ไม่แตะตารางเดิมของ HOSxP
+//   บัญชีผู้ใช้อ่านจาก ppchos.users แบบอ่านอย่างเดียว (AUTH_DB_*) หรือ APP_USERS_TABLE ถ้าไม่ได้ตั้ง AUTH_DB_*
+// สร้างให้อัตโนมัติครั้งแรกที่ใช้ (CREATE TABLE IF NOT EXISTS) หรือให้ DBA รัน docs/sql/appdb.sql (ต้องตรงกับไฟล์นี้ — มี test ตรวจ)
 
 export const T = {
   decisions: "ipdsum_code_decisions",

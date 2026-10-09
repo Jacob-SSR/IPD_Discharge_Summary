@@ -1,7 +1,7 @@
 -- docs/sql/appdb.sql — ตารางของแอป IPD Discharge Summary (สร้างจาก lib/appdb/schema.ts ห้ามแก้มือ)
--- รันในฐาน ppchos เดิม (DB_HOST2 ของ ppc-hos-10667) ได้เลย: ตารางของแอปขึ้นต้นด้วย ipdsum_
--- ตาราง users: ถ้าใช้ ppchos.users ที่มีอยู่แล้ว คำสั่งแรกจะไม่ทำอะไร
--- ใช้งาน: mysql -h <DB_HOST2> -u <user> -p ppchos < docs/sql/appdb.sql
+-- ตารางใหม่ของโปรแกรม (ipdsum_*) ไม่มีอยู่เดิมใน HOSxP — วางในฐาน ppchos
+-- ตาราง users: ppchos.users มีอยู่แล้ว คำสั่งแรกจะไม่ทำอะไร
+-- ใช้งาน (ถ้า user ของโปรแกรมไม่มีสิทธิ์ CREATE): mysql -h <server> -u <admin> -p ppchos < docs/sql/appdb.sql
 
 CREATE TABLE IF NOT EXISTS users (
   `user`  VARCHAR(50)  NOT NULL PRIMARY KEY,

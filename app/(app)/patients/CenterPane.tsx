@@ -6,6 +6,7 @@ import { FileSpreadsheet, Printer } from "lucide-react";
 import { acceptedItems } from "@/lib/ai/merge";
 import type { MergedItem } from "@/lib/ai/types";
 import { finalCodes } from "@/lib/coding/final";
+import { codeVt } from "@/components/motion";
 import { valOf } from "@/lib/drg/estimate";
 import type { WorkspaceBundle } from "@/lib/patients/bundle";
 import { baht, DT_TH, n4, orClass, orLabel, sexTh, thd } from "./shared";
@@ -19,16 +20,19 @@ export function CenterPane({
   onView,
   course,
   onCourse,
-  scanning = false,
+  stale = false,
+  stampKey = null,
 }: {
   bundle: WorkspaceBundle | null;
+  /** แผ่นของผู้ป่วยรายก่อน ระหว่างรอรายใหม่ */
+  stale?: boolean;
+  /** รหัสที่เพิ่งยืนยัน → ประทับตราในตาราง */
+  stampKey?: string | null;
   error: string | null;
   view: "chart" | "form";
   onView: (v: "chart" | "form") => void;
   course: Course;
   onCourse: (text: string) => void;
-  /** AI กำลังอ่านชาร์ตรายนี้ (เส้นสแกน) */
-  scanning?: boolean;
 }) {
   const tabs = useRef<HTMLDivElement>(null);
   const [ink, setInk] = useState<{ left: number; width: number } | null>(null);
@@ -53,7 +57,8 @@ export function CenterPane({
   const acc = acceptedItems(bundle.items, new Map(Object.entries(bundle.state)));
 
   return (
-    <main className={`pane chart ${scanning ? "scanning" : ""}`} aria-live="polite" aria-busy={scanning}>
+    <main className="pane chart" aria-live="polite" aria-busy={stale} style={{ opacity: stale ? 0.55 : 1, transition: "opacity .2s" }}>
+      {stale && error && <p className="banner">{error}</p>}
       <div className="vtabs" role="tablist" ref={tabs}>
         <button type="button" role="tab" data-v="chart" aria-selected={view === "chart"} onClick={() => onView("chart")}>
           ข้อมูลในชาร์ต
@@ -73,8 +78,13 @@ export function CenterPane({
           </span>
         )}
       </div>
-      <div key={view} className="fade-swap">
-        {view === "form" ? <FormSheet b={bundle} acc={acc} note={course?.text ?? ""} /> : <ChartView b={bundle} acc={acc} course={course} onCourse={onCourse} />}
+      {/* แบบฟอร์ม "พิมพ์ออกมา" จากช่องเครื่องพิมพ์ใต้แท็บ · ชาร์ตค่อยๆ ปรากฏ */}
+      <div key={view} className={view === "form" ? "print-out" : "page-in"}>
+        {view === "form" ? (
+          <FormSheet b={bundle} acc={acc} note={course?.text ?? ""} />
+        ) : (
+          <ChartView b={bundle} acc={acc} course={course} onCourse={onCourse} stampKey={stampKey} />
+        )}
       </div>
     </main>
   );
@@ -143,7 +153,19 @@ function Meds({ b }: { b: WorkspaceBundle }) {
   );
 }
 
-function ChartView({ b, acc, course, onCourse }: { b: WorkspaceBundle; acc: MergedItem[]; course: Course; onCourse: (t: string) => void }) {
+function ChartView({
+  b,
+  acc,
+  course,
+  onCourse,
+  stampKey,
+}: {
+  b: WorkspaceBundle;
+  acc: MergedItem[];
+  course: Course;
+  onCourse: (t: string) => void;
+  stampKey: string | null;
+}) {
   const a = b.admission;
   const pending = !a.diagnoses.some((d) => d.diagtype === "1");
   const admitted = a.dischargeDate == null;
@@ -220,14 +242,20 @@ function ChartView({ b, acc, course, onCourse }: { b: WorkspaceBundle; acc: Merg
               <table>
                 <tbody className="stagger">
                   {acc.map((s, i) => (
-                    <tr key={s.key} className="acc" style={{ ["--i" as string]: i }}>
+                    <tr key={s.key} className={`acc ${s.key === stampKey ? "stamped" : ""}`} style={{ ["--i" as string]: i }}>
                       <td>
                         {s.kind === "dx" ? DT_TH[s.diagtype ?? 0] : (
                           <>หัตถการ <span className={`orp ${orClass(s.procClass)}`}>{orLabel(s.procClass)}</span>{s.procDate ? ` ${thd(s.procDate)}` : ""}</>
                         )}
                       </td>
-                      <td className="code">{s.code}</td>
-                      <td>{s.name}</td>
+                      <td className="code">
+                        {/* รหัสที่เพิ่งยืนยัน: ชื่อเดียวกับรหัสบนการ์ด → รหัสลอยจากการ์ดมาลงแถวนี้ (View Transition) */}
+                        <span style={s.key === stampKey ? { viewTransitionName: codeVt(s.key), display: "inline-block" } : undefined}>{s.code}</span>
+                      </td>
+                      <td>
+                        {s.name}
+                        <span className="stamp-mark">{s.source === "manual" ? "แพทย์เพิ่ม" : "ยืนยันแล้ว"}</span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
